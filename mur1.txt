@@ -1,0 +1,763 @@
+print("PhantomXPro - No Lag Edition")
+
+-- تحميل WindUI
+local success, result = pcall(function()
+    local source = game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua", true)
+    if source then
+        local loaded = loadstring(source)
+        if loaded then
+            return loaded()
+        end
+    end
+    return nil
+end)
+
+if success and result then
+    local WindUI = result
+    local Players = game:GetService("Players")
+    local Workspace = game:GetService("Workspace")
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local player = Players.LocalPlayer
+
+    -- اختيار اللغة
+    local languageChoice = nil
+    WindUI:Popup({
+        Title = "PhantomXPro - اختر اللغة",
+        Icon = "globe",
+        Content = "الرجاء اختيار لغة السكربت",
+        Buttons = {
+            {
+                Title = "العربية",
+                Icon = "flag",
+                Variant = "Primary",
+                Callback = function()
+                    languageChoice = "Arabic"
+                end
+            },
+            {
+                Title = "English",
+                Icon = "flag",
+                Variant = "Primary",
+                Callback = function()
+                    languageChoice = "English"
+                end
+            }
+        }
+    })
+
+    repeat task.wait() until languageChoice ~= nil
+
+    local texts = {
+        Arabic = {
+            mainTab = "الرئيسية",
+            espOn = "🔴 تشغيل ESP",
+            espOff = "🟢 إيقاف ESP",
+            hitboxOn = "🔴 تشغيل Hitbox",
+            hitboxOff = "🟢 إيقاف Hitbox",
+            flightButton = "🛫 الطيران",
+            flightActive = "🟢 الطيران مفعل",
+            targetSelect = "🎯 اختر عدو",
+            killButton = "💀 قتل",
+            refreshButton = "🔄 تحديث الأعداء",
+            discordButton = "💬 Discord",
+            closeButton = "⏹️ إغلاق",
+            
+            settingsTab = "الإعدادات",
+            themeDropdown = "اختر السمة",
+            themeValues = {"داكن 🌙", "فاتح ☀️", "أزرق 🔵", "أخضر 💚", "أحمر 🔴"},
+            updateButton = "تحديث السكربت",
+            
+            developerTab = "المطور",
+            developerName = "Cypher",
+            developerDesc = "مطور سكربتات روبلوكس",
+            versionButton = "الإصدار 2.1.0",
+            contactButton = "تواصل مع المطور",
+            
+            -- إشعارات
+            espActivated = "✅ ESP مفعّل",
+            espDeactivated = "❌ ESP موقّف",
+            hitboxActivated = "✅ Hitbox مفعّل",
+            hitboxDeactivated = "❌ Hitbox موقّف",
+            flightActivated = "✅ الطيران مفعّل",
+            noEnemies = "⚠️ لا يوجد أعداء",
+            killedAll = "✅ تم قتل جميع الأعداء",
+            killedTarget = "✅ تم قتل الهدف",
+            discordCopied = "✅ تم نسخ رابط الديسكورد",
+            scriptLoaded = "🎮 PhantomXPro جاهز!",
+            scriptClosed = "👋 تم إغلاق السكربت",
+            enemiesRefreshed = "🔄 تم تحديث الأعداء"
+        },
+        English = {
+            mainTab = "Main",
+            espOn = "🔴 ESP ON",
+            espOff = "🟢 ESP OFF",
+            hitboxOn = "🔴 Hitbox ON",
+            hitboxOff = "🟢 Hitbox OFF",
+            flightButton = "🛫 Flight",
+            flightActive = "🟢 Flight Active",
+            targetSelect = "🎯 Select Enemy",
+            killButton = "💀 Kill",
+            refreshButton = "🔄 Refresh Enemies",
+            discordButton = "💬 Discord",
+            closeButton = "⏹️ Close",
+            
+            settingsTab = "Settings",
+            themeDropdown = "Select Theme",
+            themeValues = {"Dark 🌙", "Light ☀️", "Blue 🔵", "Green 💚", "Red 🔴"},
+            updateButton = "Update Script",
+            
+            developerTab = "Developer",
+            developerName = "Cypher",
+            developerDesc = "Roblox Script Developer",
+            versionButton = "Version 2.1.0",
+            contactButton = "Contact Developer",
+            
+            -- Notifications
+            espActivated = "✅ ESP Activated",
+            espDeactivated = "❌ ESP Deactivated",
+            hitboxActivated = "✅ Hitbox Activated",
+            hitboxDeactivated = "❌ Hitbox Deactivated",
+            flightActivated = "✅ Flight Activated",
+            noEnemies = "⚠️ No enemies found",
+            killedAll = "✅ Killed all enemies",
+            killedTarget = "✅ Killed target",
+            discordCopied = "✅ Discord link copied",
+            scriptLoaded = "🎮 PhantomXPro Ready!",
+            scriptClosed = "👋 Script closed",
+            enemiesRefreshed = "🔄 Enemies refreshed"
+        }
+    }
+
+    local t = texts[languageChoice]
+
+    WindUI.TransparencyValue = 0.2
+    WindUI:SetTheme("Dark")
+
+    -- إنشاء النافذة
+    local Window = WindUI:CreateWindow({
+        Title = "PhantomXPro",
+        Icon = "shield",
+        Author = "By Cypher",
+        Folder = "PhantomXPro",
+        Size = UDim2.fromOffset(550, 420),
+        Theme = "Dark",
+        SideBarWidth = 180
+    })
+
+    -- الأقسام
+    local MainSection = Window:Section({ Title = "PhantomXPro", Opened = true })
+    local SettingsSection = Window:Section({ Title = t.settingsTab })
+    local DeveloperSection = Window:Section({ Title = t.developerTab })
+
+    -- التبويبات
+    local Tabs = {
+        Main = MainSection:Tab({ Title = t.mainTab, Icon = "home" }),
+        Settings = SettingsSection:Tab({ Title = t.settingsTab, Icon = "settings" }),
+        Developer = DeveloperSection:Tab({ Title = t.developerTab, Icon = "user" })
+    }
+
+    -- =============================================
+    -- نظام الكشف عن الأعداء (بدون لاق)
+    -- =============================================
+    local function getPlayerTeam(targetPlayer)
+        -- جرب عدة طرق لاكتشاف الفريق
+        local methods = {
+            function() -- Method 1: من Attributes
+                local success, attrs = pcall(function()
+                    return targetPlayer:GetAttributes()
+                end)
+                if success then
+                    for attrName, attrValue in pairs(attrs) do
+                        if tostring(attrName):lower():find("team") then
+                            return tostring(attrValue)
+                        end
+                    end
+                end
+                return nil
+            end,
+            
+            function() -- Method 2: من Team Service
+                if targetPlayer.Team then
+                    return targetPlayer.Team.Name
+                end
+                return nil
+            end,
+            
+            function() -- Method 3: من Workspace
+                if Workspace:FindFirstChild("Teams") then
+                    for _, team in pairs(Workspace.Teams:GetChildren()) do
+                        if team:FindFirstChild("Players") then
+                            for _, p in pairs(team.Players:GetChildren()) do
+                                if p.Value == targetPlayer then
+                                    return team.Name
+                                end
+                            end
+                        end
+                    end
+                end
+                return nil
+            end
+        }
+        
+        for _, method in ipairs(methods) do
+            local team = method()
+            if team then
+                return team
+            end
+        end
+        
+        return "Unknown"
+    end
+
+    local function getAllEnemies()
+        local enemies = {}
+        local myTeam = getPlayerTeam(player)
+        
+        for _, otherPlayer in pairs(Players:GetPlayers()) do
+            if otherPlayer ~= player then
+                local otherTeam = getPlayerTeam(otherPlayer)
+                
+                -- إذا الفريق مختلف = عدو
+                if otherTeam ~= myTeam then
+                    table.insert(enemies, otherPlayer)
+                end
+            end
+        end
+        
+        return enemies
+    end
+
+    -- =============================================
+    -- نظام ESP (بدون لاق - مرة واحدة)
+    -- =============================================
+    local espEnabled = false
+    local espObjects = {}
+    local espConnections = {}
+
+    local function cleanESP()
+        -- تنظيف الكائنات
+        for _, obj in pairs(espObjects) do
+            if obj and obj.Parent then
+                obj:Destroy()
+            end
+        end
+        espObjects = {}
+        
+        -- قطع الـ Connections
+        for _, conn in pairs(espConnections) do
+            if conn then
+                conn:Disconnect()
+            end
+        end
+        espConnections = {}
+    end
+
+    local function createESPForEnemy(enemyPlayer)
+        if not enemyPlayer or enemyPlayer == player then return end
+        
+        local function createESP(char)
+            if not char then return end
+            
+            -- حذف القديم أولاً
+            for i = #espObjects, 1, -1 do
+                local obj = espObjects[i]
+                if obj and obj.Name:find(enemyPlayer.Name) then
+                    obj:Destroy()
+                    table.remove(espObjects, i)
+                end
+            end
+            
+            local hrp = char:FindFirstChild("HumanoidRootPart")
+            if not hrp then return end
+            
+            -- Highlight
+            local highlight = Instance.new("Highlight")
+            highlight.Name = enemyPlayer.Name .. "_ESP"
+            highlight.Adornee = char
+            highlight.FillColor = Color3.fromRGB(255, 50, 50)
+            highlight.FillTransparency = 0.3
+            highlight.OutlineColor = Color3.fromRGB(255, 0, 0)
+            highlight.OutlineTransparency = 0
+            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+            highlight.Parent = Workspace
+            
+            -- Name Tag
+            local billboard = Instance.new("BillboardGui")
+            billboard.Name = enemyPlayer.Name .. "_Name"
+            billboard.Size = UDim2.new(0, 120, 0, 30)
+            billboard.StudsOffset = Vector3.new(0, 3.5, 0)
+            billboard.AlwaysOnTop = true
+            billboard.Adornee = hrp
+            billboard.Parent = Workspace
+            
+            local label = Instance.new("TextLabel")
+            label.Size = UDim2.new(1, 0, 1, 0)
+            label.BackgroundTransparency = 1
+            label.Text = enemyPlayer.Name
+            label.TextColor3 = Color3.fromRGB(255, 100, 100)
+            label.TextSize = 14
+            label.Font = Enum.Font.GothamBold
+            label.TextStrokeTransparency = 0.3
+            label.Parent = billboard
+            
+            -- تخزين
+            table.insert(espObjects, highlight)
+            table.insert(espObjects, billboard)
+        end
+        
+        -- ESP للكاراكتر الحالي
+        if enemyPlayer.Character then
+            createESP(enemyPlayer.Character)
+        end
+        
+        -- Connect للكاراكتر الجديد
+        local conn = enemyPlayer.CharacterAdded:Connect(function(char)
+            task.wait(0.5)
+            createESP(char)
+        end)
+        table.insert(espConnections, conn)
+        
+        -- إذا خرج اللاعب
+        local conn2 = enemyPlayer.CharacterRemoving:Connect(function()
+            for i = #espObjects, 1, -1 do
+                local obj = espObjects[i]
+                if obj and obj.Name:find(enemyPlayer.Name) then
+                    obj:Destroy()
+                    table.remove(espObjects, i)
+                end
+            end
+        end)
+        table.insert(espConnections, conn2)
+    end
+
+    local function activateESP()
+        cleanESP()
+        
+        local enemies = getAllEnemies()
+        
+        for _, enemy in pairs(enemies) do
+            createESPForEnemy(enemy)
+        end
+        
+        espEnabled = true
+        return #enemies
+    end
+
+    local function deactivateESP()
+        cleanESP()
+        espEnabled = false
+    end
+
+    -- =============================================
+    -- نظام Hitbox (بدون لاق - مرة واحدة)
+    -- =============================================
+    local hitboxEnabled = false
+    local hitboxObjects = {}
+
+    local function resetHitbox(char)
+        if char then
+            local hrp = char:FindFirstChild("HumanoidRootPart")
+            if hrp and hrp:IsA("BasePart") then
+                hrp.Size = Vector3.new(2, 1, 1)
+                hrp.Transparency = 0
+                hrp.CanCollide = true
+                hrp.Color = Color3.fromRGB(255, 255, 255)
+                hrp.Material = Enum.Material.Plastic
+            end
+        end
+    end
+
+    local function applyHitbox(char)
+        if not char then return end
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        
+        hrp.CanCollide = false
+        hrp.Size = Vector3.new(25, 25, 25)
+        hrp.Transparency = 0.7
+        hrp.Color = Color3.fromRGB(255, 100, 100)
+        hrp.Material = Enum.Material.Neon
+    end
+
+    local function activateHitbox()
+        -- تنظيف القديم
+        for _, data in pairs(hitboxObjects) do
+            if data.hrp and data.hrp.Parent then
+                resetHitbox(data.hrp.Parent)
+            end
+        end
+        hitboxObjects = {}
+        
+        local enemies = getAllEnemies()
+        
+        for _, enemy in pairs(enemies) do
+            if enemy.Character then
+                applyHitbox(enemy.Character)
+                table.insert(hitboxObjects, {player = enemy, hrp = enemy.Character.HumanoidRootPart})
+            end
+        end
+        
+        hitboxEnabled = true
+        return #enemies
+    end
+
+    local function deactivateHitbox()
+        for _, data in pairs(hitboxObjects) do
+            if data.hrp and data.hrp.Parent then
+                resetHitbox(data.hrp.Parent)
+            end
+        end
+        hitboxObjects = {}
+        hitboxEnabled = false
+    end
+
+    -- =============================================
+    -- نظام Flight (مرة واحدة)
+    -- =============================================
+    local flightLoaded = false
+
+    local function activateFlight()
+        if not flightLoaded then
+            loadstring(game:HttpGet("https://pastebin.com/raw/5WLxDDvL"))()
+            flightLoaded = true
+        end
+    end
+
+    -- =============================================
+    -- نظام القتل
+    -- =============================================
+    local selectedTarget = "All Enemies"
+    local enemyList = {"All Enemies"}
+
+    local function killTarget()
+        if selectedTarget == "All Enemies" then
+            local enemies = getAllEnemies()
+            
+            if #enemies == 0 then
+                WindUI:Notify({
+                    Title = "Kill",
+                    Content = t.noEnemies,
+                    Duration = 2
+                })
+                return
+            end
+            
+            for _, enemy in pairs(enemies) do
+                pcall(function()
+                    ReplicatedStorage.KnifeKill:FireServer(enemy, enemy)
+                end)
+                task.wait(0.3)
+            end
+            
+            WindUI:Notify({
+                Title = "Kill",
+                Content = t.killedAll .. " (" .. #enemies .. ")",
+                Duration = 3
+            })
+        else
+            local target = Players:FindFirstChild(selectedTarget)
+            if target then
+                pcall(function()
+                    ReplicatedStorage.KnifeKill:FireServer(target, target)
+                end)
+                WindUI:Notify({
+                    Title = "Kill",
+                    Content = t.killedTarget .. ": " .. target.Name,
+                    Duration = 3
+                })
+            end
+        end
+    end
+
+    -- =============================================
+    -- تحديث قائمة الأعداء
+    -- =============================================
+    local function refreshEnemyList()
+        local enemies = getAllEnemies()
+        local newList = {"All Enemies"}
+        
+        for _, enemy in pairs(enemies) do
+            table.insert(newList, enemy.Name)
+        end
+        
+        enemyList = newList
+        
+        -- تحديث Dropdown
+        local dropdown = Tabs.Main:Get("enemyDropdown")
+        if dropdown then
+            dropdown:Set({Values = enemyList})
+        end
+        
+        return #enemies
+    end
+
+    -- =============================================
+    -- تبويب الرئيسية
+    -- =============================================
+    
+    -- زر ESP
+    local espButton = Tabs.Main:Button({
+        Title = t.espOn,
+        Icon = "eye",
+        Size = "large",
+        Callback = function()
+            if espEnabled then
+                deactivateESP()
+                espButton:Set({Title = t.espOn})
+                WindUI:Notify({
+                    Title = "ESP",
+                    Content = t.espDeactivated,
+                    Duration = 2
+                })
+            else
+                local count = activateESP()
+                espButton:Set({Title = t.espOff .. " (" .. count .. ")"})
+                WindUI:Notify({
+                    Title = "ESP",
+                    Content = t.espActivated .. " (" .. count .. ")",
+                    Duration = 3
+                })
+            end
+        end
+    })
+
+    -- زر Hitbox
+    local hitboxButton = Tabs.Main:Button({
+        Title = t.hitboxOn,
+        Icon = "target",
+        Size = "large",
+        Callback = function()
+            if hitboxEnabled then
+                deactivateHitbox()
+                hitboxButton:Set({Title = t.hitboxOn})
+                WindUI:Notify({
+                    Title = "Hitbox",
+                    Content = t.hitboxDeactivated,
+                    Duration = 2
+                })
+            else
+                local count = activateHitbox()
+                hitboxButton:Set({Title = t.hitboxOff .. " (" .. count .. ")"})
+                WindUI:Notify({
+                    Title = "Hitbox",
+                    Content = t.hitboxActivated .. " (" .. count .. ")",
+                    Duration = 3
+                })
+            end
+        end
+    })
+
+    -- زر Flight
+    local flightButton = Tabs.Main:Button({
+        Title = t.flightButton,
+        Icon = "wind",
+        Size = "large",
+        Callback = function()
+            activateFlight()
+            flightButton:Set({Title = t.flightActive})
+            WindUI:Notify({
+                Title = "Flight",
+                Content = t.flightActivated,
+                Duration = 3
+            })
+        end
+    })
+
+    -- Dropdown اختيار العدو
+    Tabs.Main:Dropdown({
+        Title = t.targetSelect,
+        Icon = "users",
+        Size = "large",
+        Values = enemyList,
+        Callback = function(value)
+            selectedTarget = value
+        end
+    })
+
+    -- زر القتل
+    Tabs.Main:Button({
+        Title = t.killButton,
+        Icon = "skull",
+        Size = "large",
+        Variant = "Destructive",
+        Callback = function()
+            killTarget()
+        end
+    })
+
+    -- زر تحديث الأعداء
+    Tabs.Main:Button({
+        Title = t.refreshButton,
+        Icon = "refresh-cw",
+        Size = "large",
+        Callback = function()
+            local count = refreshEnemyList()
+            WindUI:Notify({
+                Title = "Refresh",
+                Content = t.enemiesRefreshed .. " (" .. count .. ")",
+                Duration = 3
+            })
+        end
+    })
+
+    -- =============================================
+    -- تبويب الإعدادات
+    -- =============================================
+    do
+        Tabs.Settings:Dropdown({
+            Title = t.themeDropdown,
+            Values = t.themeValues,
+            Value = t.themeValues[1],
+            Size = "large",
+            Callback = function(value)
+                local themeMap = {
+                    [t.themeValues[1]] = "Dark",
+                    [t.themeValues[2]] = "Light", 
+                    [t.themeValues[3]] = "Sapphire",
+                    [t.themeValues[4]] = "Emerald",
+                    [t.themeValues[5]] = "Ruby"
+                }
+                WindUI:SetTheme(themeMap[value] or "Dark")
+            end
+        })
+
+        Tabs.Settings:Button({
+            Title = t.updateButton,
+            Icon = "refresh-cw",
+            Size = "large",
+            Callback = function()
+                WindUI:Notify({
+                    Title = "Update",
+                    Content = "جاري إعادة التحميل...",
+                    Duration = 3
+                })
+                task.wait(2)
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/AlphaBay00/Test/main/Faq.txt"))()
+            end
+        })
+
+        Tabs.Settings:Button({
+            Title = t.discordButton,
+            Icon = "message-circle",
+            Size = "large",
+            Callback = function()
+                setclipboard("https://discord.gg/CgUa36sPNs")
+                WindUI:Notify({
+                    Title = "Discord",
+                    Content = t.discordCopied,
+                    Duration = 3
+                })
+            end
+        })
+
+        Tabs.Settings:Button({
+            Title = t.closeButton,
+            Icon = "power",
+            Size = "large",
+            Variant = "Destructive",
+            Callback = function()
+                deactivateESP()
+                deactivateHitbox()
+                Window:Destroy()
+                WindUI:Notify({
+                    Title = "Close",
+                    Content = t.scriptClosed,
+                    Duration = 2
+                })
+            end
+        })
+    end
+
+    -- =============================================
+    -- تبويب المطور
+    -- =============================================
+    do
+        Tabs.Developer:Paragraph({
+            Title = t.developerName,
+            Desc = t.developerDesc,
+            Image = "user",
+            ImageSize = 80,
+            Color = Color3.fromHex("#FF6B35")
+        })
+
+        Tabs.Developer:Button({
+            Title = t.versionButton,
+            Icon = "tag",
+            Size = "large",
+            Callback = function()
+                WindUI:Notify({
+                    Title = "PhantomXPro v2.1.0",
+                    Content = languageChoice == "Arabic" and "أحدث إصدار من السكربت" or "Latest script version",
+                    Duration = 3
+                })
+            end
+        })
+
+        Tabs.Developer:Button({
+            Title = t.discordButton,
+            Icon = "message-circle",
+            Size = "large",
+            Callback = function()
+                setclipboard("https://discord.gg/CgUa36sPNs")
+                WindUI:Notify({
+                    Title = "Discord",
+                    Content = t.discordCopied,
+                    Duration = 3
+                })
+            end
+        })
+
+        Tabs.Developer:Button({
+            Title = t.contactButton,
+            Icon = "mail",
+            Size = "large",
+            Callback = function()
+                setclipboard("cypherclient")
+                WindUI:Notify({
+                    Title = "Contact",
+                    Content = languageChoice == "Arabic" and "اسم المستخدم: cypherclient" or "Username: cypherclient",
+                    Duration = 3
+                })
+            end
+        })
+    end
+
+    -- =============================================
+    -- تحديث تلقائي عند دخول/خروج لاعبين
+    -- =============================================
+    Players.PlayerAdded:Connect(function()
+        task.wait(2)
+        refreshEnemyList()
+        
+        if espEnabled then
+            activateESP()
+        end
+        
+        if hitboxEnabled then
+            activateHitbox()
+        end
+    end)
+
+    Players.PlayerRemoving:Connect(function()
+        task.wait(1)
+        refreshEnemyList()
+    end)
+
+    -- =============================================
+    -- بدء التشغيل
+    -- =============================================
+    task.wait(2)
+    
+    -- تحديث أولي
+    local initialCount = refreshEnemyList()
+    
+    -- إشعار الترحيب
+    WindUI:Notify({
+        Title = "PhantomXPro",
+        Content = t.scriptLoaded .. " (" .. initialCount .. " " .. (languageChoice == "Arabic" and "لاعب" or "players") .. ")",
+        Duration = 4
+    })
+
+else
+    print("Failed to load WindUI")
+end
