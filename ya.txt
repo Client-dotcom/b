@@ -1,0 +1,453 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local UserInputService = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
+local TweenService = game:GetService("TweenService")
+local TeleportService = game:GetService("TeleportService")
+local MarketplaceService = game:GetService("MarketplaceService")
+local StarterGui = game:GetService("StarterGui")
+
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+local Window = Rayfield:CreateWindow({
+    Name = "1kzuya MVS",
+    LoadingTitle = "1kzuya MVS Open Source",
+    LoadingSubtitle = "By 1kzuya",
+    ConfigurationSaving = { Enabled = false },
+    KeySystem = false
+})
+
+local function getTeamFrames()
+    local success, redFrame, blueFrame = pcall(function()
+        local playerGui = LocalPlayer:FindFirstChildOfClass("PlayerGui")
+        if not playerGui then return nil, nil end
+        local main = playerGui:FindFirstChild("Main")
+        if not main then return nil, nil end
+        local mainGameFrame = main:FindFirstChild("MainGameFrame")
+        if not mainGameFrame then return nil, nil end
+        local playersFrame = mainGameFrame:FindFirstChild("PlayersFrame")
+        if not playersFrame then return nil, nil end
+        return playersFrame:FindFirstChild("TeamRedFrame"), playersFrame:FindFirstChild("TeamBlueFrame")
+    end)
+    if success then
+        return redFrame, blueFrame
+    end
+    return nil, nil
+end
+
+local function getFrameChildrenNames(frame)
+    local names = {}
+    if not frame then return names end
+    for _, child in ipairs(frame:GetChildren()) do
+        if child:IsA("Frame") then
+            table.insert(names, child.Name)
+        end
+    end
+    return names
+end
+
+local function sanitizeName(name)
+    return tostring(name):gsub("%s+", "")
+end
+
+local function getEnemyPlayers()
+    local redFrame, blueFrame = getTeamFrames()
+    if not redFrame or not blueFrame then return {}, {} end
+
+    local redPlayers = getFrameChildrenNames(redFrame)
+    local bluePlayers = getFrameChildrenNames(blueFrame)
+
+    local isLocalPlayerInRed = false
+    local isLocalPlayerInBlue = false
+
+    local sanitizedLocalPlayerName = sanitizeName(LocalPlayer.Name)
+
+    for _, name in ipairs(redPlayers) do
+        if sanitizeName(name) == sanitizedLocalPlayerName then
+            isLocalPlayerInRed = true
+            break
+        end
+    end
+
+    for _, name in ipairs(bluePlayers) do
+        if sanitizeName(name) == sanitizedLocalPlayerName then
+            isLocalPlayerInBlue = true
+            break
+        end
+    end
+
+    if not isLocalPlayerInRed and not isLocalPlayerInBlue then
+        return {}, {}
+    end
+
+    local enemyFrame = isLocalPlayerInRed and blueFrame or redFrame
+    local enemyNames = getFrameChildrenNames(enemyFrame)
+
+    local enemyPlayerInstances = {}
+    for _, name in ipairs(enemyNames) do
+        local player = Players:FindFirstChild(name)
+        if player and player ~= LocalPlayer then
+            table.insert(enemyPlayerInstances, player)
+        end
+    end
+
+    local enemyTeamColor = isLocalPlayerInRed and Color3.fromRGB(0, 0, 255) or Color3.fromRGB(255, 0, 0)
+
+    return enemyPlayerInstances, enemyTeamColor
+end
+
+local AimAssistTab = Window:CreateTab("AimAssist")
+AimAssistTab:CreateLabel("Easy Win Fr")
+
+local aimDistance = 250
+local clickShootEnabled = false
+local autoShootEnabled = false
+local currentWeapon = nil
+local isWeaponEquipped = false
+
+local function updateWeaponScripts()
+    pcall(function()
+        if not currentWeapon or not currentWeapon.Parent or not currentWeapon:IsDescendantOf(game) then
+            return
+        end
+
+        local scripts = {}
+        for _, descendant in ipairs(currentWeapon:GetDescendants()) do
+            if descendant:IsA("Script") or descendant:IsA("LocalScript") then
+                table.insert(scripts, descendant)
+            end
+        end
+        table.insert(scripts, currentWeapon:FindFirstChild("Client"))
+        table.insert(scripts, currentWeapon:FindFirstChild("GunScript"))
+
+        for _, script in ipairs(scripts) do
+            if script and script.Disabled ~= _G.BlockClick then
+                script.Disabled = _G.BlockClick
+            end
+        end
+    end)
+end
+
+local function initializeWeaponScript()
+    local character = LocalPlayer.Character
+    if not character then
+        currentWeapon = nil
+        isWeaponEquipped = false
+        return
+    end
+
+    local equippedTool
+    for _, child in ipairs(character:GetChildren()) do
+        if child:IsA("Tool") and child:FindFirstChild("fire") then
+            equippedTool = child
+            break
+        end
+    end
+
+    if equippedTool and currentWeapon ~= equippedTool then
+        currentWeapon = equippedTool
+        isWeaponEquipped = true
+        updateWeaponScripts()
+    elseif not equippedTool and isWeaponEquipped then
+        currentWeapon = nil
+        isWeaponEquipped = false
+    end
+end
+
+local function updateBlockState()
+    if (clickShootEnabled or autoShootEnabled) and _G.BlockClick then
+        _G.BlockClick = false
+        updateWeaponScripts()
+    elseif not (clickShootEnabled or autoShootEnabled) and not _G.BlockClick then
+        _G.BlockClick = true
+        updateWeaponScripts()
+    end
+end
+
+local function SetClickShootState(state)
+    clickShootEnabled = state
+    updateBlockState()
+end
+
+local function SetAutoShootState(state)
+    autoShootEnabled = state
+    updateBlockState()
+end
+
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == blockShootKey then
+        if not clickShootEnabled and not autoShootEnabled then return end
+        _G.BlockClick = not _G.BlockClick
+        updateWeaponScripts()
+    end
+end)
+
+AimAssistTab:CreateInput({
+    Name = "Aim Distance",
+    PlaceholderText = "1 - 10000",
+    RemoveTextAfterFocusLost = false,
+    CurrentValue = tostring(aimDistance),
+    Callback = function(text)
+        local num = tonumber(text)
+        if num then
+            aimDistance = math.clamp(num, 1, 10000)
+        end
+    end,
+})
+
+AimAssistTab:CreateLabel("Shoot Types (For Guns)")
+AimAssistTab:CreateToggle({ Name = "Click Shoot", CurrentValue = false, Callback = SetClickShootState })
+AimAssistTab:CreateToggle({ Name = "Auto Shoot", CurrentValue = false, Callback = SetAutoShootState })
+
+-- Backpack listeners
+if LocalPlayer.Backpack then
+    LocalPlayer.Backpack.ChildRemoved:Connect(function(child)
+        if child:IsA("Tool") and child == currentWeapon then
+            isWeaponEquipped = false
+            task.wait(0.1)
+            initializeWeaponScript()
+        end
+    end)
+    LocalPlayer.Backpack.ChildAdded:Connect(function(child)
+        if child:IsA("Tool") and child:FindFirstChild("fire") and currentWeapon and child.Name == currentWeapon.Name then
+            currentWeapon = nil
+            isWeaponEquipped = false
+            updateWeaponScripts()
+        end
+    end)
+end
+
+task.spawn(function()
+    while task.wait(0.1) do
+        initializeWeaponScript()
+    end
+end)
+
+-- Closest player & visibility
+local function getClosestPlayer(playerListProvider)
+    local players = playerListProvider()
+    if not players or type(players) ~= "table" then return nil end
+
+    local character = LocalPlayer.Character
+    if not character or not character:IsDescendantOf(Workspace) then return nil end
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return nil end
+
+    local closestPlayer, minDistance = nil, aimDistance or 100
+    for _, player in ipairs(players) do
+        if player and typeof(player) == "Instance" and player:IsA("Player") then
+            local targetCharacter = player.Character
+            if targetCharacter and targetCharacter:IsDescendantOf(Workspace) then
+                local targetHrp = targetCharacter:FindFirstChild("HumanoidRootPart")
+                local targetHumanoid = targetCharacter:FindFirstChild("Humanoid")
+                if targetHrp and targetHumanoid and targetHumanoid.Health > 0 then
+                    local success, distance = pcall(function() return (hrp.Position - targetHrp.Position).Magnitude end)
+                    if success and distance < minDistance then
+                        minDistance = distance
+                        closestPlayer = player
+                    end
+                end
+            end
+        end
+    end
+    return closestPlayer
+end
+
+local function canSeeTarget(targetPlayer)
+    if not targetPlayer then return false end
+
+    local localCharacter = LocalPlayer.Character
+    if not localCharacter or not localCharacter:IsDescendantOf(Workspace) then return false end
+    local targetCharacter = targetPlayer.Character
+    if not targetCharacter or not targetCharacter:IsDescendantOf(Workspace) then return false end
+
+    local localHrp = localCharacter:FindFirstChild("HumanoidRootPart")
+    local targetHrp = targetCharacter:FindFirstChild("HumanoidRootPart")
+    local targetHumanoid = targetCharacter:FindFirstChild("Humanoid")
+
+    if not localHrp or not targetHrp or not targetHumanoid then return false end
+
+    local success, distance = pcall(function() return (localHrp.Position - targetHrp.Position).Magnitude end)
+    if not success or distance > (aimDistance or 100) then return false end
+
+    local raycastParams = RaycastParams.new()
+    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+    raycastParams.FilterDescendantsInstances = { localCharacter }
+    raycastParams.IgnoreWater = true
+    raycastParams.CollisionGroup = "Default"
+
+    local direction = targetHrp.Position - localHrp.Position
+    local raycastResult = Workspace:Raycast(localHrp.Position, direction.Unit * math.min(distance, aimDistance or 100), raycastParams)
+
+    if not raycastResult then return true end
+    local hitPart = raycastResult.Instance
+    if hitPart and hitPart:IsDescendantOf(targetCharacter) then
+        return true
+    end
+
+    return false
+end
+
+local lastFireTime = 0
+local fireDelay = 1.5
+
+local function shootLogic()
+    if tick() - lastFireTime < fireDelay then return end
+    lastFireTime = tick()
+    if not isWeaponEquipped then return end
+    local target = getClosestPlayer(getEnemyPlayers)
+    if not target then return end
+    if not canSeeTarget(target) then return end
+
+    local localCharacter = LocalPlayer.Character
+    if not localCharacter or not localCharacter:IsDescendantOf(Workspace) then return end
+    local localHrp = localCharacter:FindFirstChild("HumanoidRootPart")
+    if not localHrp then return end
+
+    local targetCharacter = target.Character
+    if not targetCharacter or not targetCharacter:IsDescendantOf(Workspace) then return end
+    local targetHrp = targetCharacter:FindFirstChild("HumanoidRootPart")
+    if not targetHrp then return end
+
+    local predictedPosition = targetHrp.Position
+    local handle = currentWeapon:FindFirstChild("Handle") or currentWeapon
+    if not handle then return end
+
+    pcall(function() currentWeapon.fire:FireServer() end)
+    pcall(function()
+        local beamRemote = ReplicatedStorage:FindFirstChild("LocalBeam")
+        if beamRemote then
+            beamRemote:Fire(handle, predictedPosition)
+        end
+        local showBeamRemote = currentWeapon:FindFirstChild("showBeam")
+        if showBeamRemote then
+            showBeamRemote:FireServer(predictedPosition, localHrp.Position, handle)
+        end
+    end)
+    pcall(function()
+        local direction = (predictedPosition - localHrp.Position).Unit
+        currentWeapon.kill:FireServer(target, direction, localHrp.Position)
+    end)
+end
+
+task.spawn(function()
+    while RunService.Heartbeat:Wait() do
+        if autoShootEnabled and isWeaponEquipped and currentWeapon and not _G.BlockClick then
+            local target = getClosestPlayer(getEnemyPlayers)
+            if target and canSeeTarget(target) then
+                shootLogic()
+            end
+        end
+    end
+end)
+
+Mouse.Button1Down:Connect(function()
+    if clickShootEnabled and isWeaponEquipped and currentWeapon and not _G.BlockClick then
+        local target = getClosestPlayer(getEnemyPlayers)
+        if target and canSeeTarget(target) then
+            shootLogic()
+        end
+    end
+end)
+
+local ESPTab2 = Window:CreateTab("ESP")
+ESPTab2:CreateLabel("ESP Enemy Team")
+
+local espEnabled = false
+local espHighlights = {}
+
+local function removeHighlight(player)
+    if espHighlights[player] then
+        pcall(function() espHighlights[player]:Destroy() end)
+        espHighlights[player] = nil
+    end
+end
+
+local function updateHighlight(player, color)
+    local character = player.Character
+    if not character then removeHighlight(player) return end
+
+    local highlight = espHighlights[player]
+    if not highlight or not highlight.Parent then
+        if highlight then removeHighlight(player) end
+        highlight = Instance.new("Highlight")
+        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+        highlight.FillTransparency = 0.5
+        highlight.OutlineTransparency = 0
+        highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+        highlight.Parent = character
+        espHighlights[player] = highlight
+    end
+
+    highlight.Adornee = character
+    highlight.FillColor = color
+end
+
+local function updateAllHighlights()
+    if not espEnabled then
+        for player, _ in pairs(espHighlights) do removeHighlight(player) end
+        return
+    end
+
+    local enemyPlayers, enemyColor = getEnemyPlayers()
+    if not enemyPlayers then return end
+
+    local currentEnemies = {}
+    for _, player in ipairs(enemyPlayers) do
+        currentEnemies[player] = true
+        updateHighlight(player, enemyColor)
+    end
+
+    for player, _ in pairs(espHighlights) do
+        if not currentEnemies[player] then removeHighlight(player) end
+    end
+end
+
+ESPTab2:CreateToggle({
+    Name = "Enable ESP",
+    CurrentValue = false,
+    Callback = function(state)
+        espEnabled = state
+        updateAllHighlights()
+    end,
+})
+
+RunService.Heartbeat:Connect(function()
+    if espEnabled then pcall(updateAllHighlights) end
+end)
+
+-- Handles respawn and player joins
+local function trackCharacter(player)
+    local function onCharAdded(character)
+        task.wait(0.1)
+        if espEnabled then updateAllHighlights() end
+    end
+    player.CharacterAdded:Connect(onCharAdded)
+end
+
+for _, player in ipairs(Players:GetPlayers()) do
+    if player ~= LocalPlayer then trackCharacter(player) end
+end
+
+Players.PlayerAdded:Connect(function(player)
+    if player ~= LocalPlayer then trackCharacter(player) end
+end)
+
+LocalPlayer.CharacterAdded:Connect(function()
+    task.wait(0.1)
+    if espEnabled then updateAllHighlights() end
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    removeHighlight(player)
+end)
+
+Rayfield:Notify({
+    Title = "1kzuya MVSD Loaded",
+    Content = "Please Report Any Bugs Found",
+    Duration = 5,
+})
