@@ -1,0 +1,948 @@
+print("PhantomXPro - Enhanced Version")
+
+-- تحميل WindUI
+local success, result = pcall(function()
+    local source = game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua", true)
+    if source then
+        local loaded = loadstring(source)
+        if loaded then
+            return loaded()
+        end
+    end
+    return nil
+end)
+
+if success and result then
+    local WindUI = result
+    local Players = game:GetService("Players")
+    local Workspace = game:GetService("Workspace")
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local RunService = game:GetService("RunService")
+    local player = Players.LocalPlayer
+
+    -- اختيار اللغة
+    local languageChoice = nil
+    WindUI:Popup({
+        Title = "PhantomXPro - اختر اللغة",
+        Icon = "globe",
+        Content = "الرجاء اختيار لغة السكربت",
+        Buttons = {
+            {
+                Title = "العربية",
+                Icon = "flag",
+                Variant = "Primary",
+                Callback = function()
+                    languageChoice = "Arabic"
+                end
+            },
+            {
+                Title = "English",
+                Icon = "flag",
+                Variant = "Primary",
+                Callback = function()
+                    languageChoice = "English"
+                end
+            }
+        }
+    })
+
+    repeat task.wait() until languageChoice ~= nil
+
+    local texts = {
+        Arabic = {
+            mainTab = "الرئيسية",
+            espOn = "🔴 تشغيل ESP",
+            espOff = "🟢 إيقاف ESP",
+            hitboxOn = "🔴 تشغيل Hitbox",
+            hitboxOff = "🟢 إيقاف Hitbox",
+            flightButton = "🛫 الطيران",
+            flightActive = "🟢 الطيران مفعل",
+            targetSelect = "🎯 اختر عدو",
+            killButton = "💀 قتل",
+            refreshButton = "🔄 تحديث",
+            discordButton = "💬 Discord",
+            closeButton = "⏹️ إغلاق",
+            autoShootOn = "🔴 Auto Shoot ON",
+            autoShootOff = "🟢 Auto Shoot OFF",
+            autoShootMode = "🎯 وضع Auto Shoot",
+            
+            settingsTab = "الإعدادات",
+            themeDropdown = "اختر السمة",
+            themeValues = {"داكن 🌙", "فاتح ☀️", "أزرق 🔵", "أخضر 💚", "أحمر 🔴"},
+            updateButton = "تحديث السكربت",
+            espSettings = "⚙️ إعدادات ESP",
+            
+            developerTab = "المطور",
+            developerName = "Cypher",
+            developerDesc = "مطور سكربتات روبلوكس",
+            versionButton = "الإصدار 2.2.0",
+            contactButton = "تواصل مع المطور",
+            
+            -- إشعارات
+            espActivated = "✅ ESP مفعّل على",
+            espDeactivated = "❌ ESP موقّف",
+            hitboxActivated = "✅ Hitbox مفعّل على",
+            hitboxDeactivated = "❌ Hitbox موقّف",
+            flightActivated = "✅ الطيران مفعّل",
+            noEnemies = "⚠️ لا يوجد أعداء",
+            killedAll = "✅ تم قتل",
+            killedTarget = "✅ تم قتل الهدف",
+            discordCopied = "✅ تم نسخ رابط الديسكورد",
+            scriptLoaded = "🎮 PhantomXPro جاهز!",
+            scriptClosed = "👋 تم إغلاق السكربت",
+            enemiesRefreshed = "🔄 تم تحديث الأعداء",
+            autoShootActivated = "✅ Auto Shoot مفعّل",
+            autoShootDeactivated = "❌ Auto Shoot موقّف"
+        },
+        English = {
+            mainTab = "Main",
+            espOn = "🔴 ESP ON",
+            espOff = "🟢 ESP OFF",
+            hitboxOn = "🔴 Hitbox ON",
+            hitboxOff = "🟢 Hitbox OFF",
+            flightButton = "🛫 Flight",
+            flightActive = "🟢 Flight Active",
+            targetSelect = "🎯 Select Enemy",
+            killButton = "💀 Kill",
+            refreshButton = "🔄 Refresh",
+            discordButton = "💬 Discord",
+            closeButton = "⏹️ Close",
+            autoShootOn = "🔴 Auto Shoot ON",
+            autoShootOff = "🟢 Auto Shoot OFF",
+            autoShootMode = "🎯 Auto Shoot Mode",
+            
+            settingsTab = "Settings",
+            themeDropdown = "Select Theme",
+            themeValues = {"Dark 🌙", "Light ☀️", "Blue 🔵", "Green 💚", "Red 🔴"},
+            updateButton = "Update Script",
+            espSettings = "⚙️ ESP Settings",
+            
+            developerTab = "Developer",
+            developerName = "Cypher",
+            developerDesc = "Roblox Script Developer",
+            versionButton = "Version 2.2.0",
+            contactButton = "Contact Developer",
+            
+            -- Notifications
+            espActivated = "✅ ESP Activated on",
+            espDeactivated = "❌ ESP Deactivated",
+            hitboxActivated = "✅ Hitbox Activated on",
+            hitboxDeactivated = "❌ Hitbox Deactivated",
+            flightActivated = "✅ Flight Activated",
+            noEnemies = "⚠️ No enemies found",
+            killedAll = "✅ Killed",
+            killedTarget = "✅ Killed target",
+            discordCopied = "✅ Discord link copied",
+            scriptLoaded = "🎮 PhantomXPro Ready!",
+            scriptClosed = "👋 Script closed",
+            enemiesRefreshed = "🔄 Enemies refreshed",
+            autoShootActivated = "✅ Auto Shoot Activated",
+            autoShootDeactivated = "❌ Auto Shoot Deactivated"
+        }
+    }
+
+    local t = texts[languageChoice]
+
+    WindUI.TransparencyValue = 0.2
+    WindUI:SetTheme("Dark")
+
+    -- إنشاء النافذة
+    local Window = WindUI:CreateWindow({
+        Title = "PhantomXPro",
+        Icon = "shield",
+        Author = "By Cypher",
+        Folder = "PhantomXPro",
+        Size = UDim2.fromOffset(550, 450),
+        Theme = "Dark",
+        SideBarWidth = 180
+    })
+
+    -- الأقسام
+    local MainSection = Window:Section({ Title = "PhantomXPro", Opened = true })
+    local SettingsSection = Window:Section({ Title = t.settingsTab })
+    local DeveloperSection = Window:Section({ Title = t.developerTab })
+
+    -- التبويبات
+    local Tabs = {
+        Main = MainSection:Tab({ Title = t.mainTab, Icon = "home" }),
+        Settings = SettingsSection:Tab({ Title = t.settingsTab, Icon = "settings" }),
+        Developer = DeveloperSection:Tab({ Title = t.developerTab, Icon = "user" })
+    }
+
+    -- =============================================
+    -- نظام كشف الأعداء
+    -- =============================================
+    local function getRealEnemies()
+        local enemies = {}
+        
+        for _, otherPlayer in pairs(Players:GetPlayers()) do
+            if otherPlayer ~= player and otherPlayer.Character then
+                local humanoid = otherPlayer.Character:FindFirstChildOfClass("Humanoid")
+                if humanoid and humanoid.Health > 0 then
+                    table.insert(enemies, otherPlayer)
+                end
+            end
+        end
+        
+        return enemies
+    end
+
+    -- =============================================
+    -- نظام ESP الجديد المتقدم
+    -- =============================================
+    local espEnabled = false
+    local espObjects = {}
+    local espConfig = {
+        Box = true,
+        Name = true,
+        Health = true,
+        Distance = true,
+        Tracer = false,
+        MaxDistance = 1000,
+        TeamColor = true
+    }
+
+    local function cleanESP()
+        for _, obj in pairs(espObjects) do
+            if obj and obj.Parent then
+                pcall(function() obj:Destroy() end)
+            end
+        end
+        espObjects = {}
+    end
+
+    local function calculateBox(character)
+        if not character then return nil end
+        
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return nil end
+        
+        local cf = hrp.CFrame
+        local size = Vector3.new(4, 6, 0)
+        
+        -- محاولة الحصول على الحجم الفعلي
+        pcall(function()
+            local bbox = character:GetBoundingBox()
+            size = bbox.Size
+        end)
+        
+        return {
+            Position = cf.Position - Vector3.new(0, size.Y/2, 0),
+            Size = size,
+            HRP = hrp
+        }
+    end
+
+    local function updateESPForEnemy(enemy)
+        if not enemy or not enemy.Character then return end
+        
+        local character = enemy.Character
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if not humanoid or humanoid.Health <= 0 then return end
+        
+        -- تنظيف ESP القديم لهذا اللاعب
+        for i = #espObjects, 1, -1 do
+            local obj = espObjects[i]
+            if obj and obj.Name:find(enemy.Name) then
+                pcall(function() obj:Destroy() end)
+                table.remove(espObjects, i)
+            end
+        end
+        
+        local boxData = calculateBox(character)
+        if not boxData then return end
+        
+        local hrp = boxData.HRP
+        local camera = Workspace.CurrentCamera
+        
+        -- التحقق من الرؤية
+        local screenPos, onScreen = camera:WorldToViewportPoint(hrp.Position)
+        if not onScreen then return end
+        
+        local distance = (hrp.Position - camera.CFrame.Position).Magnitude
+        if distance > espConfig.MaxDistance then return end
+        
+        -- اللون بناء على الفريق
+        local espColor = Color3.fromRGB(255, 50, 50)
+        if espConfig.TeamColor and enemy.TeamColor then
+            espColor = enemy.TeamColor.Color
+        end
+        
+        -- لون الصحة
+        local healthPercent = humanoid.Health / humanoid.MaxHealth
+        local healthColor = Color3.new(1 - healthPercent, healthPercent, 0)
+        
+        -- 1. Highlight (مربع)
+        if espConfig.Box then
+            local highlight = Instance.new("Highlight")
+            highlight.Name = enemy.Name .. "_Box"
+            highlight.Adornee = character
+            highlight.FillColor = espColor
+            highlight.FillTransparency = 0.7
+            highlight.OutlineColor = Color3.new(1, 1, 1)
+            highlight.OutlineTransparency = 0
+            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+            highlight.Parent = Workspace
+            table.insert(espObjects, highlight)
+        end
+        
+        -- 2. Billboard GUI (الاسم والصحة والمسافة)
+        if espConfig.Name or espConfig.Health or espConfig.Distance then
+            local billboard = Instance.new("BillboardGui")
+            billboard.Name = enemy.Name .. "_Info"
+            billboard.Size = UDim2.new(0, 200, 0, 60)
+            billboard.StudsOffset = Vector3.new(0, boxData.Size.Y + 1, 0)
+            billboard.AlwaysOnTop = true
+            billboard.Adornee = hrp
+            billboard.Parent = Workspace
+            
+            local container = Instance.new("Frame")
+            container.Size = UDim2.new(1, 0, 1, 0)
+            container.BackgroundTransparency = 0.7
+            container.BackgroundColor3 = Color3.new(0, 0, 0)
+            container.BorderSizePixel = 0
+            container.Parent = billboard
+            
+            -- الاسم
+            if espConfig.Name then
+                local nameLabel = Instance.new("TextLabel")
+                nameLabel.Size = UDim2.new(1, 0, 0, 20)
+                nameLabel.Position = UDim2.new(0, 0, 0, 0)
+                nameLabel.BackgroundTransparency = 1
+                nameLabel.Text = enemy.Name
+                nameLabel.TextColor3 = espColor
+                nameLabel.TextSize = 14
+                nameLabel.Font = Enum.Font.GothamBold
+                nameLabel.Parent = container
+            end
+            
+            -- الصحة
+            if espConfig.Health then
+                local healthLabel = Instance.new("TextLabel")
+                healthLabel.Size = UDim2.new(1, 0, 0, 18)
+                healthLabel.Position = UDim2.new(0, 0, 0, 20)
+                healthLabel.BackgroundTransparency = 1
+                healthLabel.Text = string.format("HP: %d/%d", math.floor(humanoid.Health), math.floor(humanoid.MaxHealth))
+                healthLabel.TextColor3 = healthColor
+                healthLabel.TextSize = 12
+                healthLabel.Font = Enum.Font.Gotham
+                healthLabel.Parent = container
+            end
+            
+            -- المسافة
+            if espConfig.Distance then
+                local distanceLabel = Instance.new("TextLabel")
+                distanceLabel.Size = UDim2.new(1, 0, 0, 18)
+                distanceLabel.Position = UDim2.new(0, 0, 0, 38)
+                distanceLabel.BackgroundTransparency = 1
+                distanceLabel.Text = string.format("%d studs", math.floor(distance))
+                distanceLabel.TextColor3 = Color3.new(1, 1, 1)
+                distanceLabel.TextSize = 12
+                distanceLabel.Font = Enum.Font.Gotham
+                distanceLabel.Parent = container
+            end
+            
+            table.insert(espObjects, billboard)
+        end
+        
+        -- 3. Tracer (خط من أسفل الشاشة)
+        if espConfig.Tracer then
+            local beam = Instance.new("Beam")
+            beam.Name = enemy.Name .. "_Tracer"
+            beam.Color = ColorSequence.new(espColor)
+            beam.Width0 = 0.2
+            beam.Width1 = 0.2
+            beam.Parent = Workspace
+            
+            local attachment0 = Instance.new("Attachment")
+            attachment0.Position = Vector3.new(0, -3, 0)
+            attachment0.Parent = hrp
+            
+            local attachment1 = Instance.new("Attachment")
+            attachment1.Parent = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+            
+            beam.Attachment0 = attachment0
+            beam.Attachment1 = attachment1
+            
+            table.insert(espObjects, beam)
+            table.insert(espObjects, attachment0)
+            table.insert(espObjects, attachment1)
+        end
+    end
+
+    local function updateAllESP()
+        if not espEnabled then return end
+        
+        cleanESP()
+        local enemies = getRealEnemies()
+        
+        for _, enemy in pairs(enemies) do
+            updateESPForEnemy(enemy)
+        end
+    end
+
+    local function toggleESP(enable)
+        espEnabled = enable
+        if enable then
+            updateAllESP()
+            return #getRealEnemies()
+        else
+            cleanESP()
+            return 0
+        end
+    end
+
+    -- =============================================
+    -- نظام Hitbox المحسّن
+    -- =============================================
+    local hitboxEnabled = false
+    local originalHitboxes = {}
+    local hitboxConfig = {
+        Size = Vector3.new(6, 6, 6),
+        Transparency = 0.7,
+        Color = Color3.fromRGB(255, 100, 100),
+        Material = Enum.Material.Neon
+    }
+
+    local function applyHitbox(enemy)
+        if not enemy or not enemy.Character then return end
+        
+        local character = enemy.Character
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+        
+        -- حفظ القيم الأصلية
+        if not originalHitboxes[enemy] then
+            originalHitboxes[enemy] = {
+                Size = hrp.Size,
+                Transparency = hrp.Transparency,
+                Color = hrp.Color,
+                Material = hrp.Material,
+                CanCollide = hrp.CanCollide
+            }
+        end
+        
+        -- تطبيق Hitbox
+        hrp.CanCollide = false
+        hrp.Size = hitboxConfig.Size
+        hrp.Transparency = hitboxConfig.Transparency
+        hrp.Color = hitboxConfig.Color
+        hrp.Material = hitboxConfig.Material
+    end
+
+    local function restoreHitbox(enemy)
+        if originalHitboxes[enemy] then
+            local character = enemy.Character
+            if character then
+                local hrp = character:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    local original = originalHitboxes[enemy]
+                    hrp.Size = original.Size
+                    hrp.Transparency = original.Transparency
+                    hrp.Color = original.Color
+                    hrp.Material = original.Material
+                    hrp.CanCollide = original.CanCollide
+                end
+            end
+            originalHitboxes[enemy] = nil
+        end
+    end
+
+    local function toggleHitbox(enable)
+        hitboxEnabled = enable
+        local enemies = getRealEnemies()
+        
+        if enable then
+            for _, enemy in pairs(enemies) do
+                applyHitbox(enemy)
+            end
+        else
+            for enemy, _ in pairs(originalHitboxes) do
+                restoreHitbox(enemy)
+            end
+            originalHitboxes = {}
+        end
+        
+        return #enemies
+    end
+
+    -- =============================================
+    -- نظام Auto Shoot
+    -- =============================================
+    local autoShootEnabled = false
+    local autoShootConnection = nil
+    local autoShootConfig = {
+        TargetPart = "HumanoidRootPart",
+        CheckVisible = true,
+        MaxDistance = 500,
+        ShootDelay = 0.3,
+        TeamCheck = true
+    }
+
+    local function findClosestTarget()
+        local closestPlayer = nil
+        local closestDistance = autoShootConfig.MaxDistance
+        
+        for _, enemy in pairs(getRealEnemies()) do
+            if enemy.Character then
+                local hrp = enemy.Character:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    local distance = (hrp.Position - player.Character.HumanoidRootPart.Position).Magnitude
+                    if distance < closestDistance then
+                        closestDistance = distance
+                        closestPlayer = enemy
+                    end
+                end
+            end
+        end
+        
+        return closestPlayer
+    end
+
+    local function checkVisibility(target)
+        if not autoShootConfig.CheckVisible then return true end
+        
+        local character = player.Character
+        local targetCharacter = target.Character
+        if not character or not targetCharacter then return false end
+        
+        local origin = character.HumanoidRootPart.Position
+        local targetPos = targetCharacter.HumanoidRootPart.Position
+        
+        local raycastParams = RaycastParams.new()
+        raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+        raycastParams.FilterDescendantsInstances = {character}
+        
+        local ray = Workspace:Raycast(origin, (targetPos - origin).Unit * autoShootConfig.MaxDistance, raycastParams)
+        
+        if ray then
+            local hitChar = ray.Instance:FindFirstAncestorOfClass("Model")
+            return hitChar == targetCharacter
+        end
+        
+        return true
+    end
+
+    local function autoShootLoop()
+        if not autoShootEnabled or not player.Character then return end
+        
+        local target = findClosestTarget()
+        if target and checkVisibility(target) then
+            -- محاولة إطلاق النار
+            pcall(function()
+                local tool = player.Character:FindFirstChildOfClass("Tool")
+                if tool then
+                    local fireRemote = tool:FindFirstChild("Fire") or tool:FindFirstChild("fire")
+                    if fireRemote then
+                        fireRemote:FireServer(target)
+                    end
+                end
+            end)
+        end
+    end
+
+    local function toggleAutoShoot(enable)
+        autoShootEnabled = enable
+        
+        if enable then
+            if autoShootConnection then
+                autoShootConnection:Disconnect()
+            end
+            autoShootConnection = RunService.Heartbeat:Connect(function()
+                autoShootLoop()
+            end)
+        else
+            if autoShootConnection then
+                autoShootConnection:Disconnect()
+                autoShootConnection = nil
+            end
+        end
+    end
+
+    -- =============================================
+    -- نظام Flight
+    -- =============================================
+    local flightLoaded = false
+
+    local function activateFlight()
+        if not flightLoaded then
+            loadstring(game:HttpGet("https://pastebin.com/raw/5WLxDDvL"))()
+            flightLoaded = true
+        end
+    end
+
+    -- =============================================
+    -- نظام القتل والـ Dropdown
+    -- =============================================
+    local selectedTarget = "All Enemies"
+    local enemyNames = {"All Enemies"}
+
+    local function refreshEnemyNames()
+        local enemies = getRealEnemies()
+        local names = {"All Enemies"}
+        
+        for _, enemy in pairs(enemies) do
+            table.insert(names, enemy.Name)
+        end
+        
+        enemyNames = names
+        return enemies
+    end
+
+    local function killTarget()
+        if selectedTarget == "All Enemies" then
+            local enemies = getRealEnemies()
+            
+            if #enemies == 0 then
+                WindUI:Notify({
+                    Title = "Kill",
+                    Content = t.noEnemies,
+                    Duration = 2
+                })
+                return
+            end
+            
+            for _, enemy in pairs(enemies) do
+                pcall(function()
+                    ReplicatedStorage.KnifeKill:FireServer(enemy, enemy)
+                end)
+                task.wait(0.2)
+            end
+            
+            WindUI:Notify({
+                Title = "Kill",
+                Content = t.killedAll .. " " .. #enemies .. " " .. (languageChoice == "Arabic" and "عدو" or "enemies"),
+                Duration = 3
+            })
+        else
+            local target = Players:FindFirstChild(selectedTarget)
+            if target then
+                pcall(function()
+                    ReplicatedStorage.KnifeKill:FireServer(target, target)
+                end)
+                WindUI:Notify({
+                    Title = "Kill",
+                    Content = t.killedTarget .. ": " .. target.Name,
+                    Duration = 3
+                })
+            end
+        end
+    end
+
+    -- =============================================
+    -- تبويب الرئيسية
+    -- =============================================
+    
+    -- زر ESP
+    local espButton = Tabs.Main:Button({
+        Title = t.espOn,
+        Icon = "eye",
+        Size = "large",
+        Callback = function()
+            if espEnabled then
+                local count = toggleESP(false)
+                espButton:Set({Title = t.espOn})
+                WindUI:Notify({
+                    Title = "ESP",
+                    Content = t.espDeactivated,
+                    Duration = 2
+                })
+            else
+                local count = toggleESP(true)
+                espButton:Set({Title = t.espOff .. " (" .. count .. ")"})
+                WindUI:Notify({
+                    Title = "ESP",
+                    Content = t.espActivated .. " " .. count .. " " .. (languageChoice == "Arabic" and "عدو" or "enemies"),
+                    Duration = 3
+                })
+            end
+        end
+    })
+
+    -- زر Hitbox
+    local hitboxButton = Tabs.Main:Button({
+        Title = t.hitboxOn,
+        Icon = "target",
+        Size = "large",
+        Callback = function()
+            if hitboxEnabled then
+                local count = toggleHitbox(false)
+                hitboxButton:Set({Title = t.hitboxOn})
+                WindUI:Notify({
+                    Title = "Hitbox",
+                    Content = t.hitboxDeactivated,
+                    Duration = 2
+                })
+            else
+                local count = toggleHitbox(true)
+                hitboxButton:Set({Title = t.hitboxOff .. " (" .. count .. ")"})
+                WindUI:Notify({
+                    Title = "Hitbox",
+                    Content = t.hitboxActivated .. " " .. count .. " " .. (languageChoice == "Arabic" and "عدو" or "enemies"),
+                    Duration = 3
+                })
+            end
+        end
+    })
+
+    -- زر Auto Shoot
+    local autoShootButton = Tabs.Main:Button({
+        Title = t.autoShootOn,
+        Icon = "target",
+        Size = "large",
+        Callback = function()
+            if autoShootEnabled then
+                toggleAutoShoot(false)
+                autoShootButton:Set({Title = t.autoShootOn})
+                WindUI:Notify({
+                    Title = "Auto Shoot",
+                    Content = t.autoShootDeactivated,
+                    Duration = 2
+                })
+            else
+                toggleAutoShoot(true)
+                autoShootButton:Set({Title = t.autoShootOff})
+                WindUI:Notify({
+                    Title = "Auto Shoot",
+                    Content = t.autoShootActivated,
+                    Duration = 3
+                })
+            end
+        end
+    })
+
+    -- زر Flight
+    local flightButton = Tabs.Main:Button({
+        Title = t.flightButton,
+        Icon = "wind",
+        Size = "large",
+        Callback = function()
+            activateFlight()
+            flightButton:Set({Title = t.flightActive})
+            WindUI:Notify({
+                Title = "Flight",
+                Content = t.flightActivated,
+                Duration = 3
+            })
+        end
+    })
+
+    -- Dropdown اختيار العدو
+    local enemyDropdown = Tabs.Main:Dropdown({
+        Title = t.targetSelect,
+        Icon = "users",
+        Size = "large",
+        Values = enemyNames,
+        Callback = function(value)
+            selectedTarget = value
+        end
+    })
+
+    -- زر القتل
+    Tabs.Main:Button({
+        Title = t.killButton,
+        Icon = "skull",
+        Size = "large",
+        Variant = "Destructive",
+        Callback = function()
+            killTarget()
+        end
+    })
+
+    -- زر تحديث الأعداء
+    Tabs.Main:Button({
+        Title = t.refreshButton,
+        Icon = "refresh-cw",
+        Size = "large",
+        Callback = function()
+            local enemies = refreshEnemyNames()
+            local count = #enemies
+            
+            -- تحديث الـ Dropdown
+            enemyDropdown:Set({Values = enemyNames})
+            
+            WindUI:Notify({
+                Title = "Refresh",
+                Content = t.enemiesRefreshed .. " (" .. count .. ")",
+                Duration = 2
+            })
+            
+            -- تحديث ESP إذا كان مفعلاً
+            if espEnabled then
+                updateAllESP()
+            end
+            
+            -- تحديث Hitbox إذا كان مفعلاً
+            if hitboxEnabled then
+                toggleHitbox(false)
+                task.wait(0.1)
+                toggleHitbox(true)
+            end
+        end
+    })
+
+    -- =============================================
+    -- تبويب الإعدادات
+    -- =============================================
+    do
+        Tabs.Settings:Dropdown({
+            Title = t.themeDropdown,
+            Values = t.themeValues,
+            Value = t.themeValues[1],
+            Size = "large",
+            Callback = function(value)
+                local themeMap = {
+                    [t.themeValues[1]] = "Dark",
+                    [t.themeValues[2]] = "Light", 
+                    [t.themeValues[3]] = "Sapphire",
+                    [t.themeValues[4]] = "Emerald",
+                    [t.themeValues[5]] = "Ruby"
+                }
+                WindUI:SetTheme(themeMap[value] or "Dark")
+            end
+        })
+
+        -- إعدادات ESP
+        Tabs.Settings:Button({
+            Title = t.espSettings,
+            Icon = "eye",
+            Size = "large",
+            Callback = function()
+                WindUI:Notify({
+                    Title = "ESP Settings",
+                    Content = languageChoice == "Arabic" and "مميزات ESP مفعلة: Box, Name, Health, Distance" or "ESP Features: Box, Name, Health, Distance enabled",
+                    Duration = 4
+                })
+            end
+        })
+
+        Tabs.Settings:Button({
+            Title = t.updateButton,
+            Icon = "refresh-cw",
+            Size = "large",
+            Callback = function()
+                WindUI:Notify({
+                    Title = "Update",
+                    Content = languageChoice == "Arabic" and "جاري إعادة التحميل..." or "Reloading...",
+                    Duration = 3
+                })
+                task.wait(2)
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/AlphaBay00/Test/main/Faq.txt"))()
+            end
+        })
+
+        Tabs.Settings:Button({
+            Title = t.discordButton,
+            Icon = "message-circle",
+            Size = "large",
+            Callback = function()
+                setclipboard("https://discord.gg/CgUa36sPNs")
+                WindUI:Notify({
+                    Title = "Discord",
+                    Content = t.discordCopied,
+                    Duration = 3
+                })
+            end
+        })
+
+        Tabs.Settings:Button({
+            Title = t.closeButton,
+            Icon = "power",
+            Size = "large",
+            Variant = "Destructive",
+            Callback = function()
+                toggleESP(false)
+                toggleHitbox(false)
+                toggleAutoShoot(false)
+                Window:Destroy()
+                WindUI:Notify({
+                    Title = "Close",
+                    Content = t.scriptClosed,
+                    Duration = 2
+                })
+            end
+        })
+    end
+
+    -- =============================================
+    -- تبويب المطور
+    -- =============================================
+    do
+        Tabs.Developer:Paragraph({
+            Title = t.developerName,
+            Desc = t.developerDesc,
+            Image = "user",
+            ImageSize = 80,
+            Color = Color3.fromHex("#FF6B35")
+        })
+
+        Tabs.Developer:Button({
+            Title = t.versionButton,
+            Icon = "tag",
+            Size = "large",
+            Callback = function()
+                WindUI:Notify({
+                    Title = "PhantomXPro v2.2.0",
+                    Content = languageChoice == "Arabic" and "أحدث إصدار مع ESP جديد و Auto Shoot" or "Latest version with new ESP and Auto Shoot",
+                    Duration = 3
+                })
+            end
+        })
+
+        Tabs.Developer:Button({
+            Title = t.discordButton,
+            Icon = "message-circle",
+            Size = "large",
+            Callback = function()
+                setclipboard("https://discord.gg/CgUa36sPNs")
+                WindUI:Notify({
+                    Title = "Discord",
+                    Content = t.discordCopied,
+                    Duration = 3
+                })
+            end
+        })
+
+        Tabs.Developer:Button({
+            Title = t.contactButton,
+            Icon = "mail",
+            Size = "large",
+            Callback = function()
+                setclipboard("cypherclient")
+                WindUI:Notify({
+                    Title = "Contact",
+                    Content = languageChoice == "Arabic" and "اسم المستخدم: cypherclient" or "Username: cypherclient",
+                    Duration = 3
+                })
+            end
+        })
+    end
+
+    -- =============================================
+    -- بدء التشغيل
+    -- =============================================
+    task.wait(2)
+    
+    -- تحديث أولي
+    local initialEnemies = refreshEnemyNames()
+    
+    -- تحديث الـ Dropdown
+    enemyDropdown:Set({Values = enemyNames})
+    
+    -- إشعار الترحيب
+    WindUI:Notify({
+        Title = "PhantomXPro",
+        Content = t.scriptLoaded .. " (" .. #initialEnemies .. " " .. (languageChoice == "Arabic" and "عدو" or "enemies") .. ")",
+        Duration = 4
+    })
+
+    -- حلقة تحديث ESP
+    local espUpdateConnection = RunService.Heartbeat:Connect(function()
+        if espEnabled then
+            updateAllESP()
+        end
+    end)
+
+else
+    print("Failed to load WindUI")
+end
