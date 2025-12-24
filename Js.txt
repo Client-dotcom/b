@@ -1,0 +1,1327 @@
+print("PhantomXPro")
+
+-- الطريقة الصحيحة لتحميل WindUI
+local success, result = pcall(function()
+    local source = game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua", true)
+    if source then
+        local loaded = loadstring(source)
+        if loaded then
+            return loaded()
+        end
+    end
+    return nil
+end)
+
+if success and result then
+    local WindUI = result
+    local Players = game:GetService("Players")
+    local player = Players.LocalPlayer
+    local RunService = game:GetService("RunService")
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local Workspace = game:GetService("Workspace")
+
+    -- اختيار اللغة في البداية
+    local languageChoice = nil
+    WindUI:Popup({
+        Title = "PhantomXPro - اختر اللغة / Select Language",
+        Icon = "globe",
+        Content = "الرجاء اختيار لغة السكربت\nPlease select script language",
+        Buttons = {
+            {
+                Title = "العربية",
+                Icon = "flag",
+                Variant = "Primary",
+                Callback = function()
+                    languageChoice = "Arabic"
+                end
+            },
+            {
+                Title = "English",
+                Icon = "flag",
+                Variant = "Primary",
+                Callback = function()
+                    languageChoice = "English"
+                end
+            }
+        }
+    })
+
+    -- الانتظار حتى يختار المستخدم اللغة
+    repeat task.wait() until languageChoice ~= nil
+
+    -- نصوص حسب اللغة
+    local texts = {
+        Arabic = {
+            welcomeTitle = "PhantomXPro",
+            welcomeContent = "⚠️ تنبيه هام:\nتشغيل السكربت يكون على مسؤوليتك الشخصية والكاملة، ونحن غير مسؤولين عن أي ضرر. مع أننا نعمل على تقديم سكربت بأعلى معايير الأمان الممكنة، هذا تحذير احتراطي في حال حدوث أي مشكلة غير متوقعة.نتمني لكم تجربة ممتعة ❤",
+            discordTitle = "🎮 انضم لسيرفر الديسكورد",
+            discordContent = "انضم للسيرڤر الرسمي للسكربت!\n• آخر التحديثات\n• مساعدة فنية\n• إقتراحات وتحسينات\n• تحديثات أمان\n\nالرابط: https://discord.gg/CgUa36sPNs",
+            okButton = "موافق",
+            copyButton = "نسخ الرابط وتفعيل السكربت",
+            copiedTitle = "✅ تم نسخ الرابط",
+            copiedContent = "تم تفعيل السكربت!\nرابط الديسكورد في الحافظة",
+            windowTitle = "PhantomXPro",
+            settingsTab = "الإعدادات",
+            mainTab = "الأدوات الرئيسية",
+            developerTab = "المطور",
+            mvsTab = "MVS",
+            themeDropdown = "اختر السمة",
+            themeValues = {"داكن 🌙", "فاتح ☀️", "أزرق 🔵", "أخضر 💚", "أحمر 🔴"},
+            updateButton = "تحديث السكربت",
+            updateTitle = "جاري التحديث",
+            updateContent = "بيتم إعادة تحميل السكربت...",
+            closeButton = "أقفل السكربت",
+            closeTitle = "تم الإغلاق",
+            closeContent = "تم إغلاق السكربت بنجاح",
+            discordButton = "انضم لسيرفر الديسكورد",
+            discordCopied = "✅ تم نسخ الرابط",
+            discordCopiedContent = "رابط الديسكورد في الحافظة",
+            developerName = "Cypher",
+            developerDesc = "مطور سكربتات روبلوكس",
+            versionButton = "الإصدار 2.1.0",
+            contactButton = "تواصل مع المطور",
+            contactCopied = "✅ تم النسخ",
+            contactContent = "اسم المستخدم: cypherclient",
+            finalTitle = "أهلاً وسهلاً في PhantomXPro 🌟",
+            finalContent = "السكربت شغّال وجاهز للاستخدام!\nتمتع بمميزاتنا الحصرية 🚀",
+            espButtonOn = "ESP - مفعل",
+            espButtonOff = "ESP - معطل",
+            espTitle = "ESP للمراقبة",
+            espContent = "تم تفعيل نظام كشف الأعداء",
+            espContentOff = "تم إيقاف نظام كشف الأعداء",
+            hitboxButtonOn = "Hitbox - مفعل",
+            hitboxButtonOff = "Hitbox - معطل",
+            hitboxTitle = "Hitbox للأعداء",
+            hitboxContent = "تم تفعيل نظام Hitbox",
+            hitboxContentOff = "تم إيقاف نظام Hitbox",
+            flyButtonOn = "طيران - مفعل",
+            flyButtonOff = "طيران - معطل",
+            flyTitle = "نظام الطيران",
+            flyContent = "تم تحميل نظام الطيران",
+            hitboxSlider = "حجم Hitbox:",
+            hitboxSliderDesc = "اضبط حجم الهيتبوكس من 1 إلى 50",
+            hitboxSliderNotify = "✅ تم تغيير حجم الهيتبوكس إلى",
+            -- MVS Features
+            mvsTitle = "1kzuya MVS System",
+            mvsWelcome = "نظام MVS المحمل بنجاح",
+            aimAssistTitle = "مساعدة التصويب",
+            aimDistanceTitle = "مسافة التصويب",
+            aimDistanceDesc = "اضبط مسافة التصويب (1-10000)",
+            clickShootTitle = "تصويب بالنقر",
+            autoShootTitle = "تصويب تلقائي",
+            teamESPButtonOn = "ESP الفريق - مفعل",
+            teamESPButtonOff = "ESP الفريق - معطل",
+            teamESPTitle = "ESP لفريق الأعداء",
+            teamESPContent = "تم تفعيل ESP لفريق الأعداء",
+            teamESPContentOff = "تم إيقاف ESP لفريق الأعداء",
+            easyWinLabel = "فوز سهل 😎"
+        },
+        English = {
+            welcomeTitle = "PhantomXPro",
+            welcomeContent = "⚠️ Important Warning:\nUsing the script is at your own personal and full responsibility, and we are not responsible for any damage. While we strive to provide a script with the highest possible security standards, this is a precautionary warning in case any unexpected problem occurs. We wish you a great experience ❤",
+            discordTitle = "🎮 Join Discord Server",
+            discordContent = "Join the official script server!\n• Latest updates\n• Technical help\n• Suggestions and improvements\n• Security updates\n\nLink: https://discord.gg/CgUa36sPNs",
+            okButton = "OK",
+            copyButton = "Copy Link & Activate Script",
+            copiedTitle = "✅ Link Copied",
+            copiedContent = "Script activated!\nDiscord link in clipboard",
+            windowTitle = "PhantomXPro",
+            settingsTab = "Settings",
+            mainTab = "Main Tools",
+            developerTab = "Developer",
+            mvsTab = "MVS",
+            themeDropdown = "Select Theme",
+            themeValues = {"Dark 🌙", "Light ☀️", "Blue 🔵", "Green 💚", "Red 🔴"},
+            updateButton = "Update Script",
+            updateTitle = "Updating",
+            updateContent = "Reloading script...",
+            closeButton = "Close Script",
+            closeTitle = "Closed",
+            closeContent = "Script closed successfully",
+            discordButton = "Join Discord Server",
+            discordCopied = "✅ Link Copied",
+            discordCopiedContent = "Discord link in clipboard",
+            developerName = "Cypher",
+            developerDesc = "Roblox Script Developer",
+            versionButton = "Version 2.1.0",
+            contactButton = "Contact Developer",
+            contactCopied = "✅ Copied",
+            contactContent = "Username: cypherclient",
+            finalTitle = "Welcome to PhantomXPro 🌟",
+            finalContent = "Script is running and ready to use!\nEnjoy our exclusive features 🚀",
+            espButtonOn = "ESP - Enabled",
+            espButtonOff = "ESP - Disabled",
+            espTitle = "ESP System",
+            espContent = "Enemy detection system activated",
+            espContentOff = "Enemy detection system deactivated",
+            hitboxButtonOn = "Hitbox - Enabled",
+            hitboxButtonOff = "Hitbox - Disabled",
+            hitboxTitle = "Enemy Hitbox",
+            hitboxContent = "Hitbox system activated",
+            hitboxContentOff = "Hitbox system deactivated",
+            flyButtonOn = "Fly - Enabled",
+            flyButtonOff = "Fly - Disabled",
+            flyTitle = "Fly System",
+            flyContent = "Fly system loaded successfully",
+            hitboxSlider = "Hitbox Size:",
+            hitboxSliderDesc = "Adjust hitbox size from 1 to 50",
+            hitboxSliderNotify = "✅ Hitbox size changed to",
+            -- MVS Features
+            mvsTitle = "1kzuya MVS System",
+            mvsWelcome = "MVS System Loaded Successfully",
+            aimAssistTitle = "Aim Assist",
+            aimDistanceTitle = "Aim Distance",
+            aimDistanceDesc = "Set aim distance (1-10000)",
+            clickShootTitle = "Click Shoot",
+            autoShootTitle = "Auto Shoot",
+            teamESPButtonOn = "Team ESP - Enabled",
+            teamESPButtonOff = "Team ESP - Disabled",
+            teamESPTitle = "Enemy Team ESP",
+            teamESPContent = "Enemy team ESP activated",
+            teamESPContentOff = "Enemy team ESP deactivated",
+            easyWinLabel = "Easy Win 😎"
+        }
+    }
+
+    local t = texts[languageChoice]
+
+    WindUI.TransparencyValue = 0.5
+    WindUI:SetTheme("Dark")
+
+    -- نافذة البوب أب الترحيبية
+    WindUI:Popup({
+        Title = t.welcomeTitle,
+        Icon = "crown",
+        Content = t.welcomeContent,
+        Buttons = {
+            {
+                Title = t.okButton,
+                Icon = "arrow-right",
+                Variant = "Primary",
+                Callback = function() end
+            }
+        }
+    })
+
+    -- نافذة Discord المنبثقة
+    task.wait(3)
+    WindUI:Popup({
+        Title = t.discordTitle,
+        Icon = "message-circle",
+        Content = t.discordContent,
+        Buttons = {
+            {
+                Title = t.copyButton,
+                Icon = "copy",
+                Variant = "Primary",
+                Callback = function()
+                    setclipboard("https://discord.gg/CgUa36sPNs")
+                    WindUI:Notify({
+                        Title = t.copiedTitle,
+                        Content = t.copiedContent,
+                        Duration = 4
+                    })
+                end
+            }
+        }
+    })
+
+    -- إنشاء النافذة الرئيسية
+    local Window = WindUI:CreateWindow({
+        Title = t.windowTitle,
+        Icon = "crown", 
+        Author = "By_Cypher",
+        Folder = "PhantomXPro",
+        Size = UDim2.fromOffset(800, 650),
+        Theme = "Dark",
+        User = {
+            Enabled = true,
+            Anonymous = false,
+            Callback = function()
+                WindUI:Notify({
+                    Title = languageChoice == "Arabic" and "معلوماتك" or "Your Info",
+                    Content = (languageChoice == "Arabic" and "اسمك: " or "Name: ") .. player.Name,
+                    Duration = 3
+                })
+            end
+        },
+        SideBarWidth = 250,
+        ScrollBarEnabled = true
+    })
+
+    -- الأقسام الرئيسية
+    local Sections = {
+        Main = Window:Section({ Title = t.mainTab, Opened = true }),
+        MVS = Window:Section({ Title = t.mvsTab, Opened = false }),
+        Settings = Window:Section({ Title = t.settingsTab, Opened = false }),
+        Credits = Window:Section({ Title = t.developerTab, Opened = false })
+    }
+
+    -- التبويبات
+    local Tabs = {
+        Main = Sections.Main:Tab({ Title = t.mainTab, Icon = "grid" }),
+        MVS_Tools = Sections.MVS:Tab({ Title = t.mvsTab, Icon = "target" }),
+        Config = Sections.Settings:Tab({ Title = t.settingsTab, Icon = "settings" }),
+        Developer = Sections.Credits:Tab({ Title = t.developerTab, Icon = "user" })
+    }
+
+    -- متغيرات الحالة
+    local ESPState = false
+    local HitboxState = false
+    local FlyState = false
+    local CurrentHitboxSize = 20
+    local ESPScriptLoaded = false
+    local HitboxScriptLoaded = false
+    local FlyScriptLoaded = false
+
+    -- متغيرات MVS
+    local AimAssistState = false
+    local TeamESPState = false
+    local ClickShootState = false
+    local AutoShootState = false
+    local AimDistance = 250
+    local MVSESP_Highlights = {}
+    local CurrentWeapon = nil
+    local IsWeaponEquipped = false
+    local LastFireTime = 0
+    local FireDelay = 1.5
+    _G.BlockClick = false
+
+    -- =============================================
+    -- تبويب الأدوات الرئيسية (Main)
+    -- =============================================
+    do
+        -- زر ESP
+        local espButtonText = t.espButtonOff
+        local espButton = Tabs.Main:Button({
+            Title = espButtonText,
+            Icon = "eye",
+            Size = "xlarge",
+            Callback = function()
+                ESPState = not ESPState
+                
+                if ESPState then
+                    espButtonText = t.espButtonOn
+                    WindUI:Notify({
+                        Title = t.espTitle,
+                        Content = t.espContent,
+                        Duration = 3
+                    })
+                    
+                    -- تحميل سكربت ESP
+                    loadstring(game:HttpGet("https://raw.githubusercontent.com/AlphaBay00/Test/main/Enemy%20detc.txt", true))()
+                    ESPScriptLoaded = true
+                    
+                    -- تحديث النص في الزر
+                    espButton:Destroy()
+                    espButton = Tabs.Main:Button({
+                        Title = espButtonText,
+                        Icon = "eye",
+                        Size = "xlarge",
+                        Callback = function()
+                            ESPState = not ESPState
+                            
+                            if not ESPState then
+                                espButtonText = t.espButtonOff
+                                WindUI:Notify({
+                                    Title = t.espTitle,
+                                    Content = t.espContentOff,
+                                    Duration = 3
+                                })
+                                
+                                -- تنظيف ESP
+                                for _, obj in pairs(game:GetService("Workspace"):GetChildren()) do
+                                    if obj.Name:find("_EnemyChams") or obj.Name:find("_EnemyName") then
+                                        obj:Destroy()
+                                    end
+                                end
+                                ESPScriptLoaded = false
+                                
+                                -- تحديث النص في الزر
+                                espButton:Destroy()
+                                espButton = Tabs.Main:Button({
+                                    Title = espButtonText,
+                                    Icon = "eye",
+                                    Size = "xlarge",
+                                    Callback = function()
+                                        ESPState = not ESPState
+                                        
+                                        if ESPState then
+                                            espButtonText = t.espButtonOn
+                                            WindUI:Notify({
+                                                Title = t.espTitle,
+                                                Content = t.espContent,
+                                                Duration = 3
+                                            })
+                                            
+                                            -- تحميل سكربت ESP
+                                            loadstring(game:HttpGet("https://raw.githubusercontent.com/AlphaBay00/Test/main/Enemy%20detc.txt", true))()
+                                            ESPScriptLoaded = true
+                                            
+                                            -- تحديث النص في الزر
+                                            espButton:Destroy()
+                                            espButton = Tabs.Main:Button({
+                                                Title = espButtonText,
+                                                Icon = "eye",
+                                                Size = "xlarge",
+                                                Callback = function()
+                                                    -- كود التبديل...
+                                                end
+                                            })
+                                        end
+                                    end
+                                })
+                            end
+                        end
+                    })
+                end
+            end
+        })
+
+        -- زر Hitbox
+        local hitboxButtonText = t.hitboxButtonOff
+        local hitboxButton = Tabs.Main:Button({
+            Title = hitboxButtonText,
+            Icon = "target",
+            Size = "xlarge",
+            Callback = function()
+                HitboxState = not HitboxState
+                
+                if HitboxState then
+                    hitboxButtonText = t.hitboxButtonOn
+                    WindUI:Notify({
+                        Title = t.hitboxTitle,
+                        Content = t.hitboxContent,
+                        Duration = 3
+                    })
+                    
+                    -- تحميل سكربت Hitbox مع حجم محدد
+                    local hitboxScript = game:HttpGet("https://raw.githubusercontent.com/AlphaBay00/Test/main/hitbox%20.txt", true)
+                    hitboxScript = hitboxScript:gsub("local HitboxSize = 20", "local HitboxSize = " .. CurrentHitboxSize)
+                    loadstring(hitboxScript)()
+                    HitboxScriptLoaded = true
+                    
+                    -- تحديث النص في الزر
+                    hitboxButton:Destroy()
+                    hitboxButton = Tabs.Main:Button({
+                        Title = hitboxButtonText,
+                        Icon = "target",
+                        Size = "xlarge",
+                        Callback = function()
+                            HitboxState = not HitboxState
+                            
+                            if not HitboxState then
+                                hitboxButtonText = t.hitboxButtonOff
+                                WindUI:Notify({
+                                    Title = t.hitboxTitle,
+                                    Content = t.hitboxContentOff,
+                                    Duration = 3
+                                })
+                                
+                                -- تنظيف Hitbox
+                                local gui = player:FindFirstChild("PlayerGui")
+                                if gui then
+                                    local hitboxGui = gui:FindFirstChild("HitboxControl")
+                                    if hitboxGui then
+                                        hitboxGui:Destroy()
+                                    end
+                                end
+                                
+                                -- إرجاع حجم HRP الطبيعي لجميع اللاعبين
+                                for _, otherPlayer in pairs(Players:GetPlayers()) do
+                                    if otherPlayer ~= player and otherPlayer.Character then
+                                        local hrp = otherPlayer.Character:FindFirstChild("HumanoidRootPart")
+                                        if hrp and hrp:IsA("BasePart") then
+                                            hrp.Size = Vector3.new(2, 1, 1)
+                                            hrp.Transparency = 0
+                                            hrp.CanCollide = true
+                                            hrp.Color = Color3.fromRGB(255, 255, 255)
+                                        end
+                                    end
+                                end
+                                HitboxScriptLoaded = false
+                                
+                                -- تحديث النص في الزر
+                                hitboxButton:Destroy()
+                                hitboxButton = Tabs.Main:Button({
+                                    Title = hitboxButtonText,
+                                    Icon = "target",
+                                    Size = "xlarge",
+                                    Callback = function()
+                                        HitboxState = not HitboxState
+                                        
+                                        if HitboxState then
+                                            hitboxButtonText = t.hitboxButtonOn
+                                            WindUI:Notify({
+                                                Title = t.hitboxTitle,
+                                                Content = t.hitboxContent,
+                                                Duration = 3
+                                            })
+                                            
+                                            -- تحميل سكربت Hitbox مع حجم محدد
+                                            local hitboxScript = game:HttpGet("https://raw.githubusercontent.com/AlphaBay00/Test/main/hitbox%20.txt", true)
+                                            hitboxScript = hitboxScript:gsub("local HitboxSize = 20", "local HitboxSize = " .. CurrentHitboxSize)
+                                            loadstring(hitboxScript)()
+                                            HitboxScriptLoaded = true
+                                            
+                                            -- تحديث النص في الزر
+                                            hitboxButton:Destroy()
+                                            hitboxButton = Tabs.Main:Button({
+                                                Title = hitboxButtonText,
+                                                Icon = "target",
+                                                Size = "xlarge",
+                                                Callback = function()
+                                                    -- كود التبديل...
+                                                end
+                                            })
+                                        end
+                                    end
+                                })
+                            end
+                        end
+                    })
+                end
+            end
+        })
+
+        -- سلايدر حجم Hitbox
+        Tabs.Main:Slider({
+            Title = t.hitboxSlider,
+            Desc = t.hitboxSliderDesc,
+            Value = CurrentHitboxSize,
+            Min = 1,
+            Max = 50,
+            Step = 1,
+            Callback = function(value)
+                CurrentHitboxSize = value
+                WindUI:Notify({
+                    Title = t.hitboxSliderNotify,
+                    Content = tostring(value),
+                    Duration = 3
+                })
+                
+                -- إذا كان Hitbox مفعلاً، نعيد تحميله بالحجم الجديد
+                if HitboxState and HitboxScriptLoaded then
+                    -- تنظيف الـ GUI القديم
+                    local gui = player:FindFirstChild("PlayerGui")
+                    if gui then
+                        local hitboxGui = gui:FindFirstChild("HitboxControl")
+                        if hitboxGui then
+                            hitboxGui:Destroy()
+                        end
+                    end
+                    
+                    -- تحميل سكربت جديد بالحجم الجديد
+                    local hitboxScript = game:HttpGet("https://raw.githubusercontent.com/AlphaBay00/Test/main/hitbox%20.txt", true)
+                    hitboxScript = hitboxScript:gsub("local HitboxSize = 20", "local HitboxSize = " .. CurrentHitboxSize)
+                    loadstring(hitboxScript)()
+                end
+            end
+        })
+
+        -- زر الطيران
+        local flyButtonText = t.flyButtonOff
+        local flyButton = Tabs.Main:Button({
+            Title = flyButtonText,
+            Icon = "wind",
+            Size = "xlarge",
+            Callback = function()
+                FlyState = not FlyState
+                
+                if FlyState then
+                    flyButtonText = t.flyButtonOn
+                    WindUI:Notify({
+                        Title = t.flyTitle,
+                        Content = t.flyContent,
+                        Duration = 3
+                    })
+                    
+                    -- تحميل سكربت الطيران
+                    loadstring(game:HttpGet("https://pastebin.com/raw/5WLxDDvL", true))()
+                    FlyScriptLoaded = true
+                    
+                    -- تحديث النص في الزر
+                    flyButton:Destroy()
+                    flyButton = Tabs.Main:Button({
+                        Title = flyButtonText,
+                        Icon = "wind",
+                        Size = "xlarge",
+                        Callback = function()
+                            FlyState = not FlyState
+                            
+                            if not FlyState then
+                                flyButtonText = t.flyButtonOff
+                                -- إيقاف الطيران
+                                local humanoid = player.Character and player.Character:FindFirstChild("Humanoid")
+                                if humanoid then
+                                    humanoid.PlatformStand = false
+                                end
+                                FlyScriptLoaded = false
+                                
+                                -- تحديث النص في الزر
+                                flyButton:Destroy()
+                                flyButton = Tabs.Main:Button({
+                                    Title = flyButtonText,
+                                    Icon = "wind",
+                                    Size = "xlarge",
+                                    Callback = function()
+                                        FlyState = not FlyState
+                                        
+                                        if FlyState then
+                                            flyButtonText = t.flyButtonOn
+                                            WindUI:Notify({
+                                                Title = t.flyTitle,
+                                                Content = t.flyContent,
+                                                Duration = 3
+                                            })
+                                            
+                                            -- تحميل سكربت الطيران
+                                            loadstring(game:HttpGet("https://pastebin.com/raw/5WLxDDvL", true))()
+                                            FlyScriptLoaded = true
+                                            
+                                            -- تحديث النص في الزر
+                                            flyButton:Destroy()
+                                                flyButton = Tabs.Main:Button({
+                                                Title = flyButtonText,
+                                                Icon = "wind",
+                                                Size = "xlarge",
+                                                Callback = function()
+                                                    -- كود التبديل...
+                                                end
+                                            })
+                                        end
+                                    end
+                                })
+                            end
+                        end
+                    })
+                end
+            end
+        })
+    end
+
+    -- =============================================
+    -- تبويب MVS (1kzuya MVS System)
+    -- =============================================
+    do
+        -- إشعار الترحيب
+        WindUI:Notify({
+            Title = t.mvsTitle,
+            Content = t.mvsWelcome,
+            Duration = 5
+        })
+
+        -- علامة "Easy Win"
+        Tabs.MVS_Tools:Label({
+            Title = t.easyWinLabel,
+            Desc = "",
+            Icon = "award",
+            Color = Color3.fromHex("#FFD700")
+        })
+
+        -- قسم Aim Assist
+        Tabs.MVS_Tools:Heading({
+            Title = t.aimAssistTitle,
+            Color = Color3.fromHex("#00FF00")
+        })
+
+        -- إدخال مسافة التصويب
+        Tabs.MVS_Tools:Input({
+            Title = t.aimDistanceTitle,
+            Desc = t.aimDistanceDesc,
+            Icon = "maximize-2",
+            Placeholder = "250",
+            Default = "250",
+            ClearTextOnFocus = false,
+            Callback = function(text)
+                local num = tonumber(text)
+                if num then
+                    AimDistance = math.clamp(num, 1, 10000)
+                    WindUI:Notify({
+                        Title = t.aimDistanceTitle,
+                        Content = languageChoice == "Arabic" and "تم ضبط المسافة على: " or "Distance set to: " .. AimDistance,
+                        Duration = 3
+                    })
+                end
+            end
+        })
+
+        -- Toggle Click Shoot
+        local clickShootToggle = Tabs.MVS_Tools:Toggle({
+            Title = t.clickShootTitle,
+            Icon = "mouse-pointer",
+            Desc = "",
+            Callback = function(state)
+                ClickShootState = state
+                WindUI:Notify({
+                    Title = t.clickShootTitle,
+                    Content = languageChoice == "Arabic" and (state and "مفعل" or "معطل") or (state and "Enabled" or "Disabled"),
+                    Duration = 3
+                })
+            end
+        })
+
+        -- Toggle Auto Shoot
+        local autoShootToggle = Tabs.MVS_Tools:Toggle({
+            Title = t.autoShootTitle,
+            Icon = "zap",
+            Desc = "",
+            Callback = function(state)
+                AutoShootState = state
+                WindUI:Notify({
+                    Title = t.autoShootTitle,
+                    Content = languageChoice == "Arabic" and (state and "مفعل" or "معطل") or (state and "Enabled" or "Disabled"),
+                    Duration = 3
+                })
+            end
+        })
+
+        -- زر Team ESP
+        local teamESPButtonText = t.teamESPButtonOff
+        local teamESPButton = Tabs.MVS_Tools:Button({
+            Title = teamESPButtonText,
+            Icon = "users",
+            Size = "xlarge",
+            Callback = function()
+                TeamESPState = not TeamESPState
+                
+                if TeamESPState then
+                    teamESPButtonText = t.teamESPButtonOn
+                    WindUI:Notify({
+                        Title = t.teamESPTitle,
+                        Content = t.teamESPContent,
+                        Duration = 3
+                    })
+                    
+                    -- تحديث النص في الزر
+                    teamESPButton:Destroy()
+                    teamESPButton = Tabs.MVS_Tools:Button({
+                        Title = teamESPButtonText,
+                        Icon = "users",
+                        Size = "xlarge",
+                        Callback = function()
+                            TeamESPState = not TeamESPState
+                            
+                            if not TeamESPState then
+                                teamESPButtonText = t.teamESPButtonOff
+                                WindUI:Notify({
+                                    Title = t.teamESPTitle,
+                                    Content = t.teamESPContentOff,
+                                    Duration = 3
+                                })
+                                
+                                -- تنظيف Team ESP
+                                for player, highlight in pairs(MVSESP_Highlights) do
+                                    pcall(function() highlight:Destroy() end)
+                                end
+                                MVSESP_Highlights = {}
+                                
+                                -- تحديث النص في الزر
+                                teamESPButton:Destroy()
+                                teamESPButton = Tabs.MVS_Tools:Button({
+                                    Title = teamESPButtonText,
+                                    Icon = "users",
+                                    Size = "xlarge",
+                                    Callback = function()
+                                        TeamESPState = not TeamESPState
+                                        
+                                        if TeamESPState then
+                                            teamESPButtonText = t.teamESPButtonOn
+                                            WindUI:Notify({
+                                                Title = t.teamESPTitle,
+                                                Content = t.teamESPContent,
+                                                Duration = 3
+                                            })
+                                            
+                                            -- تحديث النص في الزر
+                                            teamESPButton:Destroy()
+                                            teamESPButton = Tabs.MVS_Tools:Button({
+                                                Title = teamESPButtonText,
+                                                Icon = "users",
+                                                Size = "xlarge",
+                                                Callback = function()
+                                                    -- كود التبديل...
+                                                end
+                                            })
+                                        end
+                                    end
+                                })
+                            end
+                        end
+                    })
+                end
+            end
+        })
+    end
+
+    -- =============================================
+    -- تبويب الإعدادات (Config)
+    -- =============================================
+    do
+        Tabs.Config:Dropdown({
+            Title = t.themeDropdown,
+            Values = t.themeValues,
+            Value = t.themeValues[1],
+            Size = "xlarge",
+            Callback = function(value)
+                local themeMap = {
+                    [t.themeValues[1]] = "Dark",
+                    [t.themeValues[2]] = "Light", 
+                    [t.themeValues[3]] = "Sapphire",
+                    [t.themeValues[4]] = "Emerald",
+                    [t.themeValues[5]] = "Ruby"
+                }
+                WindUI:SetTheme(themeMap[value] or "Dark")
+            end
+        })
+
+        -- زر تحديث السكربت
+        Tabs.Config:Button({
+            Title = t.updateButton,
+            Icon = "refresh-cw",
+            Size = "xlarge",
+            Callback = function()
+                WindUI:Notify({
+                    Title = t.updateTitle,
+                    Content = t.updateContent,
+                    Duration = 3
+                })
+                wait(2)
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/AlphaBay00/Test/main/Faq.txt", true))()
+            end
+        })
+
+        -- زر إغلاق السكربت
+        Tabs.Config:Button({
+            Title = t.closeButton,
+            Icon = "power",
+            Size = "xlarge",
+            Callback = function()
+                -- تنظيف جميع السكربتات أولاً
+                
+                -- تنظيف ESP
+                for _, obj in pairs(game:GetService("Workspace"):GetChildren()) do
+                    if obj.Name:find("_EnemyChams") or obj.Name:find("_EnemyName") then
+                        obj:Destroy()
+                    end
+                end
+                
+                -- تنظيف Hitbox
+                local gui = player:FindFirstChild("PlayerGui")
+                if gui then
+                    local hitboxGui = gui:FindFirstChild("HitboxControl")
+                        if hitboxGui then
+                        hitboxGui:Destroy()
+                    end
+                end
+                
+                -- تنظيف Team ESP
+                for player, highlight in pairs(MVSESP_Highlights) do
+                    pcall(function() highlight:Destroy() end)
+                end
+                MVSESP_Highlights = {}
+                
+                -- إرجاع حجم HRP الطبيعي
+                for _, otherPlayer in pairs(Players:GetPlayers()) do
+                    if otherPlayer ~= player and otherPlayer.Character then
+                        local hrp = otherPlayer.Character:FindFirstChild("HumanoidRootPart")
+                        if hrp and hrp:IsA("BasePart") then
+                            hrp.Size = Vector3.new(2, 1, 1)
+                            hrp.Transparency = 0
+                            hrp.CanCollide = true
+                            hrp.Color = Color3.fromRGB(255, 255, 255)
+                        end
+                    end
+                end
+                
+                -- إيقاف الطيران
+                local humanoid = player.Character and player.Character:FindFirstChild("Humanoid")
+                if humanoid then
+                    humanoid.PlatformStand = false
+                end
+                
+                -- إغلاق النافذة
+                Window:Destroy()
+                WindUI:Notify({
+                    Title = t.closeTitle,
+                    Content = t.closeContent,
+                    Duration = 3
+                })
+            end
+        })
+
+        -- زر دخول الديسكورد
+        Tabs.Config:Button({
+            Title = t.discordButton,
+            Icon = "message-circle",
+            Size = "xlarge",
+            Callback = function()
+                setclipboard("https://discord.gg/CgUa36sPNs")
+                WindUI:Notify({
+                    Title = t.discordCopied,
+                    Content = t.discordCopiedContent,
+                    Duration = 4
+                })
+            end
+        })
+    end
+
+    -- =============================================
+    -- تبويب المطور (Credits)
+    -- =============================================
+    do
+        Tabs.Developer:Paragraph({
+            Title = t.developerName,
+            Desc = t.developerDesc,
+            Image = "user",
+            ImageSize = 80,
+            Color = Color3.fromHex("#FF6B35")
+        })
+
+        -- معلومات المطور
+        Tabs.Developer:Button({
+            Title = t.versionButton,
+            Icon = "tag",
+            Size = "xlarge",
+            Callback = function()
+                WindUI:Notify({
+                    Title = "PhantomXPro v2.1.0",
+                    Content = languageChoice == "Arabic" and "أحدث إصدار من السكربت" or "Latest script version",
+                    Duration = 4
+                })
+            end
+        })
+
+        Tabs.Developer:Button({
+            Title = t.discordButton,
+            Icon = "message-circle",
+            Size = "xlarge",
+            Callback = function()
+                setclipboard("https://discord.gg/CgUa36sPNs")
+                WindUI:Notify({
+                    Title = t.discordCopied,
+                    Content = t.discordCopiedContent,
+                    Duration = 4
+                })
+            end
+        })
+
+        Tabs.Developer:Button({
+            Title = t.contactButton,
+            Icon = "mail",
+            Size = "xlarge",
+            Callback = function()
+                setclipboard("cypherclient")
+                WindUI:Notify({
+                    Title = t.contactCopied,
+                    Content = t.contactContent,
+                    Duration = 4
+                })
+            end
+        })
+    end
+
+    -- =============================================
+    -- دوال MVS الأساسية
+    -- =============================================
+    local function getTeamFrames()
+        local success, redFrame, blueFrame = pcall(function()
+            local playerGui = player:FindFirstChildOfClass("PlayerGui")
+            if not playerGui then return nil, nil end
+            local main = playerGui:FindFirstChild("Main")
+            if not main then return nil, nil end
+            local mainGameFrame = main:FindFirstChild("MainGameFrame")
+            if not mainGameFrame then return nil, nil end
+            local playersFrame = mainGameFrame:FindFirstChild("PlayersFrame")
+            if not playersFrame then return nil, nil end
+            return playersFrame:FindFirstChild("TeamRedFrame"), playersFrame:FindFirstChild("TeamBlueFrame")
+        end)
+        if success then
+            return redFrame, blueFrame
+        end
+        return nil, nil
+    end
+
+    local function getFrameChildrenNames(frame)
+        local names = {}
+        if not frame then return names end
+        for _, child in ipairs(frame:GetChildren()) do
+            if child:IsA("Frame") then
+                table.insert(names, child.Name)
+            end
+        end
+        return names
+    end
+
+    local function sanitizeName(name)
+        return tostring(name):gsub("%s+", "")
+    end
+
+    local function getEnemyPlayers()
+        local redFrame, blueFrame = getTeamFrames()
+        if not redFrame or not blueFrame then return {}, {} end
+
+        local redPlayers = getFrameChildrenNames(redFrame)
+        local bluePlayers = getFrameChildrenNames(blueFrame)
+
+        local isLocalPlayerInRed = false
+        local isLocalPlayerInBlue = false
+
+        local sanitizedLocalPlayerName = sanitizeName(player.Name)
+
+        for _, name in ipairs(redPlayers) do
+            if sanitizeName(name) == sanitizedLocalPlayerName then
+                isLocalPlayerInRed = true
+                break
+            end
+        end
+
+        for _, name in ipairs(bluePlayers) do
+            if sanitizeName(name) == sanitizedLocalPlayerName then
+                isLocalPlayerInBlue = true
+                break
+            end
+        end
+
+        if not isLocalPlayerInRed and not isLocalPlayerInBlue then
+            return {}, {}
+        end
+
+        local enemyFrame = isLocalPlayerInRed and blueFrame or redFrame
+        local enemyNames = getFrameChildrenNames(enemyFrame)
+
+        local enemyPlayerInstances = {}
+        for _, name in ipairs(enemyNames) do
+            local enemyPlayer = Players:FindFirstChild(name)
+            if enemyPlayer and enemyPlayer ~= player then
+                table.insert(enemyPlayerInstances, enemyPlayer)
+            end
+        end
+
+        local enemyTeamColor = isLocalPlayerInRed and Color3.fromRGB(0, 0, 255) or Color3.fromRGB(255, 0, 0)
+
+        return enemyPlayerInstances, enemyTeamColor
+    end
+
+    local function updateWeaponScripts()
+        pcall(function()
+            if not CurrentWeapon or not CurrentWeapon.Parent or not CurrentWeapon:IsDescendantOf(game) then
+                return
+            end
+
+            local scripts = {}
+            for _, descendant in ipairs(CurrentWeapon:GetDescendants()) do
+                if descendant:IsA("Script") or descendant:IsA("LocalScript") then
+                    table.insert(scripts, descendant)
+                end
+            end
+            table.insert(scripts, CurrentWeapon:FindFirstChild("Client"))
+            table.insert(scripts, CurrentWeapon:FindFirstChild("GunScript"))
+
+            for _, script in ipairs(scripts) do
+                if script and script.Disabled ~= _G.BlockClick then
+                    script.Disabled = _G.BlockClick
+                end
+            end
+        end)
+    end
+
+    local function initializeWeaponScript()
+        local character = player.Character
+        if not character then
+            CurrentWeapon = nil
+            IsWeaponEquipped = false
+            return
+        end
+
+        local equippedTool
+        for _, child in ipairs(character:GetChildren()) do
+            if child:IsA("Tool") and child:FindFirstChild("fire") then
+                equippedTool = child
+                break
+            end
+        end
+
+        if equippedTool and CurrentWeapon ~= equippedTool then
+            CurrentWeapon = equippedTool
+            IsWeaponEquipped = true
+            updateWeaponScripts()
+        elseif not equippedTool and IsWeaponEquipped then
+            CurrentWeapon = nil
+            IsWeaponEquipped = false
+        end
+    end
+
+    local function updateBlockState()
+        if (ClickShootState or AutoShootState) and _G.BlockClick then
+            _G.BlockClick = false
+            updateWeaponScripts()
+        elseif not (ClickShootState or AutoShootState) and not _G.BlockClick then
+            _G.BlockClick = true
+            updateWeaponScripts()
+        end
+    end
+
+    -- تحديث حالة BlockClick
+    task.spawn(function()
+        while task.wait(0.1) do
+            if ClickShootState or AutoShootState then
+                updateBlockState()
+            end
+        end
+    end)
+
+    -- Backpack listeners
+    if player.Backpack then
+        player.Backpack.ChildRemoved:Connect(function(child)
+            if child:IsA("Tool") and child == CurrentWeapon then
+                IsWeaponEquipped = false
+                task.wait(0.1)
+                initializeWeaponScript()
+            end
+        end)
+        player.Backpack.ChildAdded:Connect(function(child)
+            if child:IsA("Tool") and child:FindFirstChild("fire") and CurrentWeapon and child.Name == CurrentWeapon.Name then
+                CurrentWeapon = nil
+                IsWeaponEquipped = false
+                updateWeaponScripts()
+            end
+        end)
+    end
+
+    task.spawn(function()
+        while task.wait(0.1) do
+            initializeWeaponScript()
+        end
+    end)
+
+    -- Closest player & visibility
+    local function getClosestPlayer()
+        local players, _ = getEnemyPlayers()
+        if not players or type(players) ~= "table" then return nil end
+
+        local character = player.Character
+        if not character or not character:IsDescendantOf(Workspace) then return nil end
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        if not hrp then return nil end
+
+        local closestPlayer, minDistance = nil, AimDistance or 250
+        for _, enemyPlayer in ipairs(players) do
+            if enemyPlayer and typeof(enemyPlayer) == "Instance" and enemyPlayer:IsA("Player") then
+                local targetCharacter = enemyPlayer.Character
+                if targetCharacter and targetCharacter:IsDescendantOf(Workspace) then
+                    local targetHrp = targetCharacter:FindFirstChild("HumanoidRootPart")
+                    local targetHumanoid = targetCharacter:FindFirstChild("Humanoid")
+                    if targetHrp and targetHumanoid and targetHumanoid.Health > 0 then
+                        local success, distance = pcall(function() return (hrp.Position - targetHrp.Position).Magnitude end)
+                        if success and distance < minDistance then
+                            minDistance = distance
+                            closestPlayer = enemyPlayer
+                        end
+                    end
+                end
+            end
+        end
+        return closestPlayer
+    end
+
+    local function canSeeTarget(targetPlayer)
+        if not targetPlayer then return false end
+
+        local localCharacter = player.Character
+        if not localCharacter or not localCharacter:IsDescendantOf(Workspace) then return false end
+        local targetCharacter = targetPlayer.Character
+        if not targetCharacter or not targetCharacter:IsDescendantOf(Workspace) then return false end
+
+        local localHrp = localCharacter:FindFirstChild("HumanoidRootPart")
+        local targetHrp = targetCharacter:FindFirstChild("HumanoidRootPart")
+        local targetHumanoid = targetCharacter:FindFirstChild("Humanoid")
+
+        if not localHrp or not targetHrp or not targetHumanoid then return false end
+
+        local success, distance = pcall(function() return (localHrp.Position - targetHrp.Position).Magnitude end)
+        if not success or distance > (AimDistance or 250) then return false end
+
+        local raycastParams = RaycastParams.new()
+        raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+        raycastParams.FilterDescendantsInstances = { localCharacter }
+        raycastParams.IgnoreWater = true
+        raycastParams.CollisionGroup = "Default"
+
+        local direction = targetHrp.Position - localHrp.Position
+        local raycastResult = Workspace:Raycast(localHrp.Position, direction.Unit * math.min(distance, AimDistance or 250), raycastParams)
+
+        if not raycastResult then return true end
+        local hitPart = raycastResult.Instance
+        if hitPart and hitPart:IsDescendantOf(targetCharacter) then
+            return true
+        end
+
+        return false
+    end
+
+    local function shootLogic()
+        if tick() - LastFireTime < FireDelay then return end
+        LastFireTime = tick()
+        if not IsWeaponEquipped then return end
+        local target = getClosestPlayer()
+        if not target then return end
+        if not canSeeTarget(target) then return end
+
+        local localCharacter = player.Character
+        if not localCharacter or not localCharacter:IsDescendantOf(Workspace) then return end
+        local localHrp = localCharacter:FindFirstChild("HumanoidRootPart")
+        if not localHrp then return end
+
+        local targetCharacter = target.Character
+        if not targetCharacter or not targetCharacter:IsDescendantOf(Workspace) then return end
+        local targetHrp = targetCharacter:FindFirstChild("HumanoidRootPart")
+        if not targetHrp then return end
+
+        local predictedPosition = targetHrp.Position
+        local handle = CurrentWeapon:FindFirstChild("Handle") or CurrentWeapon
+        if not handle then return end
+
+        pcall(function() CurrentWeapon.fire:FireServer() end)
+        pcall(function()
+            local beamRemote = ReplicatedStorage:FindFirstChild("LocalBeam")
+            if beamRemote then
+                beamRemote:Fire(handle, predictedPosition)
+            end
+            local showBeamRemote = CurrentWeapon:FindFirstChild("showBeam")
+            if showBeamRemote then
+                showBeamRemote:FireServer(predictedPosition, localHrp.Position, handle)
+            end
+        end)
+        pcall(function()
+            local direction = (predictedPosition - localHrp.Position).Unit
+            CurrentWeapon.kill:FireServer(target, direction, localHrp.Position)
+        end)
+    end
+
+    -- Auto Shoot System
+    task.spawn(function()
+        while RunService.Heartbeat:Wait() do
+            if AutoShootState and IsWeaponEquipped and CurrentWeapon and not _G.BlockClick then
+                local target = getClosestPlayer()
+                if target and canSeeTarget(target) then
+                    shootLogic()
+                end
+            end
+        end
+    end)
+
+    -- Click Shoot System
+    local Mouse = player:GetMouse()
+    Mouse.Button1Down:Connect(function()
+        if ClickShootState and IsWeaponEquipped and CurrentWeapon and not _G.BlockClick then
+            local target = getClosestPlayer()
+            if target and canSeeTarget(target) then
+                shootLogic()
+            end
+        end
+    end)
+
+    -- Team ESP System
+    local function removeTeamHighlight(targetPlayer)
+        if MVSESP_Highlights[targetPlayer] then
+            pcall(function() MVSESP_Highlights[targetPlayer]:Destroy() end)
+            MVSESP_Highlights[targetPlayer] = nil
+        end
+    end
+
+    local function updateTeamHighlight(targetPlayer, color)
+        local character = targetPlayer.Character
+        if not character then removeTeamHighlight(targetPlayer) return end
+
+        local highlight = MVSESP_Highlights[targetPlayer]
+        if not highlight or not highlight.Parent then
+            if highlight then removeTeamHighlight(targetPlayer) end
+            highlight = Instance.new("Highlight")
+            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+            highlight.FillTransparency = 0.5
+            highlight.OutlineTransparency = 0
+            highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+            highlight.Parent = character
+            MVSESP_Highlights[targetPlayer] = highlight
+        end
+
+        highlight.Adornee = character
+        highlight.FillColor = color
+    end
+
+    local function updateAllTeamHighlights()
+        if not TeamESPState then
+            for targetPlayer, _ in pairs(MVSESP_Highlights) do removeTeamHighlight(targetPlayer) end
+            return
+        end
+
+        local enemyPlayers, enemyColor = getEnemyPlayers()
+        if not enemyPlayers then return end
+
+        local currentEnemies = {}
+        for _, enemyPlayer in ipairs(enemyPlayers) do
+            currentEnemies[enemyPlayer] = true
+            updateTeamHighlight(enemyPlayer, enemyColor)
+        end
+
+        for targetPlayer, _ in pairs(MVSESP_Highlights) do
+            if not currentEnemies[targetPlayer] then removeTeamHighlight(targetPlayer) end
+        end
+    end
+
+    RunService.Heartbeat:Connect(function()
+        if TeamESPState then pcall(updateAllTeamHighlights) end
+    end)
+
+    -- Track player characters
+    local function trackCharacter(targetPlayer)
+        local function onCharAdded(character)
+            task.wait(0.1)
+            if TeamESPState then updateAllTeamHighlights() end
+        end
+        targetPlayer.CharacterAdded:Connect(onCharAdded)
+    end
+
+    for _, otherPlayer in ipairs(Players:GetPlayers()) do
+        if otherPlayer ~= player then trackCharacter(otherPlayer) end
+    end
+
+    Players.PlayerAdded:Connect(function(newPlayer)
+        if newPlayer ~= player then trackCharacter(newPlayer) end
+    end)
+
+    player.CharacterAdded:Connect(function()
+        task.wait(0.1)
+        if TeamESPState then updateAllTeamHighlights() end
+    end)
+
+    Players.PlayerRemoving:Connect(function(leavingPlayer)
+        removeTeamHighlight(leavingPlayer)
+    end)
+
+    -- التنظيف عند الإغلاق
+    Window:OnDestroy(function()
+        -- تنظيف Team ESP
+        for targetPlayer, highlight in pairs(MVSESP_Highlights) do
+            pcall(function() highlight:Destroy() end)
+        end
+        MVSESP_Highlights = {}
+        
+        WindUI:Notify({
+            Title = languageChoice == "Arabic" and "إغلاق السكربت" or "Script Closed",
+            Content = languageChoice == "Arabic" and "تم إغلاق PhantomXPro بنجاح" or "PhantomXPro closed successfully",
+            Duration = 3
+        })
+    end)
+
+    -- إشعار الترحيب النهائي
+    task.wait(4)
+    WindUI:Notify({
+        Title = t.finalTitle,
+        Content = t.finalContent,
+        Duration = 8
+    })
+else
+    print("Failed to load WindUI")
+end
