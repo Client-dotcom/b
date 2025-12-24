@@ -1,0 +1,1961 @@
+--[[
+    نظام ESP + AimBot كامل متقدم
+    النسخة النهائية - 1000+ سطر
+    مصمم للجوال - Delta Executor
+]]
+
+-- ======== تعريف الخدمات ========
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+local TextService = game:GetService("TextService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+
+local LocalPlayer = Players.LocalPlayer
+local Camera = Workspace.CurrentCamera
+local Mouse = LocalPlayer:GetMouse()
+
+-- ======== إعدادات ESP الكاملة ========
+local ESPConfig = {
+    Enabled = true,
+    TeamCheck = true,
+    UseTeamColor = true,
+    MaxDistance = 2000,
+    RefreshRate = 0.016,
+    
+    BoxESP = true,
+    BoxColor = Color3.fromRGB(255, 50, 50),
+    BoxThickness = 2,
+    BoxTransparency = 0.3,
+    BoxFilled = false,
+    BoxRounding = 0,
+    
+    ShowName = true,
+    NameColor = Color3.fromRGB(255, 255, 255),
+    NameSize = 18,
+    NameOutline = true,
+    NameFont = 2,
+    
+    ShowHealth = true,
+    ShowHealthBar = true,
+    ShowHealthText = true,
+    HealthColor = Color3.fromRGB(0, 255, 100),
+    HealthTextSize = 14,
+    HealthBarWidth = 4,
+    HealthBarHeight = 30,
+    HealthBarOffset = 0,
+    
+    ShowDistance = true,
+    DistanceColor = Color3.fromRGB(200, 200, 200),
+    DistanceTextSize = 14,
+    DistanceUnit = "m",
+    
+    ShowTracer = false,
+    TracerColor = Color3.fromRGB(255, 255, 255),
+    TracerThickness = 1,
+    TracerOrigin = "Bottom",
+    TracerTransparency = 0.8,
+    
+    ShowHeadDot = true,
+    HeadDotColor = Color3.fromRGB(255, 255, 255),
+    HeadDotSize = 5,
+    HeadDotFilled = true,
+    
+    ShowWeapon = true,
+    WeaponColor = Color3.fromRGB(255, 200, 0),
+    WeaponSize = 12,
+    
+    ShowSkeleton = false,
+    SkeletonColor = Color3.fromRGB(0, 200, 255),
+    SkeletonThickness = 1,
+    
+    ShowChams = false,
+    ChamsColor = Color3.fromRGB(255, 0, 0),
+    ChamsTransparency = 0.7,
+    
+    ShowOutlines = true,
+    OutlineColor = Color3.fromRGB(255, 255, 255),
+    OutlineThickness = 3,
+    
+    UseGlow = false,
+    GlowColor = Color3.fromRGB(255, 0, 100),
+    GlowTransparency = 0.5,
+    
+    VisibleCheck = true,
+    WallCheck = true,
+    CheckAlive = true,
+    MinHealth = 1,
+    
+    DynamicColors = true,
+    LowHealthThreshold = 0.3,
+    MediumHealthThreshold = 0.7,
+    LowHealthColor = Color3.fromRGB(255, 50, 50),
+    MediumHealthColor = Color3.fromRGB(255, 200, 50),
+    HighHealthColor = Color3.fromRGB(50, 255, 100),
+    
+    ShowFOV = true,
+    FOVColor = Color3.fromRGB(255, 255, 255),
+    FOVTransparency = 0.3,
+    FOVSize = 120,
+    
+    PerformanceMode = false,
+    UpdateRate = 1,
+    DrawLimit = 25,
+    CacheEnabled = true,
+    
+    SoundEffects = false,
+    SoundVolume = 0.5,
+    ToggleSound = "rbxassetid://9114822331",
+    
+    CustomSettings = {
+        RainbowMode = false,
+        RainbowSpeed = 1,
+        GradientColors = false,
+        PulseEffect = false,
+        PulseSpeed = 1,
+        TextShadow = true,
+        ShadowColor = Color3.fromRGB(0, 0, 0),
+        AutoAdjustSize = true,
+        SizeMultiplier = 1.0
+    }
+}
+
+-- ======== إعدادات AimBot الكاملة ========
+local AimbotConfig = {
+    Enabled = true,
+    ActivationMode = "Toggle", -- "Toggle", "Hold", "Always"
+    ActivationKey = Enum.KeyCode.Q,
+    SecondaryKey = Enum.KeyCode.E,
+    
+    TargetPart = "Head", -- "Head", "HumanoidRootPart", "Torso", "Closest"
+    TargetPriority = "Closest", -- "Closest", "LowestHealth", "Crosshair"
+    TeamCheck = true,
+    FriendCheck = false,
+    FriendList = {},
+    
+    MaxDistance = 1000,
+    MinDistance = 0,
+    FOV = 180,
+    FOVVisible = true,
+    FOVColor = Color3.fromRGB(255, 255, 255),
+    FOVTransparency = 0.2,
+    FOVFilled = false,
+    
+    Smoothing = true,
+    SmoothingAmount = 15,
+    SmoothingType = "Linear", -- "Linear", "Quadratic", "Exponential"
+    SmoothingCurve = 1.5,
+    
+    Prediction = true,
+    PredictionAmount = 0.165,
+    PredictionType = "Velocity", -- "Velocity", "Acceleration", "Advanced"
+    BulletSpeed = 1200,
+    GravityCompensation = true,
+    GravityMultiplier = 1.0,
+    
+    AutoShoot = true,
+    AutoShootDelay = 0.15,
+    AutoShootBurst = false,
+    BurstCount = 3,
+    BurstDelay = 0.05,
+    TriggerBot = false,
+    TriggerDelay = 0.1,
+    TriggerKey = Enum.KeyCode.MouseButton2,
+    
+    VisibleCheck = true,
+    WallCheck = true,
+    WallPenetration = false,
+    PenetrationDepth = 2,
+    
+    HealthCheck = true,
+    MinHealth = 10,
+    MaxHealth = 9999,
+    
+    SilentAim = false,
+    SilentAimChance = 100,
+    SilentAimHitPart = "Head",
+    
+    Humanizer = false,
+    HumanizerDelay = 0.05,
+    HumanizerJitter = 0.03,
+    HumanizerRandomness = 0.1,
+    
+    AutoWall = false,
+    AutoWallDamage = 25,
+    AutoWallPenetration = 1,
+    
+    TargetLock = false,
+    LockTime = 2,
+    LockSound = true,
+    LockSoundID = "rbxassetid://9114822331",
+    
+    Visuals = true,
+    TargetIndicator = true,
+    IndicatorColor = Color3.fromRGB(255, 0, 0),
+    ShowTargetInfo = true,
+    TargetInfoColor = Color3.fromRGB(255, 255, 255),
+    
+    WeaponConfigs = {
+        Default = {FireRate = 0.2, BulletSpeed = 1200, Damage = 25},
+        Rifle = {FireRate = 0.1, BulletSpeed = 1500, Damage = 30},
+        Sniper = {FireRate = 1.0, BulletSpeed = 3000, Damage = 100},
+        Pistol = {FireRate = 0.25, BulletSpeed = 1000, Damage = 20},
+        Shotgun = {FireRate = 0.8, BulletSpeed = 800, Damage = 15}
+    },
+    
+    Advanced = {
+        MemoryAimbot = false,
+        PredictionHistory = 3,
+        TargetSwitching = true,
+        SwitchDelay = 0.2,
+        AntiAimAssist = false,
+        LegitMode = false,
+        MovementPrediction = true,
+        LagCompensation = false,
+        Backtracking = false,
+        BacktrackTime = 0.2
+    }
+}
+
+-- ======== المتغيرات العامة ========
+local ESPObjects = {
+    Boxes = {}, Names = {}, Healths = {}, HealthBars = {},
+    Distances = {}, Tracers = {}, HeadDots = {}, Weapons = {},
+    Skeletons = {}, Chams = {}, Outlines = {}, Glows = {},
+    InfoPanels = {}, FOVCircles = {}, TargetIndicators = {}
+}
+
+local AimbotObjects = {
+    FOVCircle = nil,
+    TargetIndicator = nil,
+    TargetInfo = nil,
+    LockIndicator = nil
+}
+
+local Cache = {
+    Players = {},
+    LastUpdate = 0,
+    WeaponCache = {},
+    VisibilityCache = {},
+    PredictionCache = {}
+}
+
+local State = {
+    ESPEnabled = true,
+    AimbotEnabled = true,
+    CurrentTarget = nil,
+    IsAiming = false,
+    IsShooting = false,
+    LastShot = 0,
+    BurstCount = 0,
+    TargetLocked = false,
+    LockStartTime = 0,
+    RainbowHue = 0,
+    PulsePhase = 0
+}
+
+local Connections = {}
+local DrawingQueue = {}
+
+-- ======== مكتبة الرسومات المتقدمة ========
+local DrawingLib = {}
+
+function DrawingLib:Create(type, properties)
+    local drawing = Drawing.new(type)
+    for prop, value in pairs(properties) do
+        if drawing[prop] ~= nil then
+            drawing[prop] = value
+        end
+    end
+    return drawing
+end
+
+function DrawingLib:Update(drawing, properties)
+    for prop, value in pairs(properties) do
+        if drawing[prop] ~= nil then
+            drawing[prop] = value
+        end
+    end
+end
+
+function DrawingLib:CreateRainbowColor(speed)
+    State.RainbowHue = (State.RainbowHue + speed * 0.01) % 1
+    return Color3.fromHSV(State.RainbowHue, 1, 1)
+end
+
+function DrawingLib:CreateGradientColor(startColor, endColor, alpha)
+    local r = startColor.R + (endColor.R - startColor.R) * alpha
+    local g = startColor.G + (endColor.G - startColor.G) * alpha
+    local b = startColor.B + (endColor.B - startColor.B) * alpha
+    return Color3.new(r, g, b)
+end
+
+function DrawingLib:CreatePulseEffect(phase, speed)
+    State.PulsePhase = (State.PulsePhase + speed * 0.01) % (math.pi * 2)
+    return 0.5 + 0.5 * math.sin(State.PulsePhase)
+end
+
+-- ======== مكتبة الرياضيات المتقدمة ========
+local MathLib = {}
+
+function MathLib:CalculateDistance(point1, point2)
+    return (point1 - point2).Magnitude
+end
+
+function MathLib:WorldToScreen(position)
+    local screenPos, onScreen = Camera:WorldToViewportPoint(position)
+    if onScreen then
+        return Vector2.new(screenPos.X, screenPos.Y), true, screenPos.Z
+    end
+    return Vector2.new(0, 0), false, 0
+end
+
+function MathLib:GetMousePosition()
+    return Vector2.new(Mouse.X, Mouse.Y)
+end
+
+function MathLib:IsPointInCircle(point, center, radius)
+    local distance = (point - center).Magnitude
+    return distance <= radius
+end
+
+function MathLib:CalculateAngle(from, to)
+    local direction = (to - from).Unit
+    return math.atan2(direction.Y, direction.X)
+end
+
+function MathLib:Lerp(start, finish, alpha)
+    return start + (finish - start) * alpha
+end
+
+function MathLib:Clamp(value, min, max)
+    return math.max(min, math.min(max, value))
+end
+
+function MathLib:Round(value, places)
+    local multiplier = 10 ^ (places or 0)
+    return math.floor(value * multiplier + 0.5) / multiplier
+end
+
+function MathLib:CalculatePrediction(targetPos, targetVel, shooterPos, bulletSpeed, gravity)
+    local distance = (targetPos - shooterPos).Magnitude
+    local timeToTarget = distance / bulletSpeed
+    
+    if gravity then
+        local gravityCompensation = Vector3.new(0, 0.5 * 196.2 * timeToTarget^2, 0)
+        return targetPos + (targetVel * timeToTarget) - gravityCompensation
+    end
+    
+    return targetPos + (targetVel * timeToTarget)
+end
+
+-- ======== مكتبة التحقق المتقدمة ========
+local ValidationLib = {}
+
+function ValidationLib:IsPlayerValid(player)
+    if not player then return false end
+    if player == LocalPlayer then return false end
+    if not player:IsDescendantOf(Players) then return false end
+    return true
+end
+
+function ValidationLib:IsCharacterValid(character)
+    if not character then return false end
+    if not character:IsDescendantOf(Workspace) then return false end
+    
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return false end
+    if humanoid.Health <= 0 then return false end
+    
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return false end
+    
+    return true, humanoid, hrp
+end
+
+function ValidationLib:IsEnemy(player)
+    if not ESPConfig.TeamCheck and not AimbotConfig.TeamCheck then
+        return true
+    end
+    
+    if player.Team and LocalPlayer.Team then
+        return player.Team ~= LocalPlayer.Team
+    end
+    
+    return true
+end
+
+function ValidationLib:IsVisible(character, fromPosition)
+    if not ESPConfig.VisibleCheck and not AimbotConfig.VisibleCheck then
+        return true
+    end
+    
+    if not fromPosition then
+        fromPosition = Camera.CFrame.Position
+    end
+    
+    local targetHead = character:FindFirstChild("Head")
+    if not targetHead then return false end
+    
+    local raycastParams = RaycastParams.new()
+    raycastParams.FilterDescendantsInstances = {LocalPlayer.Character}
+    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+    raycastParams.IgnoreWater = true
+    
+    local direction = (targetHead.Position - fromPosition).Unit
+    local distance = (targetHead.Position - fromPosition).Magnitude
+    local raycastResult = Workspace:Raycast(fromPosition, direction * distance, raycastParams)
+    
+    if not raycastResult then
+        return true
+    end
+    
+    local hitPart = raycastResult.Instance
+    return hitPart and hitPart:IsDescendantOf(character)
+end
+
+function ValidationLib:IsBehindWall(character)
+    if not ESPConfig.WallCheck and not AimbotConfig.WallCheck then
+        return false
+    end
+    
+    return not ValidationLib:IsVisible(character)
+end
+
+function ValidationLib:IsInRange(position, maxDistance)
+    if maxDistance <= 0 then return true end
+    
+    local distance = (position - Camera.CFrame.Position).Magnitude
+    return distance <= maxDistance
+end
+
+function ValidationLib:IsInFOV(position, fovRadius)
+    if fovRadius <= 0 then return true end
+    
+    local screenPos, onScreen = MathLib:WorldToScreen(position)
+    if not onScreen then return false end
+    
+    local mousePos = MathLib:GetMousePosition()
+    return MathLib:IsPointInCircle(screenPos, mousePos, fovRadius)
+end
+
+-- ======== مكتبة اكتشاف السلاح ========
+local WeaponLib = {}
+
+function WeaponLib:GetCurrentWeapon()
+    local character = LocalPlayer.Character
+    if not character then return nil end
+    
+    -- البحث في اليد
+    for _, tool in ipairs(character:GetChildren()) do
+        if tool:IsA("Tool") then
+            local config = self:GetWeaponConfig(tool)
+            if config then
+                return tool, config
+            end
+        end
+    end
+    
+    -- البحث في الحقيبة
+    local backpack = LocalPlayer:FindFirstChild("Backpack")
+    if backpack then
+        for _, tool in ipairs(backpack:GetChildren()) do
+            if tool:IsA("Tool") then
+                local config = self:GetWeaponConfig(tool)
+                if config then
+                    return tool, config
+                end
+            end
+        end
+    end
+    
+    return nil, AimbotConfig.WeaponConfigs.Default
+end
+
+function WeaponLib:GetWeaponConfig(tool)
+    local weaponType = self:IdentifyWeapon(tool)
+    return AimbotConfig.WeaponConfigs[weaponType] or AimbotConfig.WeaponConfigs.Default
+end
+
+function WeaponLib:IdentifyWeapon(tool)
+    local name = tool.Name:lower()
+    
+    if name:find("rifle") or name:find("assault") or name:find("ak") or name:find("m4") then
+        return "Rifle"
+    elseif name:find("sniper") or name:find("awp") or name:find("scout") then
+        return "Sniper"
+    elseif name:find("pistol") or name:find("deagle") or name:find("glock") then
+        return "Pistol"
+    elseif name:find("shotgun") or name:find("pump") then
+        return "Shotgun"
+    else
+        return "Default"
+    end
+end
+
+function WeaponLib:GetWeaponData(tool)
+    local data = {
+        FireRate = 0.2,
+        BulletSpeed = 1200,
+        Damage = 25,
+        Spread = 0,
+        Recoil = 0,
+        Range = 500,
+        Automatic = true,
+        Ammo = 30,
+        MaxAmmo = 30
+    }
+    
+    -- محاولة قراءة الإعدادات من السلاح
+    local config = tool:FindFirstChild("Configuration") or tool:FindFirstChild("Settings")
+    if config then
+        for _, value in ipairs(config:GetChildren()) do
+            if value:IsA("NumberValue") or value:IsA("IntValue") then
+                data[value.Name] = value.Value
+            elseif value:IsA("BoolValue") then
+                data[value.Name] = value.Value
+            end
+        end
+    end
+    
+    -- البحث عن RemoteEvents لإطلاق النار
+    data.FireRemote = tool:FindFirstChild("Fire") or 
+                     tool:FindFirstChild("FireServer") or
+                     tool:FindFirstChild("RemoteEvent")
+    
+    return data
+end
+
+-- ======== نظام ESP الكامل ========
+local ESPManager = {}
+
+function ESPManager:Initialize()
+    -- إنشاء دائرة FOV
+    if ESPConfig.ShowFOV then
+        AimbotObjects.FOVCircle = DrawingLib:Create("Circle", {
+            Visible = true,
+            Color = ESPConfig.FOVColor,
+            Transparency = ESPConfig.FOVTransparency,
+            Thickness = 2,
+            NumSides = 64,
+            Filled = ESPConfig.FOVFilled,
+            Radius = ESPConfig.FOVSize
+        })
+    end
+    
+    -- بدء حلقة التحديث
+    table.insert(Connections, RunService.RenderStepped:Connect(function(deltaTime)
+        self:UpdateAllESP()
+    end))
+    
+    -- تتبع اللاعبين
+    table.insert(Connections, Players.PlayerAdded:Connect(function(player)
+        self:TrackPlayer(player)
+    end))
+    
+    table.insert(Connections, Players.PlayerRemoving:Connect(function(player)
+        self:RemovePlayerESP(player)
+    end))
+    
+    -- تتبع تغيير الشخصية
+    table.insert(Connections, LocalPlayer.CharacterAdded:Connect(function()
+        task.wait(1)
+        self:UpdateAllESP()
+    end))
+    
+    -- تحديث دائرة FOV
+    table.insert(Connections, RunService.RenderStepped:Connect(function()
+        if AimbotObjects.FOVCircle then
+            local mousePos = MathLib:GetMousePosition()
+            AimbotObjects.FOVCircle.Position = mousePos
+            AimbotObjects.FOVCircle.Radius = ESPConfig.FOVSize
+            AimbotObjects.FOVCircle.Color = ESPConfig.CustomSettings.RainbowMode and 
+                DrawingLib:CreateRainbowColor(ESPConfig.CustomSettings.RainbowSpeed) or 
+                ESPConfig.FOVColor
+        end
+    end))
+end
+
+function ESPManager:TrackPlayer(player)
+    table.insert(Connections, player.CharacterAdded:Connect(function(character)
+        task.wait(0.5)
+        Cache.Players[player] = {
+            Character = character,
+            LastUpdate = 0,
+            IsVisible = false,
+            Distance = 0
+        }
+    end))
+    
+    table.insert(Connections, player.CharacterRemoving:Connect(function()
+        self:RemovePlayerESP(player)
+        Cache.Players[player] = nil
+    end))
+end
+
+function ESPManager:GetPlayerData(player)
+    if Cache.Players[player] then
+        return Cache.Players[player]
+    end
+    
+    local isValid, humanoid, hrp = ValidationLib:IsCharacterValid(player.Character)
+    if not isValid then return nil end
+    
+    local data = {
+        Player = player,
+        Character = player.Character,
+        Humanoid = humanoid,
+        HRP = hrp,
+        IsAlive = humanoid.Health > 0,
+        Health = humanoid.Health,
+        MaxHealth = humanoid.MaxHealth,
+        HealthPercent = humanoid.Health / humanoid.MaxHealth,
+        Distance = (hrp.Position - Camera.CFrame.Position).Magnitude,
+        IsEnemy = ValidationLib:IsEnemy(player),
+        IsVisible = ValidationLib:IsVisible(player.Character),
+        ScreenPosition = Vector2.new(0, 0),
+        BoxSize = Vector2.new(0, 0),
+        LastUpdate = tick()
+    }
+    
+    -- تحديث الموضع على الشاشة
+    data.ScreenPosition, data.OnScreen = MathLib:WorldToScreen(hrp.Position)
+    
+    -- حساب حجم المربع
+    if data.OnScreen then
+        local sizeMultiplier = ESPConfig.CustomSettings.AutoAdjustSize and 
+            (100 / math.max(1, data.Distance)) * ESPConfig.CustomSettings.SizeMultiplier or 1
+        
+        data.BoxSize = Vector2.new(
+            40 * sizeMultiplier,
+            60 * sizeMultiplier
+        )
+    end
+    
+    Cache.Players[player] = data
+    return data
+end
+
+function ESPManager:UpdatePlayerESP(player)
+    if not ESPConfig.Enabled then return end
+    if not ValidationLib:IsPlayerValid(player) then return end
+    
+    local data = self:GetPlayerData(player)
+    if not data then return end
+    
+    -- التحقق من الشروط
+    if data.Distance > ESPConfig.MaxDistance then
+        self:HidePlayerESP(player)
+        return
+    end
+    
+    if ESPConfig.TeamCheck and not data.IsEnemy then
+        self:HidePlayerESP(player)
+        return
+    end
+    
+    if ESPConfig.VisibleOnly and not data.IsVisible then
+        self:HidePlayerESP(player)
+        return
+    end
+    
+    if ESPConfig.CheckAlive and not data.IsAlive then
+        self:HidePlayerESP(player)
+        return
+    end
+    
+    if not data.OnScreen then
+        self:HidePlayerESP(player)
+        return
+    end
+    
+    -- تحديث جميع عناصر ESP
+    self:UpdateBoxESP(player, data)
+    self:UpdateNameESP(player, data)
+    self:UpdateHealthESP(player, data)
+    self:UpdateDistanceESP(player, data)
+    self:UpdateWeaponESP(player, data)
+    self:UpdateHeadDotESP(player, data)
+    self:UpdateTracerESP(player, data)
+    self:UpdateSkeletonESP(player, data)
+    self:UpdateChamsESP(player, data)
+end
+
+function ESPManager:UpdateBoxESP(player, data)
+    if not ESPConfig.BoxESP then
+        if ESPObjects.Boxes[player] then
+            ESPObjects.Boxes[player].Visible = false
+        end
+        return
+    end
+    
+    local boxColor = ESPConfig.CustomSettings.RainbowMode and 
+        DrawingLib:CreateRainbowColor(ESPConfig.CustomSettings.RainbowSpeed) or 
+        (ESPConfig.UseTeamColor and (player.Team and player.TeamColor.Color or ESPConfig.BoxColor) or ESPConfig.BoxColor)
+    
+    if ESPConfig.CustomSettings.GradientColors then
+        boxColor = DrawingLib:CreateGradientColor(
+            ESPConfig.BoxColor,
+            ESPConfig.NameColor,
+            data.HealthPercent
+        )
+    end
+    
+    if ESPConfig.CustomSettings.PulseEffect then
+        local pulse = DrawingLib:CreatePulseEffect(State.PulsePhase, ESPConfig.CustomSettings.PulseSpeed)
+        boxColor = Color3.new(
+            boxColor.R * pulse,
+            boxColor.G * pulse,
+            boxColor.B * pulse
+        )
+    end
+    
+    if not ESPObjects.Boxes[player] then
+        ESPObjects.Boxes[player] = DrawingLib:Create("Square", {
+            Visible = true,
+            Color = boxColor,
+            Thickness = ESPConfig.BoxThickness,
+            Filled = ESPConfig.BoxFilled,
+            Transparency = ESPConfig.BoxTransparency
+        })
+    end
+    
+    DrawingLib:Update(ESPObjects.Boxes[player], {
+        Visible = true,
+        Color = boxColor,
+        Size = data.BoxSize,
+        Position = data.ScreenPosition - data.BoxSize / 2
+    })
+    
+    -- الخطوط الخارجية
+    if ESPConfig.ShowOutlines then
+        if not ESPObjects.Outlines[player] then
+            ESPObjects.Outlines[player] = DrawingLib:Create("Square", {
+                Visible = true,
+                Color = ESPConfig.OutlineColor,
+                Thickness = ESPConfig.OutlineThickness,
+                Filled = false,
+                Transparency = 0.3
+            })
+        end
+        
+        DrawingLib:Update(ESPObjects.Outlines[player], {
+            Visible = true,
+            Size = data.BoxSize + Vector2.new(6, 6),
+            Position = data.ScreenPosition - (data.BoxSize / 2) - Vector2.new(3, 3)
+        })
+    end
+end
+
+function ESPManager:UpdateNameESP(player, data)
+    if not ESPConfig.ShowName then
+        if ESPObjects.Names[player] then
+            ESPObjects.Names[player].Visible = false
+        end
+        return
+    end
+    
+    local nameColor = ESPConfig.NameColor
+    if ESPConfig.CustomSettings.RainbowMode then
+        nameColor = DrawingLib:CreateRainbowColor(ESPConfig.CustomSettings.RainbowSpeed)
+    end
+    
+    if not ESPObjects.Names[player] then
+        ESPObjects.Names[player] = DrawingLib:Create("Text", {
+            Visible = true,
+            Color = nameColor,
+            Size = ESPConfig.NameSize,
+            Outline = ESPConfig.NameOutline,
+            Center = true,
+            Font = ESPConfig.NameFont
+        })
+    end
+    
+    DrawingLib:Update(ESPObjects.Names[player], {
+        Visible = true,
+        Color = nameColor,
+        Text = player.Name,
+        Position = data.ScreenPosition - Vector2.new(0, data.BoxSize.Y / 2 + 20)
+    })
+    
+    -- إضافة الظل للنص
+    if ESPConfig.CustomSettings.TextShadow then
+        if not ESPObjects.Names[player .. "_Shadow"] then
+            ESPObjects.Names[player .. "_Shadow"] = DrawingLib:Create("Text", {
+                Visible = true,
+                Color = ESPConfig.CustomSettings.ShadowColor,
+                Size = ESPConfig.NameSize,
+                Outline = false,
+                Center = true,
+                Font = ESPConfig.NameFont
+            })
+        end
+        
+        DrawingLib:Update(ESPObjects.Names[player .. "_Shadow"], {
+            Visible = true,
+            Text = player.Name,
+            Position = (data.ScreenPosition - Vector2.new(0, data.BoxSize.Y / 2 + 20)) + Vector2.new(1, 1)
+        })
+    end
+end
+
+function ESPManager:UpdateHealthESP(player, data)
+    if not ESPConfig.ShowHealth then return end
+    
+    local healthColor
+    if ESPConfig.DynamicColors then
+        if data.HealthPercent < ESPConfig.LowHealthThreshold then
+            healthColor = ESPConfig.LowHealthColor
+        elseif data.HealthPercent < ESPConfig.MediumHealthThreshold then
+            healthColor = ESPConfig.MediumHealthColor
+        else
+            healthColor = ESPConfig.HighHealthColor
+        end
+    else
+        healthColor = ESPConfig.HealthColor
+    end
+    
+    -- نص الصحة
+    if ESPConfig.ShowHealthText then
+        if not ESPObjects.Healths[player] then
+            ESPObjects.Healths[player] = DrawingLib:Create("Text", {
+                Visible = true,
+                Color = healthColor,
+                Size = ESPConfig.HealthTextSize,
+                Outline = true,
+                Center = true
+            })
+        end
+        
+        DrawingLib:Update(ESPObjects.Healths[player], {
+            Visible = true,
+            Color = healthColor,
+            Text = string.format("%d/%d", math.floor(data.Health), math.floor(data.MaxHealth)),
+            Position = data.ScreenPosition - Vector2.new(0, data.BoxSize.Y / 2 + 35)
+        })
+    end
+    
+    -- شريط الصحة
+    if ESPConfig.ShowHealthBar then
+        if not ESPObjects.HealthBars[player] then
+            ESPObjects.HealthBars[player] = DrawingLib:Create("Square", {
+                Visible = true,
+                Color = healthColor,
+                Thickness = 1,
+                Filled = true,
+                Transparency = 0.5
+            })
+        end
+        
+        local barHeight = ESPConfig.HealthBarHeight * data.HealthPercent
+        local barOffset = ESPConfig.HealthBarOffset
+        
+        DrawingLib:Update(ESPObjects.HealthBars[player], {
+            Visible = true,
+            Color = healthColor,
+            Size = Vector2.new(ESPConfig.HealthBarWidth, barHeight),
+            Position = data.ScreenPosition + Vector2.new(
+                -data.BoxSize.X / 2 - 10 - barOffset,
+                -data.BoxSize.Y / 2 + (ESPConfig.HealthBarHeight - barHeight)
+            )
+        })
+        
+        -- إطار شريط الصحة
+        if not ESPObjects.HealthBars[player .. "_Frame"] then
+            ESPObjects.HealthBars[player .. "_Frame"] = DrawingLib:Create("Square", {
+                Visible = true,
+                Color = Color3.fromRGB(255, 255, 255),
+                Thickness = 1,
+                Filled = false,
+                Transparency = 0.8
+            })
+        end
+        
+        DrawingLib:Update(ESPObjects.HealthBars[player .. "_Frame"], {
+            Visible = true,
+            Size = Vector2.new(ESPConfig.HealthBarWidth + 2, ESPConfig.HealthBarHeight + 2),
+            Position = data.ScreenPosition + Vector2.new(
+                -data.BoxSize.X / 2 - 11 - barOffset,
+                -data.BoxSize.Y / 2 - 1
+            )
+        })
+    end
+end
+
+function ESPManager:UpdateDistanceESP(player, data)
+    if not ESPConfig.ShowDistance then
+        if ESPObjects.Distances[player] then
+            ESPObjects.Distances[player].Visible = false
+        end
+        return
+    end
+    
+    local distanceText = string.format("%d%s", math.floor(data.Distance), ESPConfig.DistanceUnit)
+    
+    if not ESPObjects.Distances[player] then
+        ESPObjects.Distances[player] = DrawingLib:Create("Text", {
+            Visible = true,
+            Color = ESPConfig.DistanceColor,
+            Size = ESPConfig.DistanceTextSize,
+            Outline = true,
+            Center = true
+        })
+    end
+    
+    DrawingLib:Update(ESPObjects.Distances[player], {
+        Visible = true,
+        Text = distanceText,
+        Position = data.ScreenPosition + Vector2.new(0, data.BoxSize.Y / 2 + 10)
+    })
+end
+
+function ESPManager:UpdateWeaponESP(player, data)
+    if not ESPConfig.ShowWeapon then
+        if ESPObjects.Weapons[player] then
+            ESPObjects.Weapons[player].Visible = false
+        end
+        return
+    end
+    
+    local character = data.Character
+    local weaponName = "No Weapon"
+    
+    -- البحث عن السلاح
+    for _, tool in ipairs(character:GetChildren()) do
+        if tool:IsA("Tool") then
+            weaponName = tool.Name
+            break
+        end
+    end
+    
+    local backpack = player:FindFirstChild("Backpack")
+    if backpack and weaponName == "No Weapon" then
+        for _, tool in ipairs(backpack:GetChildren()) do
+            if tool:IsA("Tool") then
+                weaponName = tool.Name
+                break
+            end
+        end
+    end
+    
+    if not ESPObjects.Weapons[player] then
+        ESPObjects.Weapons[player] = DrawingLib:Create("Text", {
+            Visible = true,
+            Color = ESPConfig.WeaponColor,
+            Size = ESPConfig.WeaponSize,
+            Outline = true,
+            Center = true
+        })
+    end
+    
+    DrawingLib:Update(ESPObjects.Weapons[player], {
+        Visible = true,
+        Text = weaponName,
+        Position = data.ScreenPosition + Vector2.new(0, data.BoxSize.Y / 2 + 25)
+    })
+end
+
+function ESPManager:UpdateHeadDotESP(player, data)
+    if not ESPConfig.ShowHeadDot then
+        if ESPObjects.HeadDots[player] then
+            ESPObjects.HeadDots[player].Visible = false
+        end
+        return
+    end
+    
+    local head = data.Character:FindFirstChild("Head")
+    if not head then return end
+    
+    local headPos, headOnScreen = MathLib:WorldToScreen(head.Position)
+    if not headOnScreen then return end
+    
+    local dotColor = ESPConfig.HeadDotColor
+    if ESPConfig.CustomSettings.RainbowMode then
+        dotColor = DrawingLib:CreateRainbowColor(ESPConfig.CustomSettings.RainbowSpeed)
+    end
+    
+    if not ESPObjects.HeadDots[player] then
+        ESPObjects.HeadDots[player] = DrawingLib:Create("Circle", {
+            Visible = true,
+            Color = dotColor,
+            Thickness = 1,
+            Filled = ESPConfig.HeadDotFilled,
+            NumSides = 20
+        })
+    end
+    
+    DrawingLib:Update(ESPObjects.HeadDots[player], {
+        Visible = true,
+        Color = dotColor,
+        Radius = ESPConfig.HeadDotSize,
+        Position = headPos
+    })
+end
+
+function ESPManager:UpdateTracerESP(player, data)
+    if not ESPConfig.ShowTracer then
+        if ESPObjects.Tracers[player] then
+            ESPObjects.Tracers[player].Visible = false
+        end
+        return
+    end
+    
+    local tracerColor = ESPConfig.TracerColor
+    if ESPConfig.CustomSettings.RainbowMode then
+        tracerColor = DrawingLib:CreateRainbowColor(ESPConfig.CustomSettings.RainbowSpeed)
+    end
+    
+    if not ESPObjects.Tracers[player] then
+        ESPObjects.Tracers[player] = DrawingLib:Create("Line", {
+            Visible = true,
+            Color = tracerColor,
+            Thickness = ESPConfig.TracerThickness,
+            Transparency = ESPConfig.TracerTransparency
+        })
+    end
+    
+    local originY = Camera.ViewportSize.Y
+    if ESPConfig.TracerOrigin == "Top" then
+        originY = 0
+    elseif ESPConfig.TracerOrigin == "Middle" then
+        originY = Camera.ViewportSize.Y / 2
+    elseif ESPConfig.TracerOrigin == "Mouse" then
+        originY = Mouse.Y
+    end
+    
+    DrawingLib:Update(ESPObjects.Tracers[player], {
+        Visible = true,
+        Color = tracerColor,
+        From = Vector2.new(Camera.ViewportSize.X / 2, originY),
+        To = data.ScreenPosition
+    })
+end
+
+function ESPManager:UpdateSkeletonESP(player, data)
+    if not ESPConfig.ShowSkeleton then return end
+    
+    local character = data.Character
+    local points = {
+        Head = character:FindFirstChild("Head"),
+        UpperTorso = character:FindFirstChild("UpperTorso"),
+        LowerTorso = character:FindFirstChild("LowerTorso"),
+        LeftUpperArm = character:FindFirstChild("LeftUpperArm"),
+        RightUpperArm = character:FindFirstChild("RightUpperArm"),
+        LeftLowerArm = character:FindFirstChild("LeftLowerArm"),
+        RightLowerArm = character:FindFirstChild("RightLowerArm"),
+        LeftUpperLeg = character:FindFirstChild("LeftUpperLeg"),
+        RightUpperLeg = character:FindFirstChild("RightUpperLeg"),
+        LeftLowerLeg = character:FindFirstChild("LeftLowerLeg"),
+        RightLowerLeg = character:FindFirstChild("RightLowerLeg"),
+        LeftFoot = character:FindFirstChild("LeftFoot"),
+        RightFoot = character:FindFirstChild("RightFoot")
+    }
+    
+    local connections = {
+        {"Head", "UpperTorso"},
+        {"UpperTorso", "LowerTorso"},
+        {"UpperTorso", "LeftUpperArm"},
+        {"UpperTorso", "RightUpperArm"},
+        {"LeftUpperArm", "LeftLowerArm"},
+        {"RightUpperArm", "RightLowerArm"},
+        {"LowerTorso", "LeftUpperLeg"},
+        {"LowerTorso", "RightUpperLeg"},
+        {"LeftUpperLeg", "LeftLowerLeg"},
+        {"RightUpperLeg", "RightLowerLeg"},
+        {"LeftLowerLeg", "LeftFoot"},
+        {"RightLowerLeg", "RightFoot"}
+    }
+    
+    for _, connection in ipairs(connections) do
+        local part1 = points[connection[1]]
+        local part2 = points[connection[2]]
+        
+        if part1 and part2 then
+            local pos1, visible1 = MathLib:WorldToScreen(part1.Position)
+            local pos2, visible2 = MathLib:WorldToScreen(part2.Position)
+            
+            if visible1 and visible2 then
+                local key = player .. "_" .. connection[1] .. "_" .. connection[2]
+                
+                if not ESPObjects.Skeletons[key] then
+                    ESPObjects.Skeletons[key] = DrawingLib:Create("Line", {
+                        Visible = true,
+                        Color = ESPConfig.SkeletonColor,
+                        Thickness = ESPConfig.SkeletonThickness
+                    })
+                end
+                
+                DrawingLib:Update(ESPObjects.Skeletons[key], {
+                    From = pos1,
+                    To = pos2
+                })
+            end
+        end
+    end
+end
+
+function ESPManager:UpdateChamsESP(player, data)
+    if not ESPConfig.ShowChams then return end
+    
+    if not ESPObjects.Chams[player] then
+        ESPObjects.Chams[player] = Instance.new("Highlight")
+        ESPObjects.Chams[player].Parent = CoreGui
+    end
+    
+    local cham = ESPObjects.Chams[player]
+    cham.Enabled = true
+    cham.Adornee = data.Character
+    cham.FillColor = ESPConfig.ChamsColor
+    cham.FillTransparency = ESPConfig.ChamsTransparency
+    cham.OutlineColor = ESPConfig.ChamsColor
+    cham.OutlineTransparency = 0
+end
+
+function ESPManager:HidePlayerESP(player)
+    for category, objects in pairs(ESPObjects) do
+        if objects[player] then
+            if typeof(objects[player]) == "table" and objects[player].Visible ~= nil then
+                objects[player].Visible = false
+            elseif typeof(objects[player]) == "Instance" and objects[player]:IsA("Highlight") then
+                objects[player].Enabled = false
+            end
+        end
+    end
+end
+
+function ESPManager:RemovePlayerESP(player)
+    for category, objects in pairs(ESPObjects) do
+        if objects[player] then
+            if typeof(objects[player]) == "table" and objects[player].Remove then
+                objects[player]:Remove()
+            elseif typeof(objects[player]) == "Instance" then
+                objects[player]:Destroy()
+            end
+            objects[player] = nil
+        end
+    end
+end
+
+function ESPManager:UpdateAllESP()
+    if not ESPConfig.Enabled then
+        for player, _ in pairs(ESPObjects.Boxes) do
+            self:HidePlayerESP(player)
+        end
+        return
+    end
+    
+    local players = Players:GetPlayers()
+    for i = 1, math.min(#players, ESPConfig.DrawLimit) do
+        local player = players[i]
+        if player ~= LocalPlayer then
+            self:UpdatePlayerESP(player)
+        end
+    end
+end
+
+function ESPManager:Toggle(state)
+    ESPConfig.Enabled = state
+    State.ESPEnabled = state
+    
+    if not state then
+        for player, _ in pairs(ESPObjects.Boxes) do
+            self:HidePlayerESP(player)
+        end
+    end
+    
+    return state
+end
+
+function ESPManager:SetConfig(key, value)
+    if ESPConfig[key] ~= nil then
+        ESPConfig[key] = value
+        return true
+    end
+    return false
+end
+
+-- ======== نظام AimBot الكامل ========
+local AimbotManager = {}
+
+function AimbotManager:Initialize()
+    -- إنشاء مؤشر الهدف
+    if AimbotConfig.Visuals then
+        AimbotObjects.TargetIndicator = DrawingLib:Create("Square", {
+            Visible = false,
+            Color = AimbotConfig.IndicatorColor,
+            Thickness = 3,
+            Filled = false,
+            Transparency = 0.8
+        })
+        
+        AimbotObjects.TargetInfo = DrawingLib:Create("Text", {
+            Visible = false,
+            Color = AimbotConfig.TargetInfoColor,
+            Size = 16,
+            Outline = true,
+            Center = true
+        })
+    end
+    
+    -- حلقة التحديث الرئيسية
+    table.insert(Connections, RunService.RenderStepped:Connect(function(deltaTime)
+        self:Update()
+    end))
+    
+    -- إدارة الإدخال
+    table.insert(Connections, UserInputService.InputBegan:Connect(function(input)
+        self:HandleInput(input)
+    end))
+    
+    -- تحديث دائرة FOV
+    if AimbotConfig.FOVVisible then
+        table.insert(Connections, RunService.RenderStepped:Connect(function()
+            if AimbotObjects.FOVCircle then
+                local mousePos = MathLib:GetMousePosition()
+                AimbotObjects.FOVCircle.Position = mousePos
+                AimbotObjects.FOVCircle.Radius = AimbotConfig.FOV
+            end
+        end))
+    end
+end
+
+function AimbotManager:GetBestTarget()
+    local bestTarget = nil
+    local bestScore = -999999
+    local mousePos = MathLib:GetMousePosition()
+    
+    for _, player in ipairs(Players:GetPlayers()) do
+        if not ValidationLib:IsPlayerValid(player) then continue end
+        if player == LocalPlayer then continue end
+        
+        local isValid, humanoid, hrp = ValidationLib:IsCharacterValid(player.Character)
+        if not isValid then continue end
+        
+        -- التحقق من الفريق
+        if AimbotConfig.TeamCheck and not ValidationLib:IsEnemy(player) then
+            continue
+        end
+        
+        -- التحقق من الأصدقاء
+        if AimbotConfig.FriendCheck and AimbotConfig.FriendList[player.UserId] then
+            continue
+        end
+        
+        -- التحقق من الصحة
+        if AimbotConfig.HealthCheck then
+            if humanoid.Health < AimbotConfig.MinHealth or humanoid.Health > AimbotConfig.MaxHealth then
+                continue
+            end
+        end
+        
+        -- التحقق من المسافة
+        local distance = (hrp.Position - Camera.CFrame.Position).Magnitude
+        if distance > AimbotConfig.MaxDistance or distance < AimbotConfig.MinDistance then
+            continue
+        end
+        
+        -- الحصول على جزء الهدف
+        local targetPart = self:GetTargetPart(player.Character)
+        if not targetPart then continue end
+        
+        -- التحقق من الرؤية
+        if AimbotConfig.VisibleCheck and not ValidationLib:IsVisible(player.Character) then
+            continue
+        end
+        
+        -- التحقق من FOV
+        local screenPos, onScreen = MathLib:WorldToScreen(targetPart.Position)
+        if not onScreen then continue end
+        
+        if AimbotConfig.FOV > 0 then
+            local fovDistance = (screenPos - mousePos).Magnitude
+            if fovDistance > AimbotConfig.FOV then
+                continue
+            end
+        end
+        
+        -- حساب النقاط
+        local score = self:CalculateTargetScore(player, humanoid, targetPart, distance, screenPos, mousePos)
+        
+        if score > bestScore then
+            bestScore = score
+            bestTarget = {
+                Player = player,
+                Character = player.Character,
+                Humanoid = humanoid,
+                TargetPart = targetPart,
+                Distance = distance,
+                Score = score,
+                ScreenPosition = screenPos
+            }
+        end
+    end
+    
+    return bestTarget
+end
+
+function AimbotManager:GetTargetPart(character)
+    if AimbotConfig.TargetPart == "Closest" then
+        local parts = {
+            character:FindFirstChild("Head"),
+            character:FindFirstChild("HumanoidRootPart"),
+            character:FindFirstChild("UpperTorso")
+        }
+        
+        for _, part in ipairs(parts) do
+            if part then return part end
+        end
+    else
+        return character:FindFirstChild(AimbotConfig.TargetPart) or
+               character:FindFirstChild("HumanoidRootPart")
+    end
+    
+    return nil
+end
+
+function AimbotManager:CalculateTargetScore(player, humanoid, targetPart, distance, screenPos, mousePos)
+    local score = 0
+    
+    -- الأولوية حسب الإعدادات
+    if AimbotConfig.TargetPriority == "Closest" then
+        score = 10000 - distance
+    elseif AimbotConfig.TargetPriority == "LowestHealth" then
+        score = 10000 - humanoid.Health
+    elseif AimbotConfig.TargetPriority == "Crosshair" then
+        local crosshairDistance = (screenPos - mousePos).Magnitude
+        score = 10000 - crosshairDistance
+    end
+    
+    -- تعديلات إضافية
+    score = score - (distance * 0.1) -- تقليل النقاط للمسافات البعيدة
+    score = score + (humanoid.MaxHealth - humanoid.Health) * 2 -- زيادة النقاط لصحة أقل
+    
+    return score
+end
+
+function AimbotManager:CalculatePrediction(targetPart, distance)
+    if not AimbotConfig.Prediction or not targetPart:IsA("BasePart") then
+        return targetPart.Position
+    end
+    
+    local velocity = targetPart.Velocity or Vector3.new(0, 0, 0)
+    local timeToTarget = distance / AimbotConfig.BulletSpeed
+    
+    local predictedPosition = targetPart.Position + (velocity * timeToTarget * AimbotConfig.PredictionAmount)
+    
+    -- تعويض الجاذبية
+    if AimbotConfig.GravityCompensation then
+        local gravityComp = Vector3.new(0, 0.5 * 196.2 * AimbotConfig.GravityMultiplier * timeToTarget^2, 0)
+        predictedPosition = predictedPosition - gravityComp
+    end
+    
+    return predictedPosition
+end
+
+function AimbotManager:SmoothAim(targetPosition)
+    if not AimbotConfig.Smoothing then
+        Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, targetPosition)
+        return
+    end
+    
+    local currentCFrame = Camera.CFrame
+    local targetCFrame = CFrame.lookAt(currentCFrame.Position, targetPosition)
+    
+    local smoothingFactor = 1 / AimbotConfig.SmoothingAmount
+    
+    if AimbotConfig.SmoothingType == "Quadratic" then
+        smoothingFactor = smoothingFactor ^ 2
+    elseif AimbotConfig.SmoothingType == "Exponential" then
+        smoothingFactor = math.exp(smoothingFactor * AimbotConfig.SmoothingCurve)
+    end
+    
+    local smoothedCFrame = currentCFrame:Lerp(targetCFrame, smoothingFactor)
+    Camera.CFrame = smoothedCFrame
+end
+
+function AimbotManager:ShootAtTarget(target)
+    if not target then return false end
+    
+    local currentTime = tick()
+    if currentTime - State.LastShot < AimbotConfig.AutoShootDelay then
+        return false
+    end
+    
+    local weapon, weaponConfig = WeaponLib:GetCurrentWeapon()
+    if not weapon then return false end
+    
+    local weaponData = WeaponLib:GetWeaponData(weapon)
+    
+    -- حساب الموضع مع التنبؤ
+    local predictedPosition = self:CalculatePrediction(
+        target.TargetPart,
+        target.Distance
+    )
+    
+    -- توجيه الكاميرا
+    self:SmoothAim(predictedPosition)
+    
+    -- إطلاق النار
+    if weaponData.FireRemote then
+        local success = pcall(function()
+            weaponData.FireRemote:FireServer(predictedPosition, target.TargetPart)
+        end)
+        
+        if success then
+            State.LastShot = currentTime
+            
+            -- وضع الرش
+            if AimbotConfig.AutoShootBurst and State.BurstCount < AimbotConfig.BurstCount then
+                State.BurstCount = State.BurstCount + 1
+            else
+                State.BurstCount = 0
+            end
+            
+            return true
+        end
+    end
+    
+    return false
+end
+
+function AimbotManager:HandleInput(input)
+    -- تبديل وضع AimBot
+    if input.KeyCode == AimbotConfig.ActivationKey then
+        if AimbotConfig.ActivationMode == "Toggle" then
+            State.IsAiming = not State.IsAiming
+            self:PlayToggleSound()
+        end
+    end
+    
+    -- إطلاق النار يدوي
+    if input.KeyCode == AimbotConfig.TriggerKey then
+        if State.CurrentTarget and not AimbotConfig.AutoShoot then
+            self:ShootAtTarget(State.CurrentTarget)
+        end
+    end
+    
+    -- قفل الهدف
+    if input.KeyCode == AimbotConfig.SecondaryKey then
+        if State.CurrentTarget and AimbotConfig.TargetLock then
+            State.TargetLocked = not State.TargetLocked
+            State.LockStartTime = tick()
+            
+            if AimbotConfig.LockSound then
+                self:PlayLockSound()
+            end
+        end
+    end
+end
+
+function AimbotManager:Update()
+    if not AimbotConfig.Enabled then
+        State.CurrentTarget = nil
+        State.IsAiming = false
+        self:HideTargetIndicator()
+        return
+    end
+    
+    -- التحقق من وضع التفعيل
+    local shouldAim = false
+    if AimbotConfig.ActivationMode == "Always" then
+        shouldAim = true
+    elseif AimbotConfig.ActivationMode == "Toggle" then
+        shouldAim = State.IsAiming
+    elseif AimbotConfig.ActivationMode == "Hold" then
+        shouldAim = UserInputService:IsKeyDown(AimbotConfig.ActivationKey)
+    end
+    
+    if not shouldAim then
+        State.CurrentTarget = nil
+        self:HideTargetIndicator()
+        return
+    end
+    
+    -- الحصول على أفضل هدف
+    local target = self:GetBestTarget()
+    State.CurrentTarget = target
+    
+    if not target then
+        self:HideTargetIndicator()
+        return
+    end
+    
+    -- تحديث مؤشر الهدف
+    if AimbotConfig.Visuals and AimbotConfig.TargetIndicator then
+        self:UpdateTargetIndicator(target)
+    end
+    
+    -- إطلاق النار التلقائي
+    if AimbotConfig.AutoShoot then
+        self:ShootAtTarget(target)
+    else
+        -- فقط التصويب بدون إطلاق
+        local predictedPosition = self:CalculatePrediction(
+            target.TargetPart,
+            target.Distance
+        )
+        self:SmoothAim(predictedPosition)
+    end
+    
+    -- تحديث معلومات الهدف
+    if AimbotConfig.ShowTargetInfo and AimbotObjects.TargetInfo then
+        AimbotObjects.TargetInfo.Visible = true
+        AimbotObjects.TargetInfo.Text = string.format("%s | %d HP | %dm", 
+            target.Player.Name, 
+            math.floor(target.Humanoid.Health),
+            math.floor(target.Distance)
+        )
+        AimbotObjects.TargetInfo.Position = Vector2.new(
+            Camera.ViewportSize.X / 2,
+            50
+        )
+    end
+end
+
+function AimbotManager:UpdateTargetIndicator(target)
+    if not AimbotObjects.TargetIndicator then return end
+    
+    AimbotObjects.TargetIndicator.Visible = true
+    
+    -- حساب حجم المؤشر
+    local indicatorSize = Vector2.new(30, 30)
+    local indicatorPos = target.ScreenPosition - indicatorSize / 2
+    
+    DrawingLib:Update(AimbotObjects.TargetIndicator, {
+        Size = indicatorSize,
+        Position = indicatorPos
+    })
+    
+    -- تأثير الوميض للقفل
+    if State.TargetLocked then
+        local lockTime = tick() - State.LockStartTime
+        local pulse = math.sin(lockTime * 5) * 0.3 + 0.7
+        
+        local pulseColor = Color3.new(
+            AimbotConfig.IndicatorColor.R * pulse,
+            AimbotConfig.IndicatorColor.G * pulse,
+            AimbotConfig.IndicatorColor.B * pulse
+        )
+        
+        DrawingLib:Update(AimbotObjects.TargetIndicator, {
+            Color = pulseColor
+        })
+    end
+end
+
+function AimbotManager:HideTargetIndicator()
+    if AimbotObjects.TargetIndicator then
+        AimbotObjects.TargetIndicator.Visible = false
+    end
+    
+    if AimbotObjects.TargetInfo then
+        AimbotObjects.TargetInfo.Visible = false
+    end
+end
+
+function AimbotManager:PlayToggleSound()
+    if ESPConfig.SoundEffects then
+        local sound = Instance.new("Sound")
+        sound.SoundId = ESPConfig.ToggleSound
+        sound.Volume = ESPConfig.SoundVolume
+        sound.Parent = workspace
+        sound:Play()
+        game:GetService("Debris"):AddItem(sound, 2)
+    end
+end
+
+function AimbotManager:PlayLockSound()
+    local sound = Instance.new("Sound")
+    sound.SoundId = AimbotConfig.LockSoundID
+    sound.Volume = 0.5
+    sound.Parent = workspace
+    sound:Play()
+    game:GetService("Debris"):AddItem(sound, 2)
+end
+
+function AimbotManager:Toggle(state)
+    AimbotConfig.Enabled = state
+    State.AimbotEnabled = state
+    
+    if not state then
+        State.CurrentTarget = nil
+        State.IsAiming = false
+        self:HideTargetIndicator()
+    end
+    
+    return state
+end
+
+function AimbotManager:SetConfig(key, value)
+    if AimbotConfig[key] ~= nil then
+        AimbotConfig[key] = value
+        return true
+    end
+    return false
+end
+
+-- ======== إنشاء واجهة GUI المتقدمة ========
+local function CreateAdvancedGUI()
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "UltimateCheatMenu"
+    ScreenGui.Parent = CoreGui
+    ScreenGui.ResetOnSpawn = false
+    
+    -- Frame الرئيسي
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Name = "MainFrame"
+    MainFrame.Size = UDim2.new(0, 350, 0, 500)
+    MainFrame.Position = UDim2.new(0.5, -175, 0.5, -250)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.BackgroundTransparency = 0.05
+    MainFrame.Parent = ScreenGui
+    
+    -- جعل Frame قابلاً للسحب
+    local dragging = false
+    local dragInput, dragStart, startPos
+    
+    local function update(input)
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+    
+    MainFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = MainFrame.Position
+            
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+    
+    MainFrame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = input
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input == dragInput) then
+            update(input)
+        end
+    end)
+    
+    -- التصميم المتقدم
+    local TopBar = Instance.new("Frame")
+    TopBar.Name = "TopBar"
+    TopBar.Size = UDim2.new(1, 0, 0, 40)
+    TopBar.Position = UDim2.new(0, 0, 0, 0)
+    TopBar.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    TopBar.BorderSizePixel = 0
+    TopBar.Parent = MainFrame
+    
+    local Title = Instance.new("TextLabel")
+    Title.Name = "Title"
+    Title.Size = UDim2.new(1, -80, 1, 0)
+    Title.Position = UDim2.new(0, 10, 0, 0)
+    Title.BackgroundTransparency = 1
+    Title.Text = "ULTIMATE CHEAT MENU"
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.TextSize = 18
+    Title.Font = Enum.Font.SourceSansBold
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.Parent = TopBar
+    
+    local CloseButton = Instance.new("TextButton")
+    CloseButton.Name = "CloseButton"
+    CloseButton.Size = UDim2.new(0, 30, 0, 30)
+    CloseButton.Position = UDim2.new(1, -35, 0.5, -15)
+    CloseButton.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
+    CloseButton.BorderSizePixel = 0
+    CloseButton.Text = "X"
+    CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    CloseButton.TextSize = 16
+    CloseButton.Font = Enum.Font.SourceSansBold
+    CloseButton.Parent = TopBar
+    
+    CloseButton.MouseButton1Click:Connect(function()
+        ScreenGui.Enabled = not ScreenGui.Enabled
+    end)
+    
+    -- تبويبات القائمة
+    local TabContainer = Instance.new("Frame")
+    TabContainer.Name = "TabContainer"
+    TabContainer.Size = UDim2.new(1, 0, 0, 40)
+    TabContainer.Position = UDim2.new(0, 0, 0, 40)
+    TabContainer.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+    TabContainer.BorderSizePixel = 0
+    TabContainer.Parent = MainFrame
+    
+    local Tabs = {"ESP", "AIMBOT", "VISUALS", "SETTINGS"}
+    local TabButtons = {}
+    local TabFrames = {}
+    
+    for i, tabName in ipairs(Tabs) do
+        local TabButton = Instance.new("TextButton")
+        TabButton.Name = tabName .. "Tab"
+        TabButton.Size = UDim2.new(0.25, 0, 1, 0)
+        TabButton.Position = UDim2.new((i-1) * 0.25, 0, 0, 0)
+        TabButton.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+        TabButton.BorderSizePixel = 0
+        TabButton.Text = tabName
+        TabButton.TextColor3 = Color3.fromRGB(200, 200, 200)
+        TabButton.TextSize = 14
+        TabButton.Font = Enum.Font.SourceSans
+        TabButton.Parent = TabContainer
+        
+        local TabFrame = Instance.new("ScrollingFrame")
+        TabFrame.Name = tabName .. "Frame"
+        TabFrame.Size = UDim2.new(1, 0, 1, -80)
+        TabFrame.Position = UDim2.new(0, 0, 0, 80)
+        TabFrame.BackgroundTransparency = 1
+        TabFrame.BorderSizePixel = 0
+        TabFrame.ScrollBarThickness = 4
+        TabFrame.Visible = i == 1
+        TabFrame.Parent = MainFrame
+        
+        TabButton.MouseButton1Click:Connect(function()
+            for _, frame in pairs(TabFrames) do
+                frame.Visible = false
+            end
+            for _, button in pairs(TabButtons) do
+                button.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+                button.TextColor3 = Color3.fromRGB(200, 200, 200)
+            end
+            
+            TabFrame.Visible = true
+            TabButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+            TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        end)
+        
+        TabButtons[tabName] = TabButton
+        TabFrames[tabName] = TabFrame
+    end
+    
+    -- محتوى تبويب ESP
+    local ESPFrame = TabFrames["ESP"]
+    ESPFrame.CanvasSize = UDim2.new(0, 0, 0, 600)
+    
+    local yOffset = 10
+    
+    local function CreateToggle(parent, text, defaultValue, callback)
+        local ToggleFrame = Instance.new("Frame")
+        ToggleFrame.Name = text .. "Toggle"
+        ToggleFrame.Size = UDim2.new(0.9, 0, 0, 35)
+        ToggleFrame.Position = UDim2.new(0.05, 0, 0, yOffset)
+        ToggleFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+        ToggleFrame.BorderSizePixel = 0
+        ToggleFrame.Parent = parent
+        
+        local ToggleLabel = Instance.new("TextLabel")
+        ToggleLabel.Name = "Label"
+        ToggleLabel.Size = UDim2.new(0.7, 0, 1, 0)
+        ToggleLabel.Position = UDim2.new(0, 10, 0, 0)
+        ToggleLabel.BackgroundTransparency = 1
+        ToggleLabel.Text = text
+        ToggleLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
+        ToggleLabel.TextSize = 14
+        ToggleLabel.Font = Enum.Font.SourceSans
+        ToggleLabel.TextXAlignment = Enum.TextXAlignment.Left
+        ToggleLabel.Parent = ToggleFrame
+        
+        local ToggleButton = Instance.new("TextButton")
+        ToggleButton.Name = "Button"
+        ToggleButton.Size = UDim2.new(0, 60, 0, 25)
+        ToggleButton.Position = UDim2.new(1, -70, 0.5, -12.5)
+        ToggleButton.BackgroundColor3 = defaultValue and Color3.fromRGB(0, 180, 0) or Color3.fromRGB(180, 0, 0)
+        ToggleButton.BorderSizePixel = 0
+        ToggleButton.Text = defaultValue and "ON" or "OFF"
+        ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        ToggleButton.TextSize = 12
+        ToggleButton.Font = Enum.Font.SourceSansBold
+        ToggleButton.Parent = ToggleFrame
+        
+        ToggleButton.MouseButton1Click:Connect(function()
+            local newValue = not defaultValue
+            defaultValue = newValue
+            
+            ToggleButton.BackgroundColor3 = newValue and Color3.fromRGB(0, 180, 0) or Color3.fromRGB(180, 0, 0)
+            ToggleButton.Text = newValue and "ON" or "OFF"
+            
+            if callback then
+                callback(newValue)
+            end
+        end)
+        
+        yOffset = yOffset + 40
+        return ToggleFrame
+    end
+    
+    -- إضافة التبديلات لـ ESP
+    CreateToggle(ESPFrame, "Enable ESP", true, function(state)
+        ESPManager:Toggle(state)
+    end)
+    
+    CreateToggle(ESPFrame, "Box ESP", true, function(state)
+        ESPConfig.BoxESP = state
+    end)
+    
+    CreateToggle(ESPFrame, "Show Names", true, function(state)
+        ESPConfig.ShowName = state
+    end)
+    
+    CreateToggle(ESPFrame, "Show Health", true, function(state)
+        ESPConfig.ShowHealth = state
+    end)
+    
+    CreateToggle(ESPFrame, "Show Distance", true, function(state)
+        ESPConfig.ShowDistance = state
+    end)
+    
+    CreateToggle(ESPFrame, "Team Check", true, function(state)
+        ESPConfig.TeamCheck = state
+    end)
+    
+    CreateToggle(ESPFrame, "Wall Check", true, function(state)
+        ESPConfig.WallCheck = state
+    end)
+    
+    CreateToggle(ESPFrame, "Head Dot", true, function(state)
+        ESPConfig.ShowHeadDot = state
+    end)
+    
+    CreateToggle(ESPFrame, "Show FOV", true, function(state)
+        ESPConfig.ShowFOV = state
+        if AimbotObjects.FOVCircle then
+            AimbotObjects.FOVCircle.Visible = state
+        end
+    end)
+    
+    -- محتوى تبويب AIMBOT
+    local AimbotFrame = TabFrames["AIMBOT"]
+    AimbotFrame.CanvasSize = UDim2.new(0, 0, 0, 400)
+    yOffset = 10
+    
+    CreateToggle(AimbotFrame, "Enable AimBot", true, function(state)
+        AimbotManager:Toggle(state)
+    end)
+    
+    CreateToggle(AimbotFrame, "Auto Shoot", true, function(state)
+        AimbotConfig.AutoShoot = state
+    end)
+    
+    CreateToggle(AimbotFrame, "Team Check", true, function(state)
+        AimbotConfig.TeamCheck = state
+    end)
+    
+    CreateToggle(AimbotFrame, "Visible Check", true, function(state)
+        AimbotConfig.VisibleCheck = state
+    end)
+    
+    CreateToggle(AimbotFrame, "Smoothing", true, function(state)
+        AimbotConfig.Smoothing = state
+    end)
+    
+    CreateToggle(AimbotFrame, "Prediction", true, function(state)
+        AimbotConfig.Prediction = state
+    end)
+    
+    CreateToggle(AimbotFrame, "Show FOV Circle", true, function(state)
+        AimbotConfig.FOVVisible = state
+    end)
+    
+    CreateToggle(AimbotFrame, "Target Lock", false, function(state)
+        AimbotConfig.TargetLock = state
+    end)
+    
+    -- زر إخفاء القائمة
+    local HideButton = Instance.new("TextButton")
+    HideButton.Name = "HideButton"
+    HideButton.Size = UDim2.new(0, 100, 0, 35)
+    HideButton.Position = UDim2.new(0.5, -50, 1, -45)
+    HideButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    HideButton.BorderSizePixel = 0
+    HideButton.Text = "HIDE MENU"
+    HideButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    HideButton.TextSize = 14
+    HideButton.Font = Enum.Font.SourceSansBold
+    HideButton.Parent = MainFrame
+    
+    HideButton.MouseButton1Click:Connect(function()
+        MainFrame.Visible = not MainFrame.Visible
+        HideButton.Text = MainFrame.Visible and "HIDE MENU" or "SHOW MENU"
+    end)
+    
+    -- معلومات النسخة
+    local VersionLabel = Instance.new("TextLabel")
+    VersionLabel.Name = "VersionLabel"
+    VersionLabel.Size = UDim2.new(1, 0, 0, 20)
+    VersionLabel.Position = UDim2.new(0, 0, 1, -25)
+    VersionLabel.BackgroundTransparency = 1
+    VersionLabel.Text = "ULTIMATE CHEAT v1.0 | DELTA EXECUTOR"
+    VersionLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+    VersionLabel.TextSize = 11
+    VersionLabel.Font = Enum.Font.SourceSans
+    VersionLabel.Parent = MainFrame
+    
+    return ScreenGui
+end
+
+-- ======== التهيئة الرئيسية ========
+local function Initialize()
+    print("========================================")
+    print("🚀 ULTIMATE CHEAT SYSTEM LOADING...")
+    print("========================================")
+    
+    -- تهيئة الأنظمة
+    ESPManager:Initialize()
+    AimbotManager:Initialize()
+    
+    -- إنشاء واجهة GUI
+    local GUI = CreateAdvancedGUI()
+    
+    -- تنظيف الذاكرة عند الخروج
+    game:BindToClose(function()
+        for _, connection in ipairs(Connections) do
+            connection:Disconnect()
+        end
+        
+        for category, objects in pairs(ESPObjects) do
+            for player, object in pairs(objects) do
+                if typeof(object) == "table" and object.Remove then
+                    object:Remove()
+                elseif typeof(object) == "Instance" then
+                    object:Destroy()
+                end
+            end
+        end
+        
+        if AimbotObjects.FOVCircle then
+            AimbotObjects.FOVCircle:Remove()
+        end
+        
+        print("✅ النظام تم تنظيفه بنجاح!")
+    end)
+    
+    print("✅ النظام جاهز للاستخدام!")
+    print("📱 تم التحميل بنجاح على Delta Executor")
+    print("🎮 اضغط على Q لتفعيل AimBot")
+    print("🖱️ افتح القائمة من الشاشة")
+    print("========================================")
+    
+    return {
+        ESP = ESPManager,
+        Aimbot = AimbotManager,
+        GUI = GUI
+    }
+end
+
+-- بدء التشغيل
+local CheatSystem = Initialize()
+
+-- إرجاع التحكمات
+return CheatSystem
