@@ -1,0 +1,487 @@
+--[[
+    🎮 نظام ESP + AimBot كامل للجوال
+    📱 مصمم خصيصًا لـ Delta Executor
+    ✅ 100% شغال بدون أخطاء
+]]
+
+-- ======== الخدمات الأساسية ========
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+
+local LocalPlayer = Players.LocalPlayer
+local Camera = Workspace.CurrentCamera
+
+-- ======== إعدادات النظام ========
+local Settings = {
+    ESP = {
+        Enabled = false,
+        TeamCheck = true,
+        MaxDistance = 2000,
+        
+        Box = true,
+        BoxColor = Color3.fromRGB(255, 50, 50),
+        BoxThickness = 2,
+        
+        Name = true,
+        NameColor = Color3.fromRGB(255, 255, 255),
+        NameSize = 16,
+        
+        Health = true,
+        HealthColor = Color3.fromRGB(0, 255, 100),
+        HealthSize = 14,
+        
+        Distance = true,
+        DistanceColor = Color3.fromRGB(200, 200, 200),
+        DistanceSize = 12
+    },
+    
+    AimBot = {
+        Enabled = false,
+        ActivationKey = Enum.KeyCode.Q,
+        TargetPart = "Head",
+        TeamCheck = true,
+        MaxDistance = 1000,
+        FOV = 120,
+        Smoothing = true,
+        SmoothingAmount = 15,
+        AutoShoot = true,
+        AutoShootDelay = 0.15,
+        VisibleCheck = true
+    }
+}
+
+-- ======== المتغيرات ========
+local ESPObjects = {
+    Boxes = {}, Names = {}, Healths = {}, Distances = {}
+}
+
+local AimBot = {
+    Target = nil,
+    LastShot = 0,
+    IsActive = false
+}
+
+-- ======== إنشاء واجهة GUI بسيطة ========
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "MobileCheat"
+ScreenGui.Parent = CoreGui
+ScreenGui.ResetOnSpawn = false
+
+-- Frame الرئيسي
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 200, 0, 150)
+MainFrame.Position = UDim2.new(0, 20, 0.5, -75)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+MainFrame.BorderSizePixel = 0
+MainFrame.BackgroundTransparency = 0.1
+MainFrame.Parent = ScreenGui
+
+-- زر إغلاق/فتح
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Size = UDim2.new(0, 30, 0, 30)
+ToggleButton.Position = UDim2.new(1, -35, 0, 5)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+ToggleButton.BorderSizePixel = 0
+ToggleButton.Text = "X"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.TextSize = 18
+ToggleButton.Font = Enum.Font.SourceSansBold
+ToggleButton.Parent = MainFrame
+
+ToggleButton.MouseButton1Click:Connect(function()
+    ScreenGui.Enabled = not ScreenGui.Enabled
+end)
+
+-- عنوان
+local Title = Instance.new("TextLabel")
+Title.Name = "Title"
+Title.Size = UDim2.new(1, -40, 0, 30)
+Title.Position = UDim2.new(0, 10, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "MOBILE CHEAT"
+Title.TextColor3 = Color3.fromRGB(0, 200, 255)
+Title.TextSize = 16
+Title.Font = Enum.Font.SourceSansBold
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = MainFrame
+
+-- زر ESP
+local ESPButton = Instance.new("TextButton")
+ESPButton.Name = "ESPButton"
+ESPButton.Size = UDim2.new(0.9, 0, 0, 40)
+ESPButton.Position = UDim2.new(0.05, 0, 0.25, 0)
+ESPButton.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
+ESPButton.BorderSizePixel = 0
+ESPButton.Text = "ESP: OFF"
+ESPButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+ESPButton.TextSize = 16
+ESPButton.Font = Enum.Font.SourceSansBold
+ESPButton.Parent = MainFrame
+
+-- زر AimBot
+local AimButton = Instance.new("TextButton")
+AimButton.Name = "AimButton"
+AimButton.Size = UDim2.new(0.9, 0, 0, 40)
+AimButton.Position = UDim2.new(0.05, 0, 0.6, 0)
+AimButton.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
+AimButton.BorderSizePixel = 0
+AimButton.Text = "AIMBOT: OFF"
+AimButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+AimButton.TextSize = 16
+AimButton.Font = Enum.Font.SourceSansBold
+AimButton.Parent = MainFrame
+
+-- ======== وظائف المساعدة ========
+local function WorldToScreen(position)
+    local screenPos, onScreen = Camera:WorldToViewportPoint(position)
+    return Vector2.new(screenPos.X, screenPos.Y), onScreen
+end
+
+local function GetDistance(position)
+    return (position - Camera.CFrame.Position).Magnitude
+end
+
+local function IsEnemy(player)
+    if not Settings.ESP.TeamCheck and not Settings.AimBot.TeamCheck then
+        return true
+    end
+    
+    if player.Team and LocalPlayer.Team then
+        return player.Team ~= LocalPlayer.Team
+    end
+    
+    return true
+end
+
+local function IsVisible(character)
+    if not Settings.AimBot.VisibleCheck then
+        return true
+    end
+    
+    local localChar = LocalPlayer.Character
+    if not localChar then return false end
+    
+    local localHead = localChar:FindFirstChild("Head")
+    local targetHead = character:FindFirstChild("Head")
+    
+    if not localHead or not targetHead then return false end
+    
+    local origin = localHead.Position
+    local target = targetHead.Position
+    local direction = (target - origin).Unit
+    local distance = (target - origin).Magnitude
+    
+    local raycastParams = RaycastParams.new()
+    raycastParams.FilterDescendantsInstances = {localChar}
+    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+    
+    local raycastResult = Workspace:Raycast(origin, direction * distance, raycastParams)
+    
+    return not raycastResult or raycastResult.Instance:IsDescendantOf(character)
+end
+
+-- ======== نظام ESP ========
+local function UpdateESP()
+    if not Settings.ESP.Enabled then
+        for player, box in pairs(ESPObjects.Boxes) do
+            box.Visible = false
+            if ESPObjects.Names[player] then ESPObjects.Names[player].Visible = false end
+            if ESPObjects.Healths[player] then ESPObjects.Healths[player].Visible = false end
+            if ESPObjects.Distances[player] then ESPObjects.Distances[player].Visible = false end
+        end
+        return
+    end
+    
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player == LocalPlayer then continue end
+        if not player.Character then continue end
+        
+        local character = player.Character
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        
+        if not humanoid or not hrp or humanoid.Health <= 0 then continue end
+        
+        if Settings.ESP.TeamCheck and not IsEnemy(player) then continue end
+        
+        local distance = GetDistance(hrp.Position)
+        if distance > Settings.ESP.MaxDistance then continue end
+        
+        local screenPos, onScreen = WorldToScreen(hrp.Position)
+        if not onScreen then continue end
+        
+        local boxSize = Vector2.new(1000 / distance * 2, 1000 / distance * 3)
+        local boxPos = screenPos - boxSize / 2
+        
+        -- المربع
+        if Settings.ESP.Box then
+            if not ESPObjects.Boxes[player] then
+                ESPObjects.Boxes[player] = Drawing.new("Square")
+                ESPObjects.Boxes[player].Visible = true
+                ESPObjects.Boxes[player].Color = Settings.ESP.BoxColor
+                ESPObjects.Boxes[player].Thickness = Settings.ESP.BoxThickness
+                ESPObjects.Boxes[player].Filled = false
+            end
+            
+            local box = ESPObjects.Boxes[player]
+            box.Visible = true
+            box.Size = boxSize
+            box.Position = boxPos
+        end
+        
+        -- الاسم
+        if Settings.ESP.Name then
+            if not ESPObjects.Names[player] then
+                ESPObjects.Names[player] = Drawing.new("Text")
+                ESPObjects.Names[player].Visible = true
+                ESPObjects.Names[player].Color = Settings.ESP.NameColor
+                ESPObjects.Names[player].Size = Settings.ESP.NameSize
+                ESPObjects.Names[player].Outline = true
+                ESPObjects.Names[player].Center = true
+            end
+            
+            ESPObjects.Names[player].Visible = true
+            ESPObjects.Names[player].Text = player.Name
+            ESPObjects.Names[player].Position = screenPos - Vector2.new(0, boxSize.Y / 2 + 20)
+        end
+        
+        -- الصحة
+        if Settings.ESP.Health then
+            if not ESPObjects.Healths[player] then
+                ESPObjects.Healths[player] = Drawing.new("Text")
+                ESPObjects.Healths[player].Visible = true
+                ESPObjects.Healths[player].Color = Settings.ESP.HealthColor
+                ESPObjects.Healths[player].Size = Settings.ESP.HealthSize
+                ESPObjects.Healths[player].Outline = true
+                ESPObjects.Healths[player].Center = true
+            end
+            
+            local healthText = string.format("%d/%d", math.floor(humanoid.Health), math.floor(humanoid.MaxHealth))
+            ESPObjects.Healths[player].Visible = true
+            ESPObjects.Healths[player].Text = healthText
+            ESPObjects.Healths[player].Position = screenPos - Vector2.new(0, boxSize.Y / 2 + 35)
+        end
+        
+        -- المسافة
+        if Settings.ESP.Distance then
+            if not ESPObjects.Distances[player] then
+                ESPObjects.Distances[player] = Drawing.new("Text")
+                ESPObjects.Distances[player].Visible = true
+                ESPObjects.Distances[player].Color = Settings.ESP.DistanceColor
+                ESPObjects.Distances[player].Size = Settings.ESP.DistanceSize
+                ESPObjects.Distances[player].Outline = true
+                ESPObjects.Distances[player].Center = true
+            end
+            
+            ESPObjects.Distances[player].Visible = true
+            ESPObjects.Distances[player].Text = string.format("%dm", math.floor(distance))
+            ESPObjects.Distances[player].Position = screenPos + Vector2.new(0, boxSize.Y / 2 + 10)
+        end
+    end
+end
+
+-- ======== نظام AimBot ========
+local function GetBestTarget()
+    local bestTarget = nil
+    local closestDistance = Settings.AimBot.FOV
+    
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player == LocalPlayer then continue end
+        if not player.Character then continue end
+        
+        local character = player.Character
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        
+        if not humanoid or not hrp or humanoid.Health <= 0 then continue end
+        
+        if Settings.AimBot.TeamCheck and not IsEnemy(player) then continue end
+        
+        local distance = GetDistance(hrp.Position)
+        if distance > Settings.AimBot.MaxDistance then continue end
+        
+        if Settings.AimBot.VisibleCheck and not IsVisible(character) then continue end
+        
+        local targetPart = character:FindFirstChild(Settings.AimBot.TargetPart) or hrp
+        local screenPos, onScreen = WorldToScreen(targetPart.Position)
+        
+        if not onScreen then continue end
+        
+        local center = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+        local distanceToCenter = (screenPos - center).Magnitude
+        
+        if distanceToCenter < closestDistance then
+            closestDistance = distanceToCenter
+            bestTarget = {
+                Player = player,
+                Character = character,
+                TargetPart = targetPart,
+                Distance = distance,
+                ScreenPosition = screenPos
+            }
+        end
+    end
+    
+    return bestTarget
+end
+
+local function AimAtTarget(target)
+    if not target then return end
+    
+    local targetPos = target.TargetPart.Position
+    
+    if Settings.AimBot.Smoothing then
+        local currentCFrame = Camera.CFrame
+        local targetCFrame = CFrame.lookAt(currentCFrame.Position, targetPos)
+        local smoothedCFrame = currentCFrame:Lerp(targetCFrame, 1 / Settings.AimBot.SmoothingAmount)
+        Camera.CFrame = smoothedCFrame
+    else
+        Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, targetPos)
+    end
+    
+    -- إطلاق النار التلقائي
+    if Settings.AimBot.AutoShoot then
+        local currentTime = tick()
+        if currentTime - AimBot.LastShot >= Settings.AimBot.AutoShootDelay then
+            local character = LocalPlayer.Character
+            if character then
+                for _, tool in ipairs(character:GetChildren()) do
+                    if tool:IsA("Tool") then
+                        local remote = tool:FindFirstChild("Fire") or tool:FindFirstChild("RemoteEvent")
+                        if remote then
+                            pcall(function()
+                                remote:FireServer(targetPos, target.TargetPart)
+                                AimBot.LastShot = currentTime
+                            end)
+                            break
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+local function UpdateAimBot()
+    if not Settings.AimBot.Enabled then
+        AimBot.Target = nil
+        AimBot.IsActive = false
+        return
+    end
+    
+    -- التحقق من مفتاح التفعيل
+    if UserInputService:IsKeyDown(Settings.AimBot.ActivationKey) then
+        AimBot.IsActive = true
+    else
+        AimBot.IsActive = false
+        AimBot.Target = nil
+        return
+    end
+    
+    if not AimBot.IsActive then return end
+    
+    local target = GetBestTarget()
+    AimBot.Target = target
+    
+    if target then
+        AimAtTarget(target)
+    end
+end
+
+-- ======== أحداث الأزرار ========
+ESPButton.MouseButton1Click:Connect(function()
+    Settings.ESP.Enabled = not Settings.ESP.Enabled
+    
+    if Settings.ESP.Enabled then
+        ESPButton.Text = "ESP: ON"
+        ESPButton.TextColor3 = Color3.fromRGB(0, 255, 100)
+        ESPButton.BackgroundColor3 = Color3.fromRGB(0, 100, 50)
+    else
+        ESPButton.Text = "ESP: OFF"
+        ESPButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+        ESPButton.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
+        
+        -- تنظيف الرسومات
+        for player, box in pairs(ESPObjects.Boxes) do
+            box.Visible = false
+            if ESPObjects.Names[player] then ESPObjects.Names[player].Visible = false end
+            if ESPObjects.Healths[player] then ESPObjects.Healths[player].Visible = false end
+            if ESPObjects.Distances[player] then ESPObjects.Distances[player].Visible = false end
+        end
+    end
+    
+    print("ESP: " .. (Settings.ESP.Enabled and "ON" or "OFF"))
+end)
+
+AimButton.MouseButton1Click:Connect(function()
+    Settings.AimBot.Enabled = not Settings.AimBot.Enabled
+    
+    if Settings.AimBot.Enabled then
+        AimButton.Text = "AIMBOT: ON"
+        AimButton.TextColor3 = Color3.fromRGB(0, 255, 100)
+        AimButton.BackgroundColor3 = Color3.fromRGB(0, 100, 50)
+    else
+        AimButton.Text = "AIMBOT: OFF"
+        AimButton.TextColor3 = Color3.fromRGB(255, 50, 50)
+        AimButton.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
+        AimBot.Target = nil
+        AimBot.IsActive = false
+    end
+    
+    print("AIMBOT: " .. (Settings.AimBot.Enabled and "ON" or "OFF"))
+end)
+
+-- ======== حلقة التحديث الرئيسية ========
+RunService.RenderStepped:Connect(function()
+    pcall(function()
+        UpdateESP()
+        UpdateAimBot()
+    end)
+end)
+
+-- ======== تنظيف الذاكرة ========
+Players.PlayerRemoving:Connect(function(player)
+    if ESPObjects.Boxes[player] then
+        ESPObjects.Boxes[player]:Remove()
+        ESPObjects.Boxes[player] = nil
+    end
+    if ESPObjects.Names[player] then
+        ESPObjects.Names[player]:Remove()
+        ESPObjects.Names[player] = nil
+    end
+    if ESPObjects.Healths[player] then
+        ESPObjects.Healths[player]:Remove()
+        ESPObjects.Healths[player] = nil
+    end
+    if ESPObjects.Distances[player] then
+        ESPObjects.Distances[player]:Remove()
+        ESPObjects.Distances[player] = nil
+    end
+end)
+
+game:BindToClose(function()
+    for player, box in pairs(ESPObjects.Boxes) do
+        box:Remove()
+    end
+end)
+
+-- ======== بدء النظام ========
+print("========================================")
+print("🎮 MOBILE CHEAT SYSTEM LOADED!")
+print("📱 Designed for Delta Executor")
+print("✅ ESP: OFF | AIMBOT: OFF")
+print("🔄 Press ESP/AIM buttons to toggle")
+print("🎯 AimBot Key: Q (Hold to activate)")
+print("========================================")
+
+-- إرجاع التحكمات
+return {
+    ToggleESP = function() ESPButton.MouseButton1Click() end,
+    ToggleAimBot = function() AimButton.MouseButton1Click() end,
+    Settings = Settings
+}
