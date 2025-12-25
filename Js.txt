@@ -1,0 +1,571 @@
+-- سكربت مبسط يحتوي على زرين فقط من mur1.txt
+print("Simple MVS Script")
+
+-- تحميل WindUI
+local WindUI = nil
+local success, result = pcall(function()
+    local source = game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua", true)
+    if source then
+        local loaded = loadstring(source)
+        if loaded then
+            return loaded()
+        end
+    end
+    return nil
+end)
+
+if success and result then
+    WindUI = result
+    
+    -- إعدادات أساسية
+    WindUI.TransparencyValue = 0.5
+    WindUI:SetTheme("Dark")
+    
+    -- خدمات اللعبة
+    local Players = game:GetService("Players")
+    local player = Players.LocalPlayer
+    local RunService = game:GetService("RunService")
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local Workspace = game:GetService("Workspace")
+    local Mouse = player:GetMouse()
+    
+    -- متغيرات النظام
+    local ClickShootState = false
+    local AutoShootState = false
+    local currentWeapon = nil
+    local isWeaponEquipped = false
+    local lastFireTime = 0
+    local fireDelay = 1.5
+    local AimDistance = 250
+    _G.BlockClick = false
+    
+    -- =============================================
+    -- دوال MVS الأساسية
+    -- =============================================
+    
+    -- دالة الحصول على الفريق
+    local function getTeamFrames()
+        local success, redFrame, blueFrame = pcall(function()
+            local playerGui = player:FindFirstChildOfClass("PlayerGui")
+            if not playerGui then return nil, nil end
+            local main = playerGui:FindFirstChild("Main")
+            if not main then return nil, nil end
+            local mainGameFrame = main:FindFirstChild("MainGameFrame")
+            if not mainGameFrame then return nil, nil end
+            local playersFrame = mainGameFrame:FindFirstChild("PlayersFrame")
+            if not playersFrame then return nil, nil end
+            return playersFrame:FindFirstChild("TeamRedFrame"), playersFrame:FindFirstChild("TeamBlueFrame")
+        end)
+        if success then
+            return redFrame, blueFrame
+        end
+        return nil, nil
+    end
+    
+    -- دالة تنظيف الأسماء
+    local function sanitizeName(name)
+        return tostring(name):gsub("%s+", "")
+    end
+    
+    -- دالة الحصول على الأعداء
+    local function getEnemyPlayers()
+        local enemyPlayerInstances = {}
+        local enemyTeamColor = Color3.fromRGB(255, 0, 0)
+        
+        pcall(function()
+            local redFrame, blueFrame = getTeamFrames()
+            if not redFrame or not blueFrame then return end
+        
+            local redPlayers = {}
+            local bluePlayers = {}
+            
+            for _, child in ipairs(redFrame:GetChildren()) do
+                if child:IsA("Frame") then
+                    table.insert(redPlayers, child.Name)
+                end
+            end
+            
+            for _, child in ipairs(blueFrame:GetChildren()) do
+                if child:IsA("Frame") then
+                    table.insert(bluePlayers, child.Name)
+                end
+            end
+        
+            local isLocalPlayerInRed = false
+            local isLocalPlayerInBlue = false
+        
+            local sanitizedLocalPlayerName = sanitizeName(player.Name)
+        
+            for _, name in ipairs(redPlayers) do
+                if sanitizeName(name) == sanitizedLocalPlayerName then
+                    isLocalPlayerInRed = true
+                    break
+                end
+            end
+        
+            for _, name in ipairs(bluePlayers) do
+                if sanitizeName(name) == sanitizedLocalPlayerName then
+                    isLocalPlayerInBlue = true
+                    break
+                end
+            end
+        
+            if not isLocalPlayerInRed and not isLocalPlayerInBlue then
+                return
+            end
+        
+            local enemyFrame = isLocalPlayerInRed and blueFrame or redFrame
+            local enemyNames = {}
+            
+            for _, child in ipairs(enemyFrame:GetChildren()) do
+                if child:IsA("Frame") then
+                    table.insert(enemyNames, child.Name)
+                end
+            end
+        
+            for _, name in ipairs(enemyNames) do
+                local enemyPlayer = Players:FindFirstChild(name)
+                if enemyPlayer and enemyPlayer ~= player then
+                    table.insert(enemyPlayerInstances, enemyPlayer)
+                end
+            end
+        
+            enemyTeamColor = isLocalPlayerInRed and Color3.fromRGB(0, 0, 255) or Color3.fromRGB(255, 0, 0)
+        end)
+        
+        return enemyPlayerInstances, enemyTeamColor
+    end
+    
+    -- دالة تحديث الأسلحة
+    local function updateWeaponScripts()
+        pcall(function()
+            if not currentWeapon then return end
+    
+            local scripts = {}
+            for _, descendant in ipairs(currentWeapon:GetDescendants()) do
+                if descendant:IsA("Script") or descendant:IsA("LocalScript") then
+                    table.insert(scripts, descendant)
+                end
+            end
+            
+            if currentWeapon:FindFirstChild("Client") then
+                table.insert(scripts, currentWeapon.Client)
+            end
+            
+            for _, script in ipairs(scripts) do
+                if script then
+                    script.Disabled = _G.BlockClick
+                end
+            end
+        end)
+    end
+    
+    -- دالة تهيئة السلاح
+    local function initializeWeaponScript()
+        pcall(function()
+            local character = player.Character
+            if not character then
+                currentWeapon = nil
+                isWeaponEquipped = false
+                return
+            end
+    
+            local equippedTool
+            for _, child in ipairs(character:GetChildren()) do
+                if child:IsA("Tool") and child:FindFirstChild("fire") then
+                    equippedTool = child
+                    break
+                end
+            end
+    
+            if equippedTool and currentWeapon ~= equippedTool then
+                currentWeapon = equippedTool
+                isWeaponEquipped = true
+                updateWeaponScripts()
+            elseif not equippedTool and isWeaponEquipped then
+                currentWeapon = nil
+                isWeaponEquipped = false
+            end
+        end)
+    end
+    
+    -- دالة تحديث حالة الحظر
+    local function updateBlockState()
+        pcall(function()
+            if (ClickShootState or AutoShootState) and _G.BlockClick then
+                _G.BlockClick = false
+                updateWeaponScripts()
+            elseif not (ClickShootState or AutoShootState) and not _G.BlockClick then
+                _G.BlockClick = true
+                updateWeaponScripts()
+            end
+        end)
+    end
+    
+    -- دالة العثور على أقرب لاعب
+    local function getClosestPlayer()
+        local closestPlayer = nil
+        local minDistance = AimDistance
+        
+        pcall(function()
+            local players = getEnemyPlayers()
+            if not players then return end
+    
+            local character = player.Character
+            if not character then return end
+            local hrp = character:FindFirstChild("HumanoidRootPart")
+            if not hrp then return end
+    
+            for _, enemyPlayer in ipairs(players) do
+                if enemyPlayer and typeof(enemyPlayer) == "Instance" and enemyPlayer:IsA("Player") then
+                    local targetCharacter = enemyPlayer.Character
+                    if targetCharacter then
+                        local targetHrp = targetCharacter:FindFirstChild("HumanoidRootPart")
+                        local targetHumanoid = targetCharacter:FindFirstChild("Humanoid")
+                        if targetHrp and targetHumanoid and targetHumanoid.Health > 0 then
+                            local distance = (hrp.Position - targetHrp.Position).Magnitude
+                            if distance < minDistance then
+                                minDistance = distance
+                                closestPlayer = enemyPlayer
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+        
+        return closestPlayer
+    end
+    
+    -- دالة التحقق من الرؤية
+    local function canSeeTarget(targetPlayer)
+        if not targetPlayer then return false end
+        
+        local canSee = false
+        
+        pcall(function()
+            local localCharacter = player.Character
+            if not localCharacter then return end
+            local targetCharacter = targetPlayer.Character
+            if not targetCharacter then return end
+    
+            local localHrp = localCharacter:FindFirstChild("HumanoidRootPart")
+            local targetHrp = targetCharacter:FindFirstChild("HumanoidRootPart")
+            local targetHumanoid = targetCharacter:FindFirstChild("Humanoid")
+    
+            if not localHrp or not targetHrp or not targetHumanoid then return end
+    
+            local distance = (localHrp.Position - targetHrp.Position).Magnitude
+            if distance > AimDistance then return end
+    
+            local raycastParams = RaycastParams.new()
+            raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+            raycastParams.FilterDescendantsInstances = { localCharacter }
+            raycastParams.IgnoreWater = true
+            
+            local direction = targetHrp.Position - localHrp.Position
+            local raycastResult = Workspace:Raycast(
+                localHrp.Position, 
+                direction.Unit * math.min(distance, AimDistance), 
+                raycastParams
+            )
+    
+            if not raycastResult then 
+                canSee = true 
+                return 
+            end
+        end)
+        
+        return canSee
+    end
+    
+    -- دالة التصوير
+    local function shootLogic()
+        if tick() - lastFireTime < fireDelay then return end
+        lastFireTime = tick()
+        if not isWeaponEquipped then return end
+        
+        pcall(function()
+            local target = getClosestPlayer()
+            if not target then return end
+            if not canSeeTarget(target) then return end
+    
+            local localCharacter = player.Character
+            if not localCharacter then return end
+            local localHrp = localCharacter:FindFirstChild("HumanoidRootPart")
+            if not localHrp then return end
+    
+            local targetCharacter = target.Character
+            if not targetCharacter then return end
+            local targetHrp = targetCharacter:FindFirstChild("HumanoidRootPart")
+            if not targetHrp then return end
+    
+            local predictedPosition = targetHrp.Position
+            local handle = currentWeapon:FindFirstChild("Handle") or currentWeapon
+            if not handle then return end
+    
+            if currentWeapon:FindFirstChild("fire") then
+                currentWeapon.fire:FireServer()
+            end
+        end)
+    end
+    
+    -- =============================================
+    -- إنشاء واجهة WindUI
+    -- =============================================
+    
+    -- نافذة الترحيب
+    WindUI:Popup({
+        Title = "MVS Simple Script",
+        Icon = "zap",
+        Content = "سكربت مبسط يحتوي على زرين فقط\nClick Shoot و Auto Shoot",
+        Buttons = {
+            {
+                Title = "موافق",
+                Icon = "check",
+                Variant = "Primary",
+                Callback = function() end
+            }
+        }
+    })
+    
+    -- إنشاء النافذة الرئيسية
+    local Window = WindUI:CreateWindow({
+        Title = "MVS Simple",
+        Icon = "target", 
+        Author = "Simple Version",
+        Folder = "MVS_Simple",
+        Size = UDim2.fromOffset(500, 400),
+        Theme = "Dark",
+        SideBarWidth = 200
+    })
+    
+    -- قسم الأدوات
+    local MainSection = Window:Section({ Title = "الأدوات الرئيسية", Opened = true })
+    local MainTab = MainSection:Tab({ Title = "MVS Controls", Icon = "gamepad" })
+    
+    -- =============================================
+    -- زر Click Shoot
+    -- =============================================
+    local clickShootButtonText = "Click Shoot - OFF"
+    local clickShootButton = MainTab:Button({
+        Title = clickShootButtonText,
+        Icon = "mouse-pointer",
+        Size = "xlarge",
+        Callback = function()
+            ClickShootState = not ClickShootState
+            
+            if ClickShootState then
+                clickShootButtonText = "Click Shoot - ON"
+                WindUI:Notify({
+                    Title = "Click Shoot",
+                    Content = "تم تفعيل التصوير عند الضغط",
+                    Duration = 3
+                })
+                
+                -- تحديث حالة الحظر
+                updateBlockState()
+                
+                -- تحديث النص في الزر
+                clickShootButton:Destroy()
+                clickShootButton = MainTab:Button({
+                    Title = clickShootButtonText,
+                    Icon = "mouse-pointer",
+                    Size = "xlarge",
+                    Callback = function()
+                        ClickShootState = not ClickShootState
+                        
+                        if not ClickShootState then
+                            clickShootButtonText = "Click Shoot - OFF"
+                            WindUI:Notify({
+                                Title = "Click Shoot",
+                                Content = "تم إيقاف التصوير عند الضغط",
+                                Duration = 3
+                            })
+                            
+                            -- تحديث حالة الحظر
+                            updateBlockState()
+                            
+                            -- تحديث النص في الزر
+                            clickShootButton:Destroy()
+                            clickShootButton = MainTab:Button({
+                                Title = clickShootButtonText,
+                                Icon = "mouse-pointer",
+                                Size = "xlarge",
+                                Callback = function()
+                                    ClickShootState = not ClickShootState
+                                    
+                                    if ClickShootState then
+                                        clickShootButtonText = "Click Shoot - ON"
+                                        WindUI:Notify({
+                                            Title = "Click Shoot",
+                                            Content = "تم تفعيل التصوير عند الضغط",
+                                            Duration = 3
+                                        })
+                                        
+                                        -- تحديث حالة الحظر
+                                        updateBlockState()
+                                        
+                                        -- تحديث النص في الزر
+                                        clickShootButton:Destroy()
+                                        clickShootButton = MainTab:Button({
+                                            Title = clickShootButtonText,
+                                            Icon = "mouse-pointer",
+                                            Size = "xlarge",
+                                            Callback = function()
+                                                -- كود التبديل...
+                                            end
+                                        })
+                                    end
+                                end
+                            })
+                        end
+                    end
+                })
+            end
+        end
+    })
+    
+    -- =============================================
+    -- زر Auto Shoot
+    -- =============================================
+    local autoShootButtonText = "Auto Shoot - OFF"
+    local autoShootButton = MainTab:Button({
+        Title = autoShootButtonText,
+        Icon = "zap",
+        Size = "xlarge",
+        Callback = function()
+            AutoShootState = not AutoShootState
+            
+            if AutoShootState then
+                autoShootButtonText = "Auto Shoot - ON"
+                WindUI:Notify({
+                    Title = "Auto Shoot",
+                    Content = "تم تفعيل التصوير التلقائي",
+                    Duration = 3
+                })
+                
+                -- تحديث حالة الحظر
+                updateBlockState()
+                
+                -- بدء التصوير التلقائي
+                task.spawn(function()
+                    while AutoShootState and RunService.Heartbeat:Wait() do
+                        if isWeaponEquipped and currentWeapon and not _G.BlockClick then
+                            local target = getClosestPlayer()
+                            if target and canSeeTarget(target) then
+                                shootLogic()
+                            end
+                        end
+                    end
+                end)
+                
+                -- تحديث النص في الزر
+                autoShootButton:Destroy()
+                autoShootButton = MainTab:Button({
+                    Title = autoShootButtonText,
+                    Icon = "zap",
+                    Size = "xlarge",
+                    Callback = function()
+                        AutoShootState = not AutoShootState
+                        
+                        if not AutoShootState then
+                            autoShootButtonText = "Auto Shoot - OFF"
+                            WindUI:Notify({
+                                Title = "Auto Shoot",
+                                Content = "تم إيقاف التصوير التلقائي",
+                                Duration = 3
+                            })
+                            
+                            -- تحديث حالة الحظر
+                            updateBlockState()
+                            
+                            -- تحديث النص في الزر
+                            autoShootButton:Destroy()
+                            autoShootButton = MainTab:Button({
+                                Title = autoShootButtonText,
+                                Icon = "zap",
+                                Size = "xlarge",
+                                Callback = function()
+                                    AutoShootState = not AutoShootState
+                                    
+                                    if AutoShootState then
+                                        autoShootButtonText = "Auto Shoot - ON"
+                                        WindUI:Notify({
+                                            Title = "Auto Shoot",
+                                            Content = "تم تفعيل التصوير التلقائي",
+                                            Duration = 3
+                                        })
+                                        
+                                        -- تحديث حالة الحظر
+                                        updateBlockState()
+                                        
+                                        -- تحديث النص في الزر
+                                        autoShootButton:Destroy()
+                                        autoShootButton = MainTab:Button({
+                                            Title = autoShootButtonText,
+                                            Icon = "zap",
+                                            Size = "xlarge",
+                                            Callback = function()
+                                                -- كود التبديل...
+                                            end
+                                        })
+                                    end
+                                end
+                            })
+                        end
+                    end
+                })
+            end
+        end
+    })
+    
+    -- زر إغلاق
+    MainTab:Button({
+        Title = "إغلاق السكربت",
+        Icon = "power",
+        Size = "xlarge",
+        Callback = function()
+            Window:Destroy()
+            WindUI:Notify({
+                Title = "تم الإغلاق",
+                Content = "تم إغلاق السكربت بنجاح",
+                Duration = 3
+            })
+        end
+    })
+    
+    -- =============================================
+    -- التهيئة والتشغيل
+    -- =============================================
+    
+    -- متابعة الأسلحة
+    task.spawn(function()
+        while task.wait(0.5) do
+            initializeWeaponScript()
+        end
+    end)
+    
+    -- متابعة الضغط بالماوس لـ Click Shoot
+    Mouse.Button1Down:Connect(function()
+        if ClickShootState and isWeaponEquipped and currentWeapon and not _G.BlockClick then
+            local target = getClosestPlayer()
+            if target and canSeeTarget(target) then
+                shootLogic()
+            end
+        end
+    end)
+    
+    -- إشعار النجاح
+    task.wait(2)
+    WindUI:Notify({
+        Title = "MVS Simple Script",
+        Content = "السكربت جاهز للاستخدام!",
+        Duration = 5
+    })
+    
+    print("MVS Simple Script Loaded Successfully!")
+    
+else
+    print("Failed to load WindUI:", result)
+end
