@@ -1,0 +1,3699 @@
+print("PhantomXOnTopForever")
+
+-- الطريقة الصحيحة لتحميل WindUI
+local success, result = pcall(function()
+    local source = game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua", true)
+    if source then
+        local loaded = loadstring(source)
+        if loaded then
+            return loaded()
+        end
+    end
+    return nil
+end)
+
+if success and result then
+    local WindUI = result
+    
+    -- =============================================
+    -- نظام اللغات
+    -- =============================================
+    _G.SelectedLanguage = _G.SelectedLanguage or "Arabic"
+    
+    -- ترجمات للغتين
+    local Translations = {
+        Arabic = {
+            -- نصوص عامة
+            welcome = "أهلاً وسهلاً في PhantomXPro 🌟",
+            warning = "⚠️ تنبيه هام:\nتشغيل السكربت يكون على مسؤوليتك الشخصية والكاملة، ونحن غير مسؤولين عن أي ضرر. مع أننا نعمل على تقديم سكربت بأعلى معايير الأمان الممكنة، هذا تحذير احتراطي في حال حدوث أي مشكلة غير متوقعة.نتمني لكم تجربة ممتعة ❤",
+            discord = "🎮 انضم لسيرفر الديسكورد",
+            discordContent = "انضم للسيرڤر الرسمي للسكربت!\n• آخر التحديثات\n• مساعدة فنية\n• إقتراحات وتحسينات\n• تحديثات أمان\n\nالرابط: https://discord.gg/CgUa36sPNs",
+            copyLink = "نسخ الرابط وتفعيل السكربت",
+            linkCopied = "✅ تم نسخ الرابط",
+            linkCopiedContent = "تم تفعيل السكربت!\nرابط الديسكورد في الحافظة",
+            changeLanguage = "تغيير اللغة إلى الإنجليزية",
+            languageChanged = "جاري إعادة التشغيل...",
+            scriptClosed = "تم إغلاق السكربت",
+            notification = "إشعار",
+            
+            -- أقسام التبويبات
+            mainFeatures = "الميزات الرئيسية",
+            info = "معلومات",
+            teleport = "انتقال",
+            movement = "حركة",
+            visuals = "رؤية",
+            other = "أخرى",
+            proXFeatures = "ميزات ProX",
+            settings = "إعدادات",
+            developer = "المطور",
+            config = "الإعدادات",
+            
+            -- معلومات الحساب
+            yourName = "👤 اسمك: ",
+            yourUsername = "🎫 يوزرك: ",
+            yourId = "🆔 الآي دي: ",
+            accountAge = "📅 عمر الحساب: ",
+            hack = "⚡ الهاك: ",
+            wins = "🏆 فوزاتك: ",
+            kills = "⚔️ قتلاتك: ",
+            players = "👥 اللاعبين: ",
+            fps = "📊 فريماتك: ",
+            ping = "📡 البينق: ",
+            rejoin = "ادخل نفس سيرفرك الحالي: Rejoin",
+            findServer = "🚀 ابحث عن سيرفر سريع",
+            reconnecting = "جاري إعادة الدخول",
+            searchingServer = "جاري البحث",
+            serverFound = "وجدنا سيرفر!",
+            serverNotFound = "ما لقينا",
+            
+            -- الانتقال
+            autoJoin = "Auto Join Arena",
+            autoJoinDesc = "Automatically Join Arenas",
+            enableAutoJoin = "شغّل الأوتو جوين",
+            disableAutoJoin = "طفيه اذا بتدخل انت بيدك مب اوتو",
+            joinMethod = "طريقة الدخول",
+            targetPlayer = "اللاعب المستهدف",
+            selectArena = "اختار الساحة",
+            showArena = "اظهر الساحة المختارة",
+            showArenaDesc = "بيظهر لك الساحة اللي اخترتها",
+            teleportTools = "Teleport Tools",
+            teleportDesc = "Teleport anywhere quickly",
+            savePosition = "احفظ مكاني الحالي",
+            goToSaved = "رح للمكان المحفوظ",
+            goUp = "رح فوق الخريطة",
+            goToEnemy = "اروح لأقرب عدو",
+            
+            -- حركة
+            autoFollow = "تشغيل الأوتو فولو",
+            autoFollowDesc = "بيظهر زر الأوتو على الشاشة",
+            resetAutoFollow = "ارجع زر الأوتو لمكانه",
+            pinAutoButton = "تثبيت زر الأوتو",
+            pinAutoButtonDesc = "يثبت زر الأوتو على الشاشة وينفكه بالضغط مرة ثانية",
+            importantNotes = "📝 ملاحظات مهمة",
+            notesDesc = "• لا تشغل الأوتو وأنت مفعل السرعة العالية • الأوتو يشتغل فقط عندما تملك القنبلة • إذا علق جرب تقفل وتفتح الأوتو مرة ثانية • إذا ضيعت الزر اضغط على زرار \"إرجاع\" والزر بيرجعلك",
+            speedSettings = "Speed Settings",
+            speedDesc = "Control your movement speed",
+            speedLevel = "مستوى السرعة (1-10)",
+            enableSpeed = "تشغيل السرعة",
+            speedDesc2 = "السرعة الخبيثه من 1 الي 5 و السريعة من 6 الي 10",
+            antiSlide = "منع الانزلاق على الجليد",
+            flightFeatures = "Flight Features",
+            flightDesc = "Control advanced flight",
+            enableFlight = "طيران",
+            flightDesc2 = "بتطير و بيظهر لكل اذا في قيم",
+            flightSpeed = "(200-50) الطيران",
+            stopFlight = "وقف الطيران",
+            doubleJump = "دبل نط",
+            doubleJumpDesc = "نط مرتين في هواء تستخدم في ماب نط",
+            doubleJumpEnabled = "✅ دبل نط مفعل",
+            doubleJumpDisabled = "❌ دبل نط موقف",
+            
+            -- رؤية
+            visualSettings = "Visual Settings",
+            visualDesc = "Enhance your vision and game performance",
+            enableLighting = "تشغيل اضاءة",
+            lightingDesc = "بيخلي كل الخريطة مضية",
+            antiLag = "Anti Lag: تسريع اللعبة",
+            antiLagDesc = "بيحسن أداء اللعبة ويزيد السرعة بشكل كبير",
+            
+            -- أخرى
+            otherScripts = "Other Scripts",
+            otherDesc = "Additional scripts and features",
+            headless = "🤍هيدليس & كوربلوكس",
+            headlessDesc = "ملاحظة: ترا يبان لك بس",
+            
+            -- ProX Features
+            proxFeatures = "ProXfeatures",
+            autoPassBomb = "اوتو باس بومب💣",
+            autoPassBombDesc = "اذا معك القنبلة بيعطيها ل خصمك",
+            evasionMethod = "🏃‍♂️ طريقة الهروب",
+            bombEvasion = "🛡️ نظام الهروب من القنبلة",
+            bombEvasionDesc = "يهرب من اللاعبين اللي عندهم قنبلة",
+            fakeLag = "FakeLag (فيك لاق)",
+            antiFire = "🛡️ مضاد نار",
+            antiFireDesc = "مضاد ل نار بيمنعك توقع",
+            antiIce = "🧊 منع تزحلق",
+            warningText = "تنبيه استخدم كل شي بحظر",
+            warningDesc = "كل شي شغلة بحظر اذا احد صورك بتبلع بان",
+            
+            -- إعدادات
+            scriptSettings = "Script Settings",
+            scriptDesc = "Customize the script to your liking",
+            selectTheme = "اختر السمة",
+            updateScript = "تحديث السكربت",
+            closeScript = "أقفل السكربت",
+            
+            -- المطور
+            developerName = "Cypher",
+            developerDesc = "Roblox Script Developer",
+            joinDiscord = "انضم لسيرفر الديسكورد",
+            version = "الإصدار 2.1.0",
+            contactDev = "تواصل مع المطور"
+        },
+        English = {
+            -- General texts
+            welcome = "Welcome to PhantomXPro 🌟",
+            warning = "⚠️ Important Warning:\nUsing this script is entirely at your own risk and responsibility. We are not responsible for any damage. Although we work to provide a script with the highest possible security standards, this is a precautionary warning in case any unexpected problem occurs. We hope you have an enjoyable experience ❤",
+            discord = "🎮 Join Discord Server",
+            discordContent = "Join the official script server!\n• Latest updates\n• Technical support\n• Suggestions and improvements\n• Security updates\n\nLink: https://discord.gg/CgUa36sPNs",
+            copyLink = "Copy Link & Activate Script",
+            linkCopied = "✅ Link Copied",
+            linkCopiedContent = "Script activated!\nDiscord link in clipboard",
+            changeLanguage = "Change Language to Arabic",
+            languageChanged = "Restarting...",
+            scriptClosed = "Script closed",
+            notification = "Notification",
+            
+            -- Tab sections
+            mainFeatures = "Main Features",
+            info = "Info",
+            teleport = "Teleport",
+            movement = "Movement",
+            visuals = "Visuals",
+            other = "Other",
+            proXFeatures = "ProX Features",
+            settings = "Settings",
+            developer = "Developer",
+            config = "Config",
+            
+            -- Account info
+            yourName = "👤 Your Name: ",
+            yourUsername = "🎫 Username: ",
+            yourId = "ID: ",
+            accountAge = "📅 Account Age: ",
+            hack = "⚡ Hack: ",
+            wins = "🏆 Wins: ",
+            kills = "⚔️ Kills: ",
+            players = "👥 Players: ",
+            fps = "📊 FPS: ",
+            ping = "📡 Ping: ",
+            rejoin = "Rejoin Current Server",
+            findServer = "🚀 Find Fast Server",
+            reconnecting = "Reconnecting...",
+            searchingServer = "Searching for server...",
+            serverFound = "Server found!",
+            serverNotFound = "Not found",
+            
+            -- Teleport
+            autoJoin = "Auto Join Arena",
+            autoJoinDesc = "Automatically Join Arenas",
+            enableAutoJoin = "Enable Auto Join",
+            disableAutoJoin = "Disable if you want to join manually",
+            joinMethod = "Join Method",
+            targetPlayer = "Target Player",
+            selectArena = "Select Arena",
+            showArena = "Show Selected Arena",
+            showArenaDesc = "Shows the arena you selected",
+            teleportTools = "Teleport Tools",
+            teleportDesc = "Teleport anywhere quickly",
+            savePosition = "Save Current Position",
+            goToSaved = "Go to Saved Position",
+            goUp = "Go Above Map",
+            goToEnemy = "Go to Nearest Enemy",
+            
+            -- Movement
+            autoFollow = "Enable Auto Follow",
+            autoFollowDesc = "Shows auto button on screen",
+            resetAutoFollow = "Reset Auto Button Position",
+            pinAutoButton = "Pin Auto Button",
+            pinAutoButtonDesc = "Pins auto button to screen, unpins on second click",
+            importantNotes = "📝 Important Notes",
+            notesDesc = "• Don't enable auto when high speed is active • Auto only works when you have the bomb • If stuck, try toggling auto off/on • If button lost, press reset button",
+            speedSettings = "Speed Settings",
+            speedDesc = "Control your movement speed",
+            speedLevel = "Speed Level (1-10)",
+            enableSpeed = "Enable Speed",
+            speedDesc2 = "Stealth speed 1-5, Fast speed 6-10",
+            antiSlide = "Prevent Ice Sliding",
+            flightFeatures = "Flight Features",
+            flightDesc = "Control advanced flight",
+            enableFlight = "Enable Flight",
+            flightDesc2 = "Fly and shows to everyone if enabled",
+            flightSpeed = "Flight Speed (50-200)",
+            stopFlight = "Stop Flight",
+            doubleJump = "Double Jump",
+            doubleJumpDesc = "Jump twice in air, useful for jump maps",
+            doubleJumpEnabled = "✅ Double Jump Enabled",
+            doubleJumpDisabled = "❌ Double Jump Disabled",
+            
+            -- Visuals
+            visualSettings = "Visual Settings",
+            visualDesc = "Enhance your vision and game performance",
+            enableLighting = "Enable Lighting",
+            lightingDesc = "Makes the whole map bright",
+            antiLag = "Anti Lag: Game Booster",
+            antiLagDesc = "Improves game performance and increases speed",
+            
+            -- Other
+            otherScripts = "Other Scripts",
+            otherDesc = "Additional scripts and features",
+            headless = "Headless & Korblox 🤍",
+            headlessDesc = "Note: Only visible to you",
+            
+            -- ProX Features
+            proxFeatures = "ProXfeatures",
+            autoPassBomb = "Auto Pass Bomb💣",
+            autoPassBombDesc = "If you have the bomb, passes it to enemy",
+            evasionMethod = "🏃‍♂️ Evasion Method",
+            bombEvasion = "🛡️ Bomb Evasion System",
+            bombEvasionDesc = "Escapes from players who have the bomb",
+            fakeLag = "FakeLag (Fake Lag)",
+            antiFire = "🛡️ Anti Lava",
+            antiFireDesc = "Anti-lava prevents falling",
+            antiIce = "🧊 Anti Slip",
+            warningText = "Warning use everything carefully",
+            warningDesc = "Everything can get you banned if someone records",
+            
+            -- Settings
+            scriptSettings = "Script Settings",
+            scriptDesc = "Customize the script to your liking",
+            selectTheme = "Select Theme",
+            updateScript = "Update Script",
+            closeScript = "Close Script",
+            
+            -- Developer
+            developerName = "Cypher",
+            developerDesc = "Roblox Script Developer",
+            joinDiscord = "Join Discord Server",
+            version = "Version 2.1.0",
+            contactDev = "Contact Developer"
+        }
+    }
+    
+    -- دالة الترجمة
+    local function T(key)
+        return Translations[_G.SelectedLanguage][key] or key
+    end
+    
+    -- تنظيف الواجهة
+    local function cleanupGUI()
+        for _, v in pairs(game.CoreGui:GetChildren()) do
+            if v:IsA("ScreenGui") and (v.Name:find("Wind") or v.Name:find("Phantom")) then
+                v:Destroy()
+            end
+        end
+    end
+    
+    -- نافذة اختيار اللغة
+    WindUI:Popup({
+        Title = "🌍 Select Language / اختر اللغة",
+        Icon = "globe",
+        Content = "Choose your preferred language:\n\nاختر لغتك المفضلة:",
+        Buttons = {
+            {
+                Title = "English 🇺🇸",
+                Icon = "flag",
+                Variant = "Primary",
+                Callback = function()
+                    _G.SelectedLanguage = "English"
+                    WindUI:Notify({
+                        Title = "✅ Language Selected",
+                        Content = "English language has been selected",
+                        Duration = 3
+                    })
+                    task.wait(1)
+                    createMainScript()
+                end
+            },
+            {
+                Title = "العربية 🇸🇦",
+                Icon = "flag",
+                Variant = "Secondary",
+                Callback = function()
+                    _G.SelectedLanguage = "Arabic"
+                    WindUI:Notify({
+                        Title = "✅ تم الاختيار",
+                        Content = "تم اختيار اللغة العربية",
+                        Duration = 3
+                    })
+                    task.wait(1)
+                    createMainScript()
+                end
+            }
+        }
+    })
+    
+    -- =============================================
+    -- السكربت الرئيسي
+    -- =============================================
+    function createMainScript()
+        -- تنظيف الواجهة
+        cleanupGUI()
+        
+        -- إعادة تحميل WindUI
+        local success, newWindUI = pcall(function()
+            local source = game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua", true)
+            return loadstring(source)()
+        end)
+        
+        if not success then
+            WindUI:Notify({
+                Title = "❌ Error",
+                Content = "Failed to load UI",
+                Duration = 3
+            })
+            return
+        end
+        
+        WindUI = newWindUI
+        WindUI.TransparencyValue = 0.5
+        WindUI:SetTheme("Dark")
+        
+        local Players = game:GetService("Players")
+        local RunService = game:GetService("RunService")
+        local Lighting = game:GetService("Lighting")
+        local TweenService = game:GetService("TweenService")
+        local UserInputService = game:GetService("UserInputService")
+        local StatsService = game:GetService("Stats")
+        local TeleportService = game:GetService("TeleportService")
+        local player = Players.LocalPlayer
+
+        -- نافذة البوب أب الترحيبية
+        WindUI:Popup({
+            Title = "PhantomXPro",
+            Icon = "crown",
+            Content = T("warning"),
+            Buttons = {
+                {
+                    Title = _G.SelectedLanguage == "Arabic" and "موافق" or "OK",
+                    Icon = "arrow-right",
+                    Variant = "Primary",
+                    Callback = function() end
+                }
+            }
+        })
+
+        -- نافذة Discord المنبثقة
+        task.wait(5)
+        WindUI:Popup({
+            Title = T("discord"),
+            Icon = "message-circle",
+            Content = T("discordContent"),
+            Buttons = {
+                {
+                    Title = T("copyLink"),
+                    Icon = "copy",
+                    Variant = "Primary",
+                    Callback = function()
+                        setclipboard("https://discord.gg/CgUa36sPNs")
+                        WindUI:Notify({
+                            Title = T("linkCopied"),
+                            Content = T("linkCopiedContent"),
+                            Duration = 4
+                        })
+                    end
+                }
+            }
+        })
+        
+        -- إنشاء النافذة الرئيسية
+        local Window = WindUI:CreateWindow({
+            Title = "PhantomXPro",
+            Icon = "crown", 
+            Author = "By_Cypher",
+            Folder = "PhantomXPro",
+            Size = UDim2.fromOffset(800, 650),
+            Theme = "Dark",
+            User = {
+                Enabled = true,
+                Anonymous = false,
+                Callback = function()
+                    WindUI:Notify({
+                        Title = T("info"),
+                        Content = (_G.SelectedLanguage == "Arabic" and "اسمك: " or "Name: ") .. player.Name,
+                        Duration = 3
+                    })
+                end
+            },
+            SideBarWidth = 250,
+            ScrollBarEnabled = true
+        })
+
+        -- الأقسام الرئيسية
+        local Sections = {
+            Main = Window:Section({ Title = T("mainFeatures"), Opened = true }),
+            Settings = Window:Section({ Title = T("settings"), Opened = true })
+        }
+
+        -- التبويبات
+        local Tabs = {
+            Info = Sections.Main:Tab({ Title = T("info"), Icon = "info" }),
+            Teleport = Sections.Main:Tab({ Title = T("teleport"), Icon = "navigation" }),
+            Movement = Sections.Main:Tab({ Title = T("movement"), Icon = "move" }),
+            Visuals = Sections.Main:Tab({ Title = T("visuals"), Icon = "eye" }),
+            Other = Sections.Main:Tab({ Title = T("other"), Icon = "box" }),
+            ProXFeatures = Sections.Main:Tab({ Title = T("proXFeatures"), Icon = "zap" }),
+            Config = Sections.Settings:Tab({ Title = T("config"), Icon = "settings" }),
+            Credits = Sections.Settings:Tab({ Title = T("developer"), Icon = "user" })
+        }
+
+        -- =============================================
+        -- تبويب المعلومات  
+        -- =============================================
+        do
+            local function getRealStat(statName)
+                local leaderstats = player:FindFirstChild("leaderstats")
+                if leaderstats then
+                    local stat = leaderstats:FindFirstChild(statName)
+                    if stat then
+                        return tostring(stat.Value)
+                    end
+                end
+                
+                local statsFolder = player:FindFirstChild("Stats")
+                if statsFolder then
+                    local stat = statsFolder:FindFirstChild(statName)
+                    if stat then
+                        return tostring(stat.Value)
+                    end
+                end
+                
+                return "0"
+            end
+
+            -- معلومات الحساب
+            Tabs.Info:Button({
+                Title = T("yourName") .. player.DisplayName,
+                Callback = function() end
+            })
+            
+            Tabs.Info:Button({
+                Title = T("yourUsername") .. player.Name,
+                Callback = function() end
+            })
+            
+            Tabs.Info:Button({
+                Title = T("yourId") .. player.UserId,
+                Callback = function() end
+            })
+            
+            Tabs.Info:Button({
+                Title = T("accountAge") .. player.AccountAge .. (_G.SelectedLanguage == "Arabic" and " يوم" or " day"),
+                Callback = function() end
+            })
+            
+            Tabs.Info:Button({
+                Title = T("hack") .. (identifyexecutor and identifyexecutor() or (_G.SelectedLanguage == "Arabic" and "ساينابس" or "Synapse")),
+                Callback = function() end
+            })
+
+            Tabs.Info:Divider({Title = ""})
+
+            -- الإحصائيات
+            local winsBtn = Tabs.Info:Button({
+                Title = T("wins") .. getRealStat("Wins"),
+                Callback = function() end
+            })
+            
+            local killsBtn = Tabs.Info:Button({
+                Title = T("kills") .. getRealStat("Kills"),
+                Callback = function() end
+            })
+
+            Tabs.Info:Divider({Title = ""})
+
+            -- معلومات السيرفر
+            local playersBtn = Tabs.Info:Button({
+                Title = T("players") .. #Players:GetPlayers(),
+                Callback = function() end
+            })
+            
+            local fpsBtn = Tabs.Info:Button({
+                Title = T("fps") .. (_G.SelectedLanguage == "Arabic" and "يحسب..." or "calculating..."),
+                Callback = function() end
+            })
+            
+            local pingBtn = Tabs.Info:Button({
+                Title = T("ping") .. (_G.SelectedLanguage == "Arabic" and "يحسب..." or "calculating..."),
+                Callback = function() end
+            })
+
+            Tabs.Info:Divider({Title = ""})
+
+            -- زر Rejoin
+            Tabs.Info:Button({
+                Title = T("rejoin"),
+                Callback = function()
+                    local currentServerId = game.JobId
+                    
+                    WindUI:Notify({
+                        Title = T("reconnecting"),
+                        Content = _G.SelectedLanguage == "Arabic" and "بيخرجك ويدخلك نفس السيرفر..." or "Leaving and rejoining same server...",
+                        Duration = 3
+                    })
+                    
+                    wait(1)
+                    
+                    local placeId = game.PlaceId
+                    local jobId = game.JobId
+                    
+                    pcall(function()
+                        TeleportService:TeleportToPlaceInstance(placeId, jobId, player)
+                    end)
+                end
+            })
+
+            -- زر البحث عن أفضل سيرفر
+            Tabs.Info:Button({
+                Title = T("findServer"),
+                Callback = function()
+                    local HttpService = game:GetService("HttpService")
+                    
+                    WindUI:Notify({
+                        Title = T("searchingServer"),
+                        Content = _G.SelectedLanguage == "Arabic" and "بدور على سيرفر..." or "Searching for server...",
+                        Duration = 5
+                    })
+                    
+                    local function teleportToRandomServer()
+                        local placeId = game.PlaceId
+                        pcall(function()
+                            TeleportService:Teleport(placeId, player)
+                        end)
+                    end
+                    
+                    local function tryFindServer()
+                        local placeId = game.PlaceId
+                        local url = "https://games.roblox.com/v1/games/" .. placeId .. "/servers/Public?limit=10"
+                        
+                        local success, result = pcall(function()
+                            local response = game:HttpGet(url)
+                            return HttpService:JSONDecode(response)
+                        end)
+                        
+                        if success and result and result.data then
+                            for _, server in pairs(result.data) do
+                                if server.id and server.playing < server.maxPlayers then
+                                    WindUI:Notify({
+                                        Title = T("serverFound"),
+                                        Content = _G.SelectedLanguage == "Arabic" and "بيتقل الآن..." or "Teleporting now...",
+                                        Duration = 3
+                                    })
+                                    
+                                    wait(1)
+                                    TeleportService:TeleportToPlaceInstance(placeId, server.id, player)
+                                    return
+                                end
+                            end
+                        end
+                        
+                        WindUI:Notify({
+                            Title = T("serverNotFound"),
+                            Content = _G.SelectedLanguage == "Arabic" and "بننتقل عشوائياً..." or "Teleporting randomly...",
+                            Duration = 3
+                        })
+                        wait(2)
+                        teleportToRandomServer()
+                    end
+                    
+                    tryFindServer()
+                end
+            })
+
+            -- تحديث المعلومات
+            spawn(function()
+                while true do
+                    wait(3)
+                    winsBtn:SetTitle(T("wins") .. getRealStat("Wins"))
+                    killsBtn:SetTitle(T("kills") .. getRealStat("Kills"))
+                    playersBtn:SetTitle(T("players") .. #Players:GetPlayers())
+                    
+                    pcall(function()
+                        local ping = StatsService.Network.ServerStatsItem["Data Ping"]:GetValue()
+                        pingBtn:SetTitle(T("ping") .. math.floor(ping) .. " ms")
+                    end)
+                end
+            end)
+
+            local frameCount = 0
+            local lastTime = tick()
+            RunService.RenderStepped:Connect(function()
+                frameCount = frameCount + 1
+                local currentTime = tick()
+                if currentTime - lastTime >= 1 then
+                    local fps = math.floor(frameCount / (currentTime - lastTime))
+                    frameCount = 0
+                    lastTime = currentTime
+                    fpsBtn:SetTitle(T("fps") .. fps)
+                end
+            end)
+        end
+
+        -- =============================================
+        -- نظام الأوتو جوين الكامل
+        -- =============================================
+        do
+            Tabs.Teleport:Paragraph({
+                Title = T("autoJoin"),
+                Desc = T("autoJoinDesc"),
+                Image = "users",
+                ImageSize = 28,
+                Color = Color3.fromRGB(0, 200, 255)
+            })
+
+            local AutoJoinEnabled = false
+            local JoinMode = _G.SelectedLanguage == "Arabic" and "عدوى" or "Infection"
+            local TargetPlayer = _G.SelectedLanguage == "Arabic" and "الكل" or "Everyone"
+            local SelectedArena = _G.SelectedLanguage == "Arabic" and "أي ساحة" or "Any Arena"
+            local ShowArenaESP = true
+            local arenaESP = nil
+            local autoJoinConnection = nil
+
+            local function getAllPlayerNames()
+                local players = {_G.SelectedLanguage == "Arabic" and "الكل" or "Everyone"}
+                for _, plr in pairs(game.Players:GetPlayers()) do
+                    if plr ~= player then
+                        table.insert(players, plr.Name)
+                    end
+                end
+                return players
+            end
+
+            local function teleportToWorldSpawn()
+                local character = player.Character
+                if character and character:FindFirstChild("HumanoidRootPart") and workspace:FindFirstChild("WorldSpawn") then
+                    local humanoidRootPart = character.HumanoidRootPart
+                    local worldSpawn = workspace.WorldSpawn
+                    humanoidRootPart.CFrame = worldSpawn.CFrame
+                    return true
+                end
+                return false
+            end
+
+            local function createArenaESP()
+                if arenaESP and arenaESP.Parent then
+                    arenaESP:Destroy()
+                    arenaESP = nil
+                end
+                
+                if SelectedArena == (_G.SelectedLanguage == "Arabic" and "أي ساحة" or "Any Arena") or not ShowArenaESP then
+                    return
+                end
+                
+                local targetArena = workspace.Arenas:FindFirstChild(SelectedArena)
+                if not targetArena then
+                    return
+                end
+                
+                arenaESP = Instance.new("Highlight")
+                arenaESP.Name = "SelectedArenaESP"
+                arenaESP.FillColor = Color3.fromRGB(0, 255, 0)
+                arenaESP.FillTransparency = 0.8
+                arenaESP.OutlineColor = Color3.fromRGB(255, 255, 0)
+                arenaESP.OutlineTransparency = 0
+                arenaESP.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                
+                arenaESP.Parent = targetArena
+                
+                local espLabel = Instance.new("BillboardGui")
+                espLabel.Name = "ArenaLabel"
+                espLabel.Size = UDim2.new(0, 200, 0, 50)
+                espLabel.StudsOffset = Vector3.new(0, 10, 0)
+                espLabel.AlwaysOnTop = true
+                espLabel.Adornee = targetArena
+                
+                local labelText = Instance.new("TextLabel")
+                labelText.Size = UDim2.new(1, 0, 1, 0)
+                labelText.BackgroundTransparency = 1
+                labelText.Text = (_G.SelectedLanguage == "Arabic" and "الساحة المختارة\n[" or "Selected Arena\n[") .. SelectedArena .. "]"
+                labelText.TextColor3 = Color3.fromRGB(255, 255, 0)
+                labelText.TextSize = 14
+                labelText.Font = Enum.Font.GothamBold
+                labelText.TextStrokeTransparency = 0
+                labelText.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+                
+                labelText.Parent = espLabel
+                espLabel.Parent = targetArena
+            end
+
+            local function removeArenaESP()
+                if arenaESP and arenaESP.Parent then
+                    arenaESP:Destroy()
+                    arenaESP = nil
+                end
+                
+                if workspace.Arenas then
+                    for _, arena in pairs(workspace.Arenas:GetChildren()) do
+                        local label = arena:FindFirstChild("ArenaLabel")
+                        if label then
+                            label:Destroy()
+                        end
+                    end
+                end
+            end
+
+            local function isPlayerInsideHull(arena, side, slotNum)
+                local character = player.Character
+                if not character or not character:FindFirstChild("HumanoidRootPart") then
+                    return false
+                end
+                
+                local slot = arena.Slots[side]:FindFirstChild(tostring(slotNum))
+                if not slot or not slot:FindFirstChild("Hull") then
+                    return false
+                end
+                
+                local hull = slot.Hull
+                local playerPosition = character.HumanoidRootPart.Position
+                local hullPosition = hull.Position
+                local hullSize = hull.Size
+                
+                local distance = (playerPosition - hullPosition).Magnitude
+                local maxDistance = math.max(hullSize.X, hullSize.Y, hullSize.Z) / 2 + 2
+                
+                return distance <= maxDistance
+            end
+
+            local function isPadStillValid(arena, side, slotNum)
+                local slot = arena.Slots[side]:FindFirstChild(tostring(slotNum))
+                if not slot then return false end
+                
+                local pad = slot:FindFirstChild("Pad")
+                if not pad then return false end
+                
+                return pad.Transparency < 1 and pad.Parent ~= nil
+            end
+
+            local function checkPlayerArenaStatus()
+                if workspace:FindFirstChild("Arenas") then
+                    for _, arena in pairs(workspace.Arenas:GetChildren()) do
+                        if arena:FindFirstChild("Slots") then
+                            for _, side in pairs({"Left", "Right"}) do
+                                if arena.Slots:FindFirstChild(side) then
+                                    for i = 1, 4 do
+                                        local slot = arena.Slots[side]:FindFirstChild(tostring(i))
+                                        if slot and slot:FindFirstChild("Data") and slot.Data:FindFirstChild("Player") then
+                                            if slot.Data.Player.Value == player then
+                                                local isInside = isPlayerInsideHull(arena, side, i)
+                                                return true, arena, side, i, isInside
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+                return false, nil, nil, nil, false
+            end
+
+            local function handlePadDisappearance()
+                local isInArena, arena, side, slot = checkPlayerArenaStatus()
+                if isInArena then
+                    if not isPadStillValid(arena, side, slot) then
+                        teleportToWorldSpawn()
+                        return true
+                    end
+                end
+                return false
+            end
+
+            local function pressReadyButton()
+                local remoteStorage = game:GetService("ReplicatedStorage")
+                if remoteStorage:FindFirstChild("Remotes") and remoteStorage.Remotes:FindFirstChild("Arena") 
+                and remoteStorage.Remotes.Arena:FindFirstChild("Ready") then
+                    pcall(function()
+                        remoteStorage.Remotes.Arena.Ready:FireServer(true)
+                    end)
+                    return true
+                end
+                
+                local playerGui = player:FindFirstChild("PlayerGui")
+                if playerGui and playerGui:FindFirstChild("TBDUI") then
+                    local main = playerGui.TBDUI:FindFirstChild("Main")
+                    if main then
+                        local prompts = main:FindFirstChild("Prompts")
+                        if prompts then
+                            local readyButton = prompts:FindFirstChild("Ready")
+                            if readyButton and readyButton:IsA("TextButton") and readyButton.Visible then
+                                pcall(function()
+                                    readyButton:FireServer("MouseButton1Click")
+                                end)
+                                pcall(function()
+                                    readyButton:Activate()
+                                end)
+                                return true
+                            end
+                        end
+                    end
+                end
+                return false
+            end
+
+            local function isSlotInGame(arena, side, slotNum)
+                local slot = arena.Slots[side]:FindFirstChild(tostring(slotNum))
+                if slot and slot:FindFirstChild("Pad") then
+                    local pad = slot.Pad
+                    local color = pad.Color
+                    if math.abs(color.R - 87/255) < 0.01 and 
+                       math.abs(color.G - 181/255) < 0.01 and 
+                       math.abs(color.B - 57/255) < 0.01 then
+                        return true
+                    end
+                end
+                return false
+            end
+
+            local function isAnyPlayerInGameInArena(arena)
+                if not arena or not arena:FindFirstChild("Slots") then
+                    return false
+                end
+                
+                for _, side in pairs({"Left", "Right"}) do
+                    if arena.Slots:FindFirstChild(side) then
+                        for i = 1, 4 do
+                            if isSlotInGame(arena, side, i) then
+                                return true
+                            end
+                        end
+                    end
+                end
+                
+                return false
+            end
+
+            local function findEmptyPadInArena(arena, preferredSide)
+                if not arena or not arena:FindFirstChild("Slots") then
+                    return nil, nil
+                end
+                
+                if preferredSide and arena.Slots:FindFirstChild(preferredSide) then
+                    for i = 1, 4 do
+                        local slot = arena.Slots[preferredSide]:FindFirstChild(tostring(i))
+                        if slot and slot:FindFirstChild("Data") and slot.Data:FindFirstChild("Player") then
+                            if slot.Data.Player.Value == nil and not isSlotInGame(arena, preferredSide, i) then
+                                return preferredSide, i
+                            end
+                        end
+                    end
+                end
+                
+                for _, side in pairs({"Left", "Right"}) do
+                    if arena.Slots:FindFirstChild(side) then
+                        for i = 1, 4 do
+                            local slot = arena.Slots[side]:FindFirstChild(tostring(i))
+                            if slot and slot:FindFirstChild("Data") and slot.Data:FindFirstChild("Player") then
+                                if slot.Data.Player.Value == nil and not isSlotInGame(arena, side, i) then
+                                    return side, i
+                                end
+                            end
+                        end
+                    end
+                end
+                
+                return nil, nil
+            end
+
+            local function joinArenaSlot(arena, targetSide, targetSlot)
+                if not arena.Slots[targetSide]:FindFirstChild(tostring(targetSlot)) or 
+                   not arena.Slots[targetSide][tostring(targetSlot)]:FindFirstChild("Hull") then
+                    return false
+                end
+                
+                local hull = arena.Slots[targetSide][tostring(targetSlot)].Hull
+                local character = player.Character
+                if character and character:FindFirstChild("HumanoidRootPart") then
+                    character.HumanoidRootPart.CFrame = hull.CFrame + Vector3.new(0, 5, 0)
+                    
+                    task.wait(0.3)
+                    
+                    if isPlayerInsideHull(arena, targetSide, targetSlot) then
+                        return true
+                    else
+                        return false
+                    end
+                end
+                return false
+            end
+
+            local function findFirstAvailableSlot(arena, side, excludeSlot)
+                if not arena or not arena.Slots or not arena.Slots:FindFirstChild(side) then
+                    return nil
+                end
+                
+                for i = 1, 4 do
+                    if i ~= excludeSlot then
+                        local slot = arena.Slots[side]:FindFirstChild(tostring(i))
+                        if slot and slot:FindFirstChild("Data") and slot.Data:FindFirstChild("Player") then
+                            if slot.Data.Player.Value == nil and not isSlotInGame(arena, side, i) then
+                                return i
+                            end
+                        end
+                    end
+                end
+                
+                return nil
+            end
+
+            function findTargetPlayer(targetName)
+                if targetName == (_G.SelectedLanguage == "Arabic" and "الكل" or "Everyone") then
+                    return nil
+                end
+                
+                for _, plr in pairs(game.Players:GetPlayers()) do
+                    if plr.Name == targetName and plr ~= player then
+                        return plr
+                    end
+                end
+                return nil
+            end
+
+            function isInGame()
+                local playerGui = player:FindFirstChild("PlayerGui")
+                if playerGui and playerGui:FindFirstChild("TBDUI") and playerGui.TBDUI:FindFirstChild("Main") and playerGui.TBDUI.Main:FindFirstChild("Scorebar") then
+                    return playerGui.TBDUI.Main.Scorebar.Visible
+                end
+                return false
+            end
+
+            function findPlayerInArenas(targetPlayer)
+                if workspace.Arenas then
+                    local availablePlayers = {}
+                    
+                    for _, arena in pairs(workspace.Arenas:GetChildren()) do
+                        -- تعديل: تخطي Arena 5 إذا كان الهدف أي لاعب
+                        if arena.Name == "Arena5" or arena.Name == "Arena5ICED" then
+                            if targetPlayer == nil then
+                                continue
+                            end
+                        end
+                        
+                        if SelectedArena ~= (_G.SelectedLanguage == "Arabic" and "أي ساحة" or "Any Arena") and arena.Name ~= SelectedArena then
+                            continue
+                        end
+                        
+                        if arena:FindFirstChild("Slots") then
+                            if isAnyPlayerInGameInArena(arena) then
+                                continue
+                            end
+                            
+                            for _, side in pairs({"Left", "Right"}) do
+                                if arena.Slots:FindFirstChild(side) then
+                                    for i = 1, 4 do
+                                        local slot = arena.Slots[side]:FindFirstChild(tostring(i))
+                                        if slot and slot:FindFirstChild("Data") and slot.Data:FindFirstChild("Player") then
+                                            local plr = slot.Data.Player.Value
+                                            if plr and plr ~= player and plr.Parent and not isSlotInGame(arena, side, i) then
+                                                local hasAvailableSlot = false
+                                                
+                                                if JoinMode == (_G.SelectedLanguage == "Arabic" and "عدوى" or "Infection") then
+                                                    local oppositeSide = (side == "Left") and "Right" or "Left"
+                                                    if findFirstAvailableSlot(arena, oppositeSide, nil) then
+                                                        hasAvailableSlot = true
+                                                    end
+                                                elseif JoinMode == (_G.SelectedLanguage == "Arabic" and "فريق" or "Team") then
+                                                    if findFirstAvailableSlot(arena, side, i) then
+                                                        hasAvailableSlot = true
+                                                    end
+                                                end
+                                                
+                                                if hasAvailableSlot then
+                                                    if targetPlayer == nil then
+                                                        table.insert(availablePlayers, {
+                                                            arena = arena,
+                                                            side = side,
+                                                            slot = i,
+                                                            player = plr
+                                                        })
+                                                    elseif plr == targetPlayer then
+                                                        return arena, side, i, plr
+                                                    end
+                                                end
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                    
+                    if targetPlayer == nil and #availablePlayers > 0 then
+                        local selected = availablePlayers[1]
+                        return selected.arena, selected.side, selected.slot, selected.player
+                    end
+                end
+                return nil
+            end
+
+            function findBestSlot(arena, foundSide, foundSlot, foundPlayer)
+                if isAnyPlayerInGameInArena(arena) then
+                    return nil, nil
+                end
+                
+                local targetSide = foundSide
+                local targetSlot = foundSlot
+                
+                if JoinMode == (_G.SelectedLanguage == "Arabic" and "عدوى" or "Infection") then
+                    targetSide = (foundSide == "Left") and "Right" or "Left"
+                    local emptySide, emptySlot = findEmptyPadInArena(arena, targetSide)
+                    if emptySide and emptySlot then
+                        return emptySide, emptySlot
+                    end
+                elseif JoinMode == (_G.SelectedLanguage == "Arabic" and "فريق" or "Team") then
+                    targetSide = foundSide
+                    local emptySide, emptySlot = findEmptyPadInArena(arena, targetSide)
+                    if emptySide and emptySlot then
+                        return emptySide, emptySlot
+                    end
+                end
+                
+                return nil, nil
+            end
+
+            function isReadyPromptVisible()
+                local playerGui = player:FindFirstChild("PlayerGui")
+                if playerGui and playerGui:FindFirstChild("TBDUI") and playerGui.TBDUI:FindFirstChild("Main") 
+                and playerGui.TBDUI.Main:FindFirstChild("Prompts") and playerGui.TBDUI.Main.Prompts:FindFirstChild("Ready") then
+                    return playerGui.TBDUI.Main.Prompts.Ready.Visible, playerGui.TBDUI.Main.Prompts.Ready
+                end
+                return false, nil
+            end
+
+            function startAutoJoinLoop()
+                if autoJoinConnection then
+                    autoJoinConnection:Disconnect()
+                end
+                
+                autoJoinConnection = RunService.Heartbeat:Connect(function()
+                    if not AutoJoinEnabled then return end
+                    
+                    if handlePadDisappearance() then
+                        return
+                    end
+                    
+                    if isInGame() then
+                        return
+                    end
+                    
+                    local isInArena, currentArena, currentSide, currentSlot, isInsideHull = checkPlayerArenaStatus()
+                    
+                    if isInArena then
+                        if not isInsideHull then
+                            joinArenaSlot(currentArena, currentSide, currentSlot)
+                            return
+                        end
+                        
+                        local playersInCurrentArena = {}
+                        if currentArena and currentArena:FindFirstChild("Slots") then
+                            for _, side in pairs({"Left", "Right"}) do
+                                if currentArena.Slots:FindFirstChild(side) then
+                                    for i = 1, 4 do
+                                        local slot = currentArena.Slots[side]:FindFirstChild(tostring(i))
+                                        if slot and slot:FindFirstChild("Data") and slot.Data:FindFirstChild("Player") and slot.Data.Player.Value then
+                                            local plr = slot.Data.Player.Value
+                                            if plr ~= player and plr.Parent and not isSlotInGame(currentArena, side, i) then
+                                                table.insert(playersInCurrentArena, plr)
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+
+                        if #playersInCurrentArena == 0 then
+                            teleportToWorldSpawn()
+                            return
+                        end
+
+                        local readyVisible, readyPrompt = isReadyPromptVisible()
+                        if readyVisible and readyPrompt and readyPrompt.Text == "Ready" then
+                            pressReadyButton()
+                        end
+                        return
+                    end
+                    
+                    local foundArena, foundSide, foundSlot, foundPlayer
+                    if TargetPlayer == (_G.SelectedLanguage == "Arabic" and "الكل" or "Everyone") then
+                        foundArena, foundSide, foundSlot, foundPlayer = findPlayerInArenas(nil)
+                    else
+                        local targetPlr = findTargetPlayer(TargetPlayer)
+                        if targetPlr and targetPlr.Parent then 
+                            foundArena, foundSide, foundSlot, foundPlayer = findPlayerInArenas(targetPlr)
+                        end
+                    end
+                    
+                    if foundArena and foundSide and foundSlot then
+                        local targetSide, targetSlot = findBestSlot(foundArena, foundSide, foundSlot, foundPlayer)
+                        
+                        if targetSide and targetSlot then
+                            joinArenaSlot(foundArena, targetSide, targetSlot)
+                        end
+                    end
+                end)
+            end
+
+            Tabs.Teleport:Toggle({
+                Title = T("enableAutoJoin"),
+                Desc = T("disableAutoJoin"),
+                Value = false,
+                Size = "xlarge",
+                Callback = function(state)
+                    AutoJoinEnabled = state
+                    if state then
+                        startAutoJoinLoop()
+                    else
+                        if autoJoinConnection then
+                            autoJoinConnection:Disconnect()
+                            autoJoinConnection = nil
+                        end
+                    end
+                end
+            })
+
+            local joinMethodValues = _G.SelectedLanguage == "Arabic" and {"عدوى", "فريق"} or {"Infection", "Team"}
+            Tabs.Teleport:Dropdown({
+                Title = T("joinMethod"),
+                Values = joinMethodValues,
+                Value = joinMethodValues[1],
+                Size = "xlarge",
+                Callback = function(value)
+                    JoinMode = value
+                end
+            })
+
+            Tabs.Teleport:Dropdown({
+                Title = T("targetPlayer"),
+                Values = getAllPlayerNames(),
+                Value = getAllPlayerNames()[1],
+                Size = "xlarge",
+                Callback = function(value)
+                    TargetPlayer = value
+                end
+            })
+
+            local arenaValues = _G.SelectedLanguage == "Arabic" and 
+                {"أي ساحة", "Arena1", "Arena2", "Arena3", "Arena4", "Arena5", "Arena6", "Arena5ICED"} or
+                {"Any Arena", "Arena1", "Arena2", "Arena3", "Arena4", "Arena5", "Arena6", "Arena5ICED"}
+            
+            Tabs.Teleport:Dropdown({
+                Title = T("selectArena"),
+                Values = arenaValues,
+                Value = arenaValues[1],
+                Size = "xlarge",
+                Callback = function(value)
+                    SelectedArena = value
+                    removeArenaESP()
+                    if value ~= arenaValues[1] then
+                        createArenaESP()
+                    end
+                end
+            })
+
+            Tabs.Teleport:Toggle({
+                Title = T("showArena"),
+                Desc = T("showArenaDesc"),
+                Value = true,
+                Size = "xlarge",
+                Callback = function(state)
+                    ShowArenaESP = state
+                    if state then
+                        createArenaESP()
+                    else
+                        removeArenaESP()
+                    end
+                end
+            })
+
+            Tabs.Teleport:Divider()
+
+            Tabs.Teleport:Paragraph({
+                Title = T("teleportTools"),
+                Desc = T("teleportDesc"),
+                Image = "navigation",
+                ImageSize = 28,
+                Color = "White"
+            })
+
+            local lastPosition = nil
+
+            local function teleportToPosition(cframePosition)
+                local character = player.Character
+                if character and cframePosition then
+                    local hrp = character:FindFirstChild("HumanoidRootPart")
+                    local hum = character:FindFirstChild("Humanoid")
+                    if hrp and hum then
+                        hum.PlatformStand = true
+                        local startPos = hrp.Position
+                        local endPos = cframePosition.Position
+                        local steps = 10
+
+                        for i = 1, steps do
+                            local alpha = i / steps
+                            local interpPos = startPos:Lerp(endPos, alpha)
+                            hrp.CFrame = CFrame.new(interpPos)
+                            task.wait(0.01)
+                        end
+
+                        hrp.CFrame = cframePosition
+                        task.wait(0.1)
+                        hum.PlatformStand = false
+                        return true
+                    end
+                end
+                return false
+            end
+
+            local function teleportToNearestEnemy()
+                local char = player.Character
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                if not hrp then return false end
+
+                local nearest, dist = nil, math.huge
+                for _, p in ipairs(Players:GetPlayers()) do
+                    if p ~= player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") and p.Character:FindFirstChild("Humanoid") then
+                        local target = p.Character
+                        if target.Humanoid.Health > 0 then
+                            local d = (hrp.Position - target.HumanoidRootPart.Position).Magnitude
+                            if d < dist then
+                                dist = d
+                                nearest = target
+                            end
+                        end
+                    end
+                end
+
+                if nearest then
+                    local direction = (nearest.HumanoidRootPart.Position - hrp.Position).Unit
+                    hrp.CFrame = CFrame.new(nearest.HumanoidRootPart.Position - direction * 3, nearest.HumanoidRootPart.Position)
+                    return true
+                end
+                return false
+            end
+
+            Tabs.Teleport:Button({
+                Title = T("savePosition"),
+                Icon = "map-pin",
+                Size = "xlarge",
+                Callback = function()
+                    local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+                    if hrp then 
+                        lastPosition = hrp.CFrame
+                        WindUI:Notify({
+                            Title = T("notification"),
+                            Content = _G.SelectedLanguage == "Arabic" and "تم حفظ المكان" or "Position saved",
+                            Duration = 2
+                        })
+                    end
+                end
+            })
+
+            Tabs.Teleport:Button({
+                Title = T("goToSaved"),
+                Icon = "send",
+                Size = "xlarge",
+                Callback = function()
+                    if lastPosition then
+                        teleportToPosition(lastPosition)
+                    else
+                        WindUI:Notify({
+                            Title = T("notification"),
+                            Content = _G.SelectedLanguage == "Arabic" and "ما فيه مكان محفوظ" or "No saved position",
+                            Duration = 2
+                        })
+                    end
+                end
+            })
+
+            Tabs.Teleport:Button({
+                Title = T("goUp"),
+                Icon = "arrow-up",
+                Size = "xlarge",
+                Callback = function()
+                    local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+                    if hrp then 
+                        hrp.CFrame = hrp.CFrame + Vector3.new(0, 100, 0)
+                    end
+                end
+            })
+
+            Tabs.Teleport:Button({
+                Title = T("goToEnemy"),
+                Icon = "target",
+                Size = "xlarge",
+                Callback = function()
+                    teleportToNearestEnemy()
+                end
+            })
+        end
+
+        -- =============================================
+        -- نظام الأوتو فولو الكامل
+        -- =============================================
+        do
+            local FOLLOW_DURATION = 8
+            local MIN_DIST = 1.5
+            local SCRIPT_ENABLED = false
+            local SUSPEND_ON_GIVE = true
+            local RECENT_OWNER_WINDOW = 1.2
+            local STRAFE_DISTANCE = 5
+            local STRAFE_AMPLITUDE = 1.4
+            local STRAFE_SPEED = 8
+
+            local followUntil = 0
+            local bombGiver = nil
+            local targetPlayer = nil
+            local suspendMovement = false
+            local lastHadBomb = {}
+            local lockedByGame = false
+
+            local autoFollowGUI = nil
+            local autoFollowFrame = nil
+            local autoFollowButton = nil
+            local autoFollowPosition = UDim2.new(0, 30, 0, 30)
+            local isAutoButtonPinned = false
+
+            local function createAutoFollowGUI()
+                if autoFollowGUI then autoFollowGUI:Destroy() end
+                
+                autoFollowGUI = Instance.new("ScreenGui")
+                autoFollowGUI.Name = "PhantomXPro_Auto"
+                autoFollowGUI.Parent = game.CoreGui
+                autoFollowGUI.ResetOnSpawn = false
+
+                autoFollowFrame = Instance.new("Frame")
+                autoFollowFrame.Size = UDim2.new(0, 130, 0, 50)
+                autoFollowFrame.Position = autoFollowPosition
+                autoFollowFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+                autoFollowFrame.BackgroundTransparency = 0.2
+                autoFollowFrame.BorderSizePixel = 0
+                autoFollowFrame.Visible = SCRIPT_ENABLED
+                autoFollowFrame.Parent = autoFollowGUI
+
+                local gradient = Instance.new("UIGradient", autoFollowFrame)
+                gradient.Color = ColorSequence.new({
+                    ColorSequenceKeypoint.new(0, Color3.fromRGB(60, 60, 255)),
+                    ColorSequenceKeypoint.new(1, Color3.fromRGB(180, 0, 255))
+                })
+                gradient.Rotation = 45
+
+                local corner = Instance.new("UICorner", autoFollowFrame)
+                corner.CornerRadius = UDim.new(0, 12)
+
+                autoFollowButton = Instance.new("TextButton")
+                autoFollowButton.Size = UDim2.new(1, -8, 1, -8)
+                autoFollowButton.Position = UDim2.new(0, 4, 0, 4)
+                autoFollowButton.BackgroundTransparency = 1
+                autoFollowButton.Font = Enum.Font.GothamBold
+                autoFollowButton.TextColor3 = Color3.new(1, 1, 1)
+                autoFollowButton.TextSize = 16
+                autoFollowButton.Text = (_G.SelectedLanguage == "Arabic" and "🔄 الأوتو: متوقف" or "🔄 Auto: Stopped")
+                autoFollowButton.Parent = autoFollowFrame
+
+                local dragging = false
+                local dragStart, startPos
+
+                local function updateDrag(input)
+                    local delta = input.Position - dragStart
+                    autoFollowFrame.Position = UDim2.new(
+                        startPos.X.Scale, startPos.X.Offset + delta.X,
+                        startPos.Y.Scale, startPos.Y.Offset + delta.Y
+                    )
+                    autoFollowPosition = autoFollowFrame.Position
+                end
+
+                local function beginDrag(input)
+                    if not isAutoButtonPinned then
+                        dragging = true
+                        dragStart = input.Position
+                        startPos = autoFollowFrame.Position
+                    end
+                end
+
+                local function endDrag()
+                    dragging = false
+                end
+
+                for _, element in pairs({autoFollowFrame, autoFollowButton}) do
+                    element.InputBegan:Connect(function(input)
+                        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                            beginDrag(input)
+                            input.Changed:Connect(function()
+                                if input.UserInputState == Enum.UserInputState.End then
+                                    endDrag()
+                                end
+                            end)
+                        end
+                    end)
+                end
+
+                UserInputService.InputChanged:Connect(function(input)
+                    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+                        updateDrag(input)
+                    end
+                end)
+
+                local backgroundFrame = Instance.new("Frame")
+                backgroundFrame.Size = UDim2.new(1, 0, 1, 0)
+                backgroundFrame.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
+                backgroundFrame.BackgroundTransparency = 0.2
+                backgroundFrame.BorderSizePixel = 0
+                backgroundFrame.ZIndex = -1
+                backgroundFrame.Parent = autoFollowFrame
+
+                local backgroundCorner = Instance.new("UICorner", backgroundFrame)
+                backgroundCorner.CornerRadius = UDim.new(0, 12)
+
+                autoFollowButton.MouseButton1Click:Connect(function()
+                    SCRIPT_ENABLED = not SCRIPT_ENABLED
+                    if SCRIPT_ENABLED then
+                        autoFollowButton.Text = _G.SelectedLanguage == "Arabic" and "الأوتو: شغال" or "Auto: Running"
+                        local tween = TweenService:Create(backgroundFrame, TweenInfo.new(0.5), {
+                            BackgroundColor3 = Color3.fromRGB(0, 180, 255)
+                        })
+                        tween:Play()
+                    else
+                        autoFollowButton.Text = _G.SelectedLanguage == "Arabic" and "الأوتو: متوقف" or "Auto: Stopped"
+                        local tween = TweenService:Create(backgroundFrame, TweenInfo.new(0.5), {
+                            BackgroundColor3 = Color3.fromRGB(255, 60, 60)
+                        })
+                        tween:Play()
+                        targetPlayer = nil
+                        suspendMovement = false
+                    end
+                end)
+            end
+
+            local function toggleAutoFollow(state)
+                SCRIPT_ENABLED = state
+                if SCRIPT_ENABLED then
+                    if not autoFollowGUI then
+                        createAutoFollowGUI()
+                    end
+                    if autoFollowFrame then
+                        autoFollowFrame.Visible = true
+                        autoFollowFrame.Position = autoFollowPosition
+                        autoFollowButton.Text = _G.SelectedLanguage == "Arabic" and "الأوتو: شغال" or "Auto: Running"
+                    end
+                else
+                    if autoFollowFrame then
+                        autoFollowPosition = autoFollowFrame.Position
+                        autoFollowFrame.Visible = false
+                        autoFollowButton.Text = _G.SelectedLanguage == "Arabic" and "الأوتو: متوقف" or "Auto: Stopped"
+                    end
+                    targetPlayer = nil
+                    suspendMovement = false
+                end
+            end
+
+            local function isAlive(p)
+                return p and p.Character and p.Character:FindFirstChild("Humanoid") and p.Character.Humanoid.Health > 0
+            end
+
+            local function hasBomb(char)
+                if not char then return false end
+                return char:FindFirstChild("Bomb") ~= nil
+            end
+
+            local function hasGreenHighlight(char)
+                if not char then return false end
+                for _, obj in pairs(char:GetDescendants()) do
+                    if obj:IsA("Highlight") and math.abs(obj.FillColor.G - 1) < 0.01 then return true end
+                    if obj:IsA("BillboardGui") then
+                        local fr = obj:FindFirstChildOfClass("Frame")
+                        if fr and fr.BackgroundColor3 == Color3.fromRGB(0,255,0) then return true end
+                    end
+                end
+                return false
+            end
+
+            local function detectArenaForLocal()
+                if workspace:FindFirstChild("Arenas") then
+                    for _, arena in pairs(workspace.Arenas:GetChildren()) do
+                        if arena:FindFirstChild("Slots") then
+                            for _, side in ipairs({"Left","Right"}) do
+                                local folder = arena.Slots:FindFirstChild(side)
+                                if folder then
+                                    for i = 1,4 do
+                                        local slot = folder:FindFirstChild(tostring(i))
+                                        if slot and slot:FindFirstChild("Data") and slot.Data:FindFirstChild("Player") then
+                                            if slot.Data.Player.Value == player then
+                                                return arena, side
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+                return nil, nil
+            end
+
+            local function getEnemiesInSameArena()
+                local arena, mySide = detectArenaForLocal()
+                if not arena then return {}, nil end
+                local opp = (mySide == "Left") and "Right" or "Left"
+                local enemies = {}
+                if arena.Slots:FindFirstChild(opp) then
+                    for _, slot in pairs(arena.Slots[opp]:GetChildren()) do
+                        if slot:FindFirstChild("Data") and slot.Data:FindFirstChild("Player") then
+                            local p = slot.Data.Player.Value
+                            if p and p ~= player then table.insert(enemies, p) end
+                        end
+                    end
+                end
+                return enemies, arena
+            end
+
+            local function watchCharacter(ch, plr)
+                ch.ChildAdded:Connect(function(c)
+                    if c:IsA("Tool") and c.Name == "Bomb" then
+                        lastHadBomb[plr] = tick()
+                    end
+                end)
+                ch.ChildRemoved:Connect(function(c)
+                    if c:IsA("Tool") and c.Name == "Bomb" then
+                        lastHadBomb[plr] = tick()
+                    end
+                end)
+            end
+
+            for _, p in ipairs(Players:GetPlayers()) do
+                if p.Character then watchCharacter(p.Character, p) end
+                p.CharacterAdded:Connect(function(c) watchCharacter(c, p) end)
+            end
+            Players.PlayerAdded:Connect(function(p) p.CharacterAdded:Connect(function(c) watchCharacter(c, p) end) end)
+
+            local function guessGiver()
+                local best, bt = nil, math.huge
+                local now = tick()
+                for p, t in pairs(lastHadBomb) do
+                    if p ~= player and t and (now - t) <= RECENT_OWNER_WINDOW then
+                        local dt = now - t
+                        if dt < bt then bt = dt best = p end
+                    end
+                end
+                return best
+            end
+
+            local function onLocalAdded(c)
+                if c:IsA("Tool") and c.Name == "Bomb" then
+                    local g = guessGiver()
+                    if g and isAlive(g) then
+                        bombGiver = g
+                        lockedByGame = false
+                    else
+                        bombGiver = nil
+                        lockedByGame = true
+                    end
+                    followUntil = tick() + FOLLOW_DURATION
+                    suspendMovement = false
+                    
+                    if SCRIPT_ENABLED then
+                        targetPlayer = bombGiver
+                    end
+                end
+            end
+
+            local function onLocalRemoved(c)
+                if c:IsA("Tool") and c.Name == "Bomb" then
+                    targetPlayer = nil
+                    bombGiver = nil
+                    lockedByGame = false
+                    
+                    if SUSPEND_ON_GIVE then
+                        suspendMovement = true
+                    end
+                end
+            end
+
+            local function connectLocal(ch)
+                ch.ChildAdded:Connect(onLocalAdded)
+                ch.ChildRemoved:Connect(onLocalRemoved)
+            end
+
+            if player.Character then connectLocal(player.Character) end
+            player.CharacterAdded:Connect(connectLocal)
+
+            local function resetRound()
+                bombGiver = nil
+                targetPlayer = nil
+                followUntil = 0
+                suspendMovement = false
+                lockedByGame = false
+            end
+
+            if workspace:FindFirstChild("Arenas") then
+                workspace.Arenas.ChildAdded:Connect(resetRound)
+                workspace.Arenas.ChildRemoved:Connect(resetRound)
+            end
+
+            local function chooseClosestEnemy()
+                local enemies, arena = getEnemiesInSameArena()
+                if #enemies == 0 then return nil end
+                local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+                if not hrp then return nil end
+                local best, dist = nil, math.huge
+                for _, e in ipairs(enemies) do
+                    if isAlive(e) and e.Character and not hasGreenHighlight(e.Character) then
+                        local eh = e.Character:FindFirstChild("HumanoidRootPart")
+                        if eh then
+                            local d = (eh.Position - hrp.Position).Magnitude
+                            if d < dist then dist = d best = e end
+                        end
+                    end
+                end
+                return best
+            end
+
+            RunService.RenderStepped:Connect(function()
+                if not SCRIPT_ENABLED then 
+                    targetPlayer = nil
+                    suspendMovement = false
+                    return 
+                end
+                
+                if not hasBomb(player.Character) then
+                    return
+                end
+                
+                if not isAlive(player) then
+                    resetRound()
+                    return
+                end
+                
+                if suspendMovement then 
+                    if tick() > followUntil + 1 then
+                        suspendMovement = false
+                        targetPlayer = chooseClosestEnemy()
+                        if targetPlayer then
+                            followUntil = tick() + FOLLOW_DURATION
+                        end
+                    end
+                    return 
+                end
+                
+                if tick() >= followUntil or not targetPlayer or not isAlive(targetPlayer) then
+                    local newTarget = chooseClosestEnemy()
+                    if newTarget then
+                        targetPlayer = newTarget
+                        followUntil = tick() + FOLLOW_DURATION
+                    else
+                        targetPlayer = nil
+                    end
+                end
+                
+                if lockedByGame then
+                    targetPlayer = nil
+                    return
+                end
+
+                if targetPlayer and player.Character and targetPlayer.Character then
+                    local thrp = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+                    local myhrp = player.Character:FindFirstChild("HumanoidRootPart")
+                    local myhum = player.Character:FindFirstChild("Humanoid")
+                    if thrp and myhrp and myhum then
+                        local dir = thrp.Position - myhrp.Position
+                        local dist = dir.Magnitude
+                        
+                        if dist > 50 then
+                            targetPlayer = chooseClosestEnemy()
+                            return
+                        end
+                        
+                        local lookOffset = Vector3.new(math.random(-0.8,0.8),0,math.random(-0.8,0.8))
+                        myhrp.CFrame = CFrame.new(myhrp.Position, thrp.Position + lookOffset)
+                        if dist > MIN_DIST then
+                            local desired = thrp.Position - (dir.Unit * 0.8)
+                            if dist <= STRAFE_DISTANCE then
+                                local perp = Vector3.new(-dir.Z,0,dir.X)
+                                if perp.Magnitude == 0 then perp = Vector3.new(1,0,0) end
+                                perp = perp.Unit
+                                local offset = perp * (math.sin(tick() * STRAFE_SPEED) * STRAFE_AMPLITUDE)
+                                desired = desired + offset
+                            end
+                            myhum:MoveTo(desired)
+                        else
+                            myhum:MoveTo(thrp.Position)
+                        end
+                    end
+                end
+            end)
+
+            Tabs.Movement:Toggle({
+                Title = T("autoFollow"),
+                Desc = T("autoFollowDesc"),
+                Value = false,
+                Size = "xlarge",
+                Callback = function(state)
+                    toggleAutoFollow(state)
+                end
+            })
+
+            Tabs.Movement:Button({
+                Title = T("resetAutoFollow"),
+                Icon = "refresh-cw",
+                Size = "xlarge",
+                Callback = function()
+                    if autoFollowFrame then
+                        autoFollowPosition = UDim2.new(0, 30, 0, 30)
+                        autoFollowFrame.Position = autoFollowPosition
+                    end
+                end
+            })
+
+            -- زر تثبيت زر الأوتو (مضافة جديدة)
+            Tabs.Movement:Button({
+                Title = T("pinAutoButton"),
+                Desc = T("pinAutoButtonDesc"),
+                Icon = "anchor",
+                Size = "xlarge",
+                Callback = function()
+                    isAutoButtonPinned = not isAutoButtonPinned
+                    
+                    if autoFollowFrame then
+                        if isAutoButtonPinned then
+                            autoFollowFrame.Active = false
+                            autoFollowButton.Text = _G.SelectedLanguage == "Arabic" and "🔄 الأوتو: مثبت" or "🔄 Auto: Pinned"
+                            WindUI:Notify({
+                                Title = T("notification"),
+                                Content = _G.SelectedLanguage == "Arabic" and "تم تثبيت زر الأوتو" or "Auto button pinned",
+                                Duration = 2
+                            })
+                        else
+                            autoFollowFrame.Active = true
+                            autoFollowButton.Text = _G.SelectedLanguage == "Arabic" and "🔄 الأوتو: متحرك" or "🔄 Auto: Movable"
+                            WindUI:Notify({
+                                Title = T("notification"),
+                                Content = _G.SelectedLanguage == "Arabic" and "تم فك تثبيت زر الأوتو" or "Auto button unpinned",
+                                Duration = 2
+                            })
+                        end
+                    end
+                end
+            })
+
+            Tabs.Movement:Paragraph({
+                Title = T("importantNotes"),
+                Desc = T("notesDesc"),
+                Image = "info",
+                ImageSize = 28,
+                Color = Color3.fromRGB(255, 165, 0)
+            })
+        end
+
+        -- =============================================
+        -- نظام السرعة المحدثة
+        -- =============================================
+        do
+            Tabs.Movement:Paragraph({
+                Title = T("speedSettings"),
+                Desc = T("speedDesc"),
+                Image = "zap",
+                ImageSize = 28,
+                Color = "White"
+            })
+
+            local speedActive = false
+            local speedConnection = nil
+            _G.SpeedValue = _G.SpeedValue or 5
+
+            function _G.SetSpeed(v)
+                if type(v) ~= "number" then return end
+                _G.SpeedValue = math.clamp(math.floor(v), 1, 100)
+            end
+
+            local function valueToSpeed(v)
+                local minSpeed, maxSpeed = 16, 35
+                local minV, maxV = 1, 10
+                local t = (v - minV) / (maxV - minV)
+                t = math.clamp(t, 0, 1)
+                return minSpeed + (maxSpeed - minSpeed) * t
+            end
+
+            local function setupSpeedCharacter(char)
+                local humanoid = char:WaitForChild("Humanoid", 5)
+                local root = char:WaitForChild("HumanoidRootPart", 5)
+                if not humanoid or not root then return end
+
+                if speedConnection then 
+                    speedConnection:Disconnect() 
+                    speedConnection = nil
+                end
+
+                speedConnection = RunService.RenderStepped:Connect(function()
+                    if not speedActive or not root or not root.Parent then return end
+                    
+                    local moveDir = humanoid.MoveDirection
+                    if moveDir.Magnitude > 0.01 then
+                        local desiredSpeed = valueToSpeed(math.clamp(_G.SpeedValue or 5, 1, 10))
+                        if _G.SpeedValue >= 7 then
+                            desiredSpeed = desiredSpeed * 1.2
+                        elseif _G.SpeedValue >= 5 then
+                            desiredSpeed = desiredSpeed * 1.1
+                        end
+                        local horizDir = Vector3.new(moveDir.X, 0, moveDir.Z)
+                        if horizDir.Magnitude > 0 then
+                            local newVel = horizDir.Unit * desiredSpeed
+                            root.Velocity = Vector3.new(newVel.X, root.Velocity.Y, newVel.Z)
+                        end
+                    else
+                        local v = root.Velocity
+                        root.Velocity = Vector3.new(v.X * 0.8, v.Y, v.Z * 0.8)
+                    end
+                end)
+            end
+
+            local function toggleSpeed(state)
+                speedActive = state
+                if speedActive then
+                    if player.Character and not speedConnection then
+                        setupSpeedCharacter(player.Character)
+                    end
+                else
+                    if speedConnection then 
+                        speedConnection:Disconnect() 
+                        speedConnection = nil
+                    end
+                end
+            end
+
+            Tabs.Movement:Input({
+                Title = T("speedLevel"),
+                Value = tostring(_G.SpeedValue),
+                Size = "xlarge",
+                Callback = function(value)
+                    local num = tonumber(value)
+                    if num then 
+                        _G.SetSpeed(num)
+                    end
+                end
+            })
+
+            Tabs.Movement:Toggle({
+                Title = T("enableSpeed"),
+                Desc = T("speedDesc2"),
+                Value = false,
+                Size = "xlarge",
+                Callback = function(state) 
+                    toggleSpeed(state)
+                end
+            })
+
+            local antiSlideEnabled = false
+local originalIceProperties = {}
+
+Tabs.Movement:Toggle({
+    Title = T("antiSlide"),
+    Desc = _G.SelectedLanguage == "Arabic" and "يمنع التزحلق على الجليد - ينفع/يوقف بالتوجل" or "Prevents sliding on ice - Toggle on/off",
+    Value = false,
+    Size = "xlarge",
+    Callback = function(state) 
+        antiSlideEnabled = state
+        
+        spawn(function()
+            local TARGET_NAME = "Ice"
+            local TARGET_POSITION = Vector3.new(
+                42.99999237060547,
+                0.5,
+                -29.999984741210938
+            )
+            local POSITION_TOLERANCE = 0.1
+
+            local function isSamePosition(pos1, pos2)
+                return (pos1 - pos2).Magnitude <= POSITION_TOLERANCE
+            end
+
+            for _, v in ipairs(workspace:GetDescendants()) do
+                if v:IsA("BasePart")
+                    and v.Name == TARGET_NAME
+                    and v.Material == Enum.Material.Ice
+                    and isSamePosition(v.Position, TARGET_POSITION)
+                then
+                    if state then
+                        -- حفظ الخصائص الأصلية أول مرة بس
+                        if not originalIceProperties[v] then
+                            originalIceProperties[v] = v.CustomPhysicalProperties
+                        end
+                        
+                        -- تعديل لمنع الانزلاق
+                        v.CustomPhysicalProperties = PhysicalProperties.new(1, 6, 0, 6, 0)
+                    else
+                        -- إرجاع الخصائص الأصلية إذا موجودة
+                        if originalIceProperties[v] then
+                            v.CustomPhysicalProperties = originalIceProperties[v]
+                        end
+                    end
+                end
+            end
+            
+            if state then
+                WindUI:Notify({
+                    Title = T("notification"),
+                    Content = _G.SelectedLanguage == "Arabic" and "تم تفعيل منع الانزلاق" or "Anti-slide enabled",
+                    Duration = 2
+                })
+            else
+                WindUI:Notify({
+                    Title = T("notification"),
+                    Content = _G.SelectedLanguage == "Arabic" and "تم إيقاف منع الانزلاق" or "Anti-slide disabled",
+                    Duration = 2
+                })
+            end
+        end)
+    end
+})
+
+            player.CharacterAdded:Connect(function(char)
+                task.wait(1)
+                if speedActive then
+                    setupSpeedCharacter(char)
+                end
+            end)
+
+            if player.Character then 
+                task.wait(1)
+                if speedActive then
+                    setupSpeedCharacter(player.Character) 
+                end
+            end
+        end
+
+        -- =============================================
+        -- نظام الطيران
+        -- =============================================
+        do
+            Tabs.Movement:Paragraph({
+                Title = T("flightFeatures"),
+                Desc = T("flightDesc"),
+                Image = "feather",
+                ImageSize = 28,
+                Color = "White"
+            })
+
+            local CFloop = nil
+            local CFspeed = 50
+            local flyActive = false
+
+            local function toggleAdvancedFly()
+                if CFloop then 
+                    CFloop:Disconnect()
+                    CFloop = nil
+                    local speaker = game.Players.LocalPlayer
+                    if speaker.Character then
+                        local humanoid = speaker.Character:FindFirstChildOfClass('Humanoid')
+                        if humanoid then humanoid.PlatformStand = false end
+                        local head = speaker.Character:FindFirstChild("Head")
+                        if head then head.Anchored = false end
+                    end
+                    flyActive = false
+                else
+                    local speaker = game.Players.LocalPlayer
+                    local character = speaker.Character
+                    if not character then return end
+                    
+                    local humanoid = character:FindFirstChildOfClass('Humanoid')
+                    if not humanoid then return end
+                    
+                    humanoid.PlatformStand = true
+                    local head = character:WaitForChild("Head")
+                    head.Anchored = true
+                    
+                    CFloop = game:GetService("RunService").Heartbeat:Connect(function(deltaTime)
+                        if not character or not head then return end
+                        
+                        local moveDirection = humanoid.MoveDirection * (CFspeed * deltaTime)
+                        local headCFrame = head.CFrame
+                        local cameraCFrame = workspace.CurrentCamera.CFrame
+                        local cameraOffset = headCFrame:ToObjectSpace(cameraCFrame).Position
+                        cameraCFrame = cameraCFrame * CFrame.new(-cameraOffset.X, -cameraOffset.Y, -cameraOffset.Z + 1)
+                        local cameraPosition = cameraCFrame.Position
+                        local headPosition = headCFrame.Position
+
+                        local objectSpaceVelocity = CFrame.new(cameraPosition, Vector3.new(headPosition.X, cameraPosition.Y, headPosition.Z)):VectorToObjectSpace(moveDirection)
+                        head.CFrame = CFrame.new(headPosition) * (cameraCFrame - cameraPosition) * CFrame.new(objectSpaceVelocity)
+                    end)
+                    
+                    flyActive = true
+                end
+            end
+
+            Tabs.Movement:Toggle({
+                Title = T("enableFlight"),
+                Desc = T("flightDesc2"),
+                Value = false,
+                Size = "xlarge",
+                Callback = function(state)
+                    if state then 
+                        toggleAdvancedFly() 
+                    else 
+                        if CFloop then 
+                            toggleAdvancedFly() 
+                        end 
+                    end
+                end
+            })
+
+            Tabs.Movement:Input({
+                Title = T("flightSpeed"),
+                Value = "50",
+                Size = "xlarge",
+                Callback = function(value)
+                    local num = tonumber(value)
+                    if num and num > 0 and num <= 200 then 
+                        CFspeed = num
+                    end
+                end
+            })
+
+            Tabs.Movement:Button({
+                Title = T("stopFlight"),
+                Icon = "square",
+                Size = "xlarge", 
+                Callback = function()
+                    if CFloop then 
+                        toggleAdvancedFly()
+                    end
+                end
+            })
+        end
+
+        -- =============================================
+        -- نظام الدبل نط
+        -- =============================================
+        do
+            local doubleJumpActive = false
+            local jumpConnection = nil
+            
+            Tabs.Movement:Toggle({
+                Title = T("doubleJump"),
+                Desc = T("doubleJumpDesc"),
+                Value = false,
+                Size = "xlarge",
+                Callback = function(state)
+                    doubleJumpActive = state
+                    
+                    if state then
+                        WindUI:Notify({
+                            Title = T("doubleJumpEnabled"),
+                            Content = _G.SelectedLanguage == "Arabic" and "انط مرتين في الهواء" or "Jump twice in the air",
+                            Duration = 3
+                        })
+                        
+                        local player = Players.LocalPlayer
+                        
+                        local function createJumpConnection()
+                            if jumpConnection then
+                                jumpConnection:Disconnect()
+                            end
+                            
+                            jumpConnection = UserInputService.JumpRequest:Connect(function()
+                                if not doubleJumpActive then return end
+                                
+                                local character = player.Character
+                                if not character then return end
+                                
+                                local humanoid = character:FindFirstChild("Humanoid")
+                                local rootPart = character:FindFirstChild("HumanoidRootPart")
+                                
+                                if not humanoid or not rootPart then return end
+                                if humanoid.Health <= 0 then return end
+                                
+                                local state = humanoid:GetState()
+                                if state == Enum.HumanoidStateType.Freefall or 
+                                   state == Enum.HumanoidStateType.Jumping then
+                                    
+                                    rootPart.Velocity = Vector3.new(
+                                        rootPart.Velocity.X,
+                                        50,
+                                        rootPart.Velocity.Z
+                                    )
+                                end
+                            end)
+                        end
+                        
+                        createJumpConnection()
+                        
+                        player.CharacterAdded:Connect(function()
+                            task.wait(0.5)
+                            if doubleJumpActive then
+                                createJumpConnection()
+                            end
+                        end)
+                        
+                        player.CharacterRemoving:Connect(function()
+                            if jumpConnection then
+                                jumpConnection:Disconnect()
+                                jumpConnection = nil
+                            end
+                        end)
+                        
+                    else
+                        if jumpConnection then
+                            jumpConnection:Disconnect()
+                            jumpConnection = nil
+                        end
+                        
+                        WindUI:Notify({
+                            Title = T("doubleJumpDisabled"),
+                            Content = _G.SelectedLanguage == "Arabic" and "القفزة رجعت عادية" or "Jump returned to normal",
+                            Duration = 3
+                        })
+                    end
+                end
+            })
+            
+            Window:OnDestroy(function()
+                if jumpConnection then
+                    jumpConnection:Disconnect()
+                end
+            end)
+        end
+
+        -- =============================================
+        -- تبويب الرؤية
+        -- =============================================
+        do
+            Tabs.Visuals:Paragraph({
+                Title = T("visualSettings"),
+                Desc = T("visualDesc"),
+                Image = "eye",
+                ImageSize = 28,
+                Color = "White"
+            })
+
+            Tabs.Visuals:Toggle({
+                Title = T("enableLighting"),
+                Desc = T("lightingDesc"),
+                Value = false,
+                Size = "xlarge",
+                Callback = function(state)
+                    if state then
+                        Lighting.Brightness = 2
+                        Lighting.ClockTime = 14
+                        Lighting.FogEnd = 100000
+                        Lighting.GlobalShadows = false
+                    else
+                        Lighting.Brightness = 1
+                        Lighting.ClockTime = 14
+                        Lighting.FogEnd = 10000
+                        Lighting.GlobalShadows = true
+                    end
+                end
+            })
+
+            local fpsBoostActive = false
+
+            local function ApplyFPSBooster(state)
+                fpsBoostActive = state
+                if fpsBoostActive then
+                    local Terrain = workspace:FindFirstChildOfClass('Terrain')
+                    if Terrain then
+                        Terrain.WaterWaveSize = 0
+                        Terrain.WaterWaveSpeed = 0
+                        Terrain.WaterReflectance = 0
+                        Terrain.WaterTransparency = 0
+                    end
+
+                    Lighting.GlobalShadows = false
+                    Lighting.FogEnd = 9e9
+
+                    pcall(function() settings().Rendering.QualityLevel = Enum.QualityLevel.Level01 end)
+
+                    for _, v in pairs(game:GetDescendants()) do
+                        if v:IsA("Part") or v:IsA("MeshPart") or v:IsA("UnionOperation") then
+                            v.Material = Enum.Material.Plastic
+                            v.Reflectance = 0
+                        elseif v:IsA("Decal") then v.Transparency = 1
+                        elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then v.Lifetime = NumberRange.new(0) end
+                    end
+
+                    for _, v in pairs(Lighting:GetDescendants()) do
+                        if v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("BloomEffect") or v:IsA("ColorCorrectionEffect") or v:IsA("DepthOfFieldEffect") then
+                            v.Enabled = false
+                        end
+                    end
+                else
+                    Lighting.GlobalShadows = true
+                    Lighting.FogEnd = 100000
+                    settings().Rendering.QualityLevel = Enum.QualityLevel.Automatic
+                end
+            end
+
+            Tabs.Visuals:Toggle({
+                Title = T("antiLag"),
+                Desc = T("antiLagDesc"),
+                Value = false,
+                Size = "xlarge",
+                Callback = function(state) 
+                    ApplyFPSBooster(state)
+                end
+            })
+        end
+
+-- =============================================
+-- تبويب Other
+-- =============================================
+do
+    Tabs.Other:Paragraph({
+        Title = T("otherScripts"),
+        Desc = T("otherDesc"),
+        Image = "box",
+        ImageSize = 28,
+        Color = "White"
+    })
+
+    Tabs.Other:Button({
+        Title = T("headless"),
+        Desc = T("headlessDesc"),
+        Icon = "user",
+        Size = "xlarge",
+        Callback = function()
+            loadstring(game:HttpGet("https://pastebin.com/raw/hwPZXtfq"))()
+        end
+    })
+    
+    -- زر الرقصات
+    Tabs.Other:Button({
+        Title = T("dances"),
+        Desc = T("dancesDesc"),
+        Icon = "music",
+        Size = "xlarge",
+        Callback = function()
+            WindUI:Notify({
+                Title = T("notification"),
+                Content = _G.SelectedLanguage == "Arabic" and "جاري تحميل الرقصات" or "Loading dances",
+                Duration = 3
+            })
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Client-dotcom/Admins/main/Dance.txt"))()
+        end
+    })
+end
+
+        -- =============================================
+        -- تبويب ProX Features
+        -- =============================================
+        do
+            Tabs.ProXFeatures:Paragraph({
+                Title = T("proxFeatures"),
+                Desc = "",
+                Image = "zap",
+                ImageSize = 28,
+                Color = Color3.fromRGB(255, 165, 0)
+            })
+
+            local EnemyDetection = false
+            local SmartEvasion = false
+            local AutoLavaCopy = false
+            
+            local bombLoop = nil
+            local originalPosition = nil
+            local isUsingBomb = false
+            
+            local evasionConnection = nil
+            local spinConnection = nil
+            
+            local copiedLavaObjects = {}
+            local lavaDataCache = {}
+
+            local function isInGame()
+                local playerGui = player:FindFirstChild("PlayerGui")
+                if playerGui and playerGui:FindFirstChild("TBDUI") and playerGui.TBDUI:FindFirstChild("Main") and playerGui.TBDUI.Main:FindFirstChild("Scorebar") then
+                    return playerGui.TBDUI.Main.Scorebar.Visible
+                end
+                return false
+            end
+
+            local function detectEnemyPlayers()
+                local enemyPlayers = {}
+                local localPlayerTeam = nil
+                local currentArenaForLocalPlayer = nil 
+                
+                if workspace.Arenas then
+                    for arenaName, arena in pairs(workspace.Arenas:GetChildren()) do
+                        -- تعديل: لا يشتغل Auto Pass Bomb في Arena 5
+                        if arenaName == "Arena5" or arenaName == "Arena5ICED" then
+                            continue -- تخطي Arena 5
+                        end
+                        
+                        if arena:FindFirstChild("Slots") then
+                            if arena.Slots:FindFirstChild("Left") then
+                                for i = 1, 4 do
+                                    local slot = arena.Slots.Left:FindFirstChild(tostring(i))
+                                    if slot and slot:FindFirstChild("Data") and slot.Data:FindFirstChild("Player") then
+                                        local slotPlayer = slot.Data.Player.Value
+                                        if slotPlayer == player then
+                                            localPlayerTeam = "Left"
+                                            currentArenaForLocalPlayer = arena 
+                                            break
+                                        end
+                                    end
+                                end
+                            end
+                            
+                            if not currentArenaForLocalPlayer and arena.Slots:FindFirstChild("Right") then
+                                for i = 1, 4 do
+                                    local slot = arena.Slots.Right:FindFirstChild(tostring(i))
+                                    if slot and slot:FindFirstChild("Data") and slot.Data:FindFirstChild("Player") then
+                                        local slotPlayer = slot.Data.Player.Value
+                                        if slotPlayer == player then
+                                            localPlayerTeam = "Right"
+                                            currentArenaForLocalPlayer = arena
+                                            break
+                                        end
+                                    end
+                                end
+                            end
+                            
+                            if localPlayerTeam and currentArenaForLocalPlayer then 
+                                local enemyTeam = (localPlayerTeam == "Left") and "Right" or "Left"
+                                
+                                if currentArenaForLocalPlayer.Slots:FindFirstChild(enemyTeam) then
+                                    for i = 1, 4 do
+                                        local slot = currentArenaForLocalPlayer.Slots[enemyTeam]:FindFirstChild(tostring(i))
+                                        if slot and slot:FindFirstChild("Data") and slot.Data:FindFirstChild("Player") then
+                                            local enemyPlayer = slot.Data.Player.Value
+                                            if enemyPlayer and enemyPlayer ~= player then
+                                                table.insert(enemyPlayers, enemyPlayer)
+                                            end
+                                        end
+                                    end
+                                end
+                                break 
+                            end
+                        end
+                    end
+                end
+                
+                return enemyPlayers, currentArenaForLocalPlayer 
+            end
+
+            local function isPlayerOnArenaFloor(plr, arena)
+                if not plr or not arena then return false end
+                
+                if arena:FindFirstChild("Slots") then
+                    for _, side in pairs({"Left", "Right"}) do
+                        if arena.Slots:FindFirstChild(side) then
+                            for i = 1, 4 do
+                                local slot = arena.Slots[side]:FindFirstChild(tostring(i))
+                                if slot and slot:FindFirstChild("Data") and slot.Data:FindFirstChild("Player") then
+                                    local slotPlayer = slot.Data.Player.Value
+                                    
+                                    if slotPlayer == plr then
+                                        if slot:FindFirstChild("Pad") then
+                                            local pad = slot.Pad
+                                            local color = pad.Color
+                                            
+                                            if math.abs(color.R - 255/255) < 0.01 and 
+                                               math.abs(color.G - 89/255) < 0.01 and 
+                                               math.abs(color.B - 89/255) < 0.01 then
+                                                return false 
+                                            else
+                                                return true 
+                                            end
+                                        end
+                                        return true
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+                return false
+            end
+
+            local function isPlayerAlive(plr)
+                if plr and plr.Character and plr.Character:FindFirstChild("Humanoid") then
+                    local humanoid = plr.Character.Humanoid
+                    if humanoid.Health > 0 then return true end
+                end
+                return false
+            end
+
+            local function findBombTool()
+                local localCharacter = player.Character
+                if localCharacter then
+                    local bombTool = localCharacter:FindFirstChild("Bomb")
+                    if bombTool then return bombTool, localCharacter end
+                    
+                    if localCharacter:FindFirstChild("Humanoid") then
+                        for _, tool in pairs(localCharacter:GetChildren()) do
+                            if tool:IsA("Tool") and tool.Name == "Bomb" then
+                                return tool, localCharacter
+                            end
+                        end
+                    end
+                end
+                
+                if workspace.Characters then
+                    local specificCharacter = workspace.Characters:FindFirstChild(player.Name)
+                    if specificCharacter then
+                        local bombTool = specificCharacter:FindFirstChild("Bomb")
+                        if bombTool then return bombTool, specificCharacter end
+                    end
+                end
+                
+                return nil, nil
+            end
+
+            local function hasEnemyBomb(enemy)
+                if enemy.Character then
+                    local bombTool = enemy.Character:FindFirstChild("Bomb")
+                    if bombTool then return true end
+                    
+                    for _, tool in pairs(enemy.Character:GetChildren()) do
+                        if tool:IsA("Tool") and tool.Name == "Bomb" then
+                            return true
+                        end
+                    end
+                end
+                return false
+            end
+
+            local function getEnemiesWithBombs(enemies)
+                local enemiesWithBombs = {}
+                for _, enemy in pairs(enemies) do
+                    if hasEnemyBomb(enemy) then
+                        table.insert(enemiesWithBombs, enemy)
+                    end
+                end
+                return enemiesWithBombs
+            end
+
+            local function checkPathClear(startPos, endPos)
+                local direction = (endPos - startPos)
+                local distance = direction.Magnitude
+                
+                local raycastParams = RaycastParams.new()
+                raycastParams.FilterDescendantsInstances = {player.Character}
+                raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+                
+                local result = workspace:Raycast(startPos, direction, raycastParams)
+                
+                if result then
+                    return false, result.Position
+                else
+                    return true, nil
+                end
+            end
+
+            local function isPositionInArena(pos, arena)
+                if arena and arena:IsA("Part") then
+                    local bounds = arena.CFrame:pointToObjectSpace(pos)
+                    local halfSize = arena.Size / 2
+                    return math.abs(bounds.X) <= halfSize.X and math.abs(bounds.Y) <= halfSize.Y and math.abs(bounds.Z) <= halfSize.Z
+                end
+                return true 
+            end
+
+            local function findUltimateEscapePosition(currentPosition, primaryEnemy, allEnemies, arena)
+                local character = player.Character
+                if not character or not character:FindFirstChild("HumanoidRootPart") then
+                    return currentPosition
+                end
+
+                local primaryEnemyPos = primaryEnemy.Character.HumanoidRootPart.Position
+                local primaryDistance = (currentPosition - primaryEnemyPos).Magnitude
+
+                if primaryDistance < 8 then
+                    local emergencyDirection = (currentPosition - primaryEnemyPos).Unit
+
+                    for testDist = 15, 5, -2 do
+                        local emergencyPos = currentPosition + (emergencyDirection * testDist)
+                        emergencyPos = Vector3.new(emergencyPos.X, currentPosition.Y, emergencyPos.Z)
+
+                        local pathClear, actualPos = checkPathClear(currentPosition, emergencyPos)
+
+                        if pathClear and isPositionInArena(emergencyPos, arena) then
+                            return emergencyPos
+                        elseif actualPos then
+                            local safePos = currentPosition + (emergencyDirection * ((actualPos - currentPosition).Magnitude - 1))
+                            safePos = Vector3.new(safePos.X, currentPosition.Y, safePos.Z)
+                            if isPositionInArena(safePos, arena) then
+                                return safePos
+                            end
+                        end
+                    end
+                end
+
+                local bestPosition = currentPosition
+                local maxSafetyScore = 0
+
+                local directions = {}
+                for angle = 0, 315, 30 do
+                    local rad = math.rad(angle)
+                    table.insert(directions, Vector3.new(math.cos(rad), 0, math.sin(rad)))
+                end
+
+                for _, direction in pairs(directions) do
+                    for testDistance = 6, 25, 3 do
+                        local testPosition = currentPosition + (direction * testDistance)
+                        testPosition = Vector3.new(testPosition.X, currentPosition.Y, testPosition.Z)
+
+                        local pathClear, blockedAt = checkPathClear(currentPosition, testPosition)
+
+                        if not pathClear then
+                            if blockedAt then
+                                local safeDistance = (blockedAt - currentPosition).Magnitude
+                                if safeDistance > 3 then
+                                    testPosition = currentPosition + (direction * (safeDistance - 2))
+                                    testPosition = Vector3.new(testPosition.X, currentPosition.Y, testPosition.Z)
+                                    testDistance = safeDistance - 2
+                                else
+                                    break
+                                end
+                            else
+                                break
+                            end
+                        end
+
+                        if not isPositionInArena(testPosition, arena) then
+                            break
+                        end
+
+                        local safetyScore = 0
+                        local minEnemyDistance = math.huge
+
+                        for _, enemy in pairs(allEnemies) do
+                            if enemy.Character and enemy.Character:FindFirstChild("HumanoidRootPart") then
+                                local enemyPos = enemy.Character.HumanoidRootPart.Position
+                                local distanceToEnemy = (testPosition - enemyPos).Magnitude
+
+                                minEnemyDistance = math.min(minEnemyDistance, distanceToEnemy)
+
+                                if enemy == primaryEnemy then
+                                    safetyScore = safetyScore + (distanceToEnemy * 3)
+                                else
+                                    safetyScore = safetyScore + (distanceToEnemy * 1.5)
+                                end
+                            end
+                        end
+
+                        if minEnemyDistance > 12 and minEnemyDistance < 30 then
+                            safetyScore = safetyScore + 25
+                        end
+
+                        if pathClear then
+                            safetyScore = safetyScore + 15
+                        end
+
+                        if testDistance > 8 and testDistance < 20 then
+                            safetyScore = safetyScore + 10
+                        end
+
+                        if safetyScore > maxSafetyScore then
+                            maxSafetyScore = safetyScore
+                            bestPosition = testPosition
+                        end
+                    end
+                end
+
+                local finalCheck, blockedAt = checkPathClear(currentPosition, bestPosition)
+                if not finalCheck then
+                    if blockedAt then
+                        local fallbackDirection = (bestPosition - currentPosition).Unit
+                        for dist = 5, 15, 2 do
+                            local fallbackPos = currentPosition + (fallbackDirection * dist)
+                            fallbackPos = Vector3.new(fallbackPos.X, currentPosition.Y, fallbackPos.Z)
+                            local fallbackCheck, _ = checkPathClear(currentPosition, fallbackPos)
+                            if fallbackCheck and isPositionInArena(fallbackPos, arena) then
+                                return fallbackPos
+                            end
+                        end
+                    end
+                    return currentPosition
+                end
+
+                return bestPosition
+            end
+
+            local function useBombOnEnemy(bombTool, character, targetEnemy)
+                if bombLoop or not bombTool or not character or not targetEnemy or not targetEnemy.Character then
+                    return false
+                end
+
+                local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+                local targetRootPart = targetEnemy.Character:FindFirstChild("HumanoidRootPart")
+                if not humanoidRootPart or not targetRootPart then
+                    return false
+                end
+
+                if not isUsingBomb then
+                    originalPosition = humanoidRootPart.CFrame
+                    isUsingBomb = true
+                end
+
+                local lastTargetCFrame = targetRootPart.CFrame
+                local cframeChangeHistory = {}
+                local maxHistorySize = 3
+
+                local thresholds = {
+                    {limit = 0.5,  offset = 0},
+                    {limit = 1.0,  offset = -7},
+                    {limit = 1.5,  offset = -14},
+                    {limit = 2.0,  offset = -21},
+                    {limit = 3.0,  offset = -27},
+                    {limit = 4.0,  offset = -36},
+                    {limit = math.huge, offset = -43}
+                }
+
+                bombLoop = task.spawn(function()
+                    local bombActivated = false
+                    local attempts = 0
+                    local maxAttempts = 100
+
+                    while EnemyDetection and character:FindFirstChild("Bomb") and attempts < maxAttempts do
+                        attempts += 1
+                        task.wait(0.001)
+                        if not targetRootPart or not humanoidRootPart then break end
+
+                        local currentCFrame = targetRootPart.CFrame
+                        local cframeChange = (currentCFrame.Position - lastTargetCFrame.Position).Magnitude
+
+                        table.insert(cframeChangeHistory, cframeChange)
+                        if #cframeChangeHistory > maxHistorySize then
+                            table.remove(cframeChangeHistory, 1)
+                        end
+
+                        local avgChange = 0
+                        for _, change in ipairs(cframeChangeHistory) do
+                            avgChange += change
+                        end
+                        avgChange = avgChange / #cframeChangeHistory
+
+                        local baseOffset = 0
+                        for _, t in ipairs(thresholds) do
+                            if avgChange <= t.limit then
+                                baseOffset = t.offset
+                                break
+                            end
+                        end
+
+                        local enemyVelocity = targetRootPart.Velocity
+                        local predictionTime = 0.05
+                        local predictedPosition = targetRootPart.Position + (enemyVelocity * predictionTime)
+
+                        local predictedCFrame = CFrame.new(predictedPosition, predictedPosition + targetRootPart.CFrame.LookVector)
+                        local smartBehindPosition = predictedCFrame * CFrame.new(0, 0, baseOffset)
+
+                        local raycastParams = RaycastParams.new()
+                        raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+                        raycastParams.FilterDescendantsInstances = {character, targetEnemy.Character}
+                        local direction = (smartBehindPosition.Position - humanoidRootPart.Position)
+                        local raycastResult = workspace:Raycast(humanoidRootPart.Position, direction.Unit * direction.Magnitude, raycastParams)
+
+                        if raycastResult then
+                            smartBehindPosition = CFrame.new(raycastResult.Position) * CFrame.new(0,0,-1)
+                        end
+
+                        humanoidRootPart.CFrame = smartBehindPosition
+                        lastTargetCFrame = currentCFrame
+
+                        if not bombActivated then
+                            bombActivated = true
+                            task.wait(0.02)
+                        end
+                    end
+
+                    bombLoop = nil
+                    isUsingBomb = false
+                    if originalPosition and humanoidRootPart then
+                        humanoidRootPart.CFrame = originalPosition
+                    end
+                    originalPosition = nil
+                end)
+
+                return true
+            end
+
+            local function startEnemyDetectionLoop()
+                spawn(function()
+                    while EnemyDetection do
+                        task.wait(.0015)
+                        
+                        if not isInGame() then
+                            task.wait(0.2)
+                            continue
+                        end
+                        
+                        local enemies, arenaOfLocalPlayer = detectEnemyPlayers()
+                        
+                        local validEnemies = {}
+                        if arenaOfLocalPlayer then
+                            for _, enemy in pairs(enemies) do
+                                if isPlayerAlive(enemy) and isPlayerOnArenaFloor(enemy, arenaOfLocalPlayer) then
+                                    table.insert(validEnemies, enemy)
+                                end
+                            end
+                        end
+
+                        if #validEnemies > 0 and not isUsingBomb then
+                            local firstValidEnemy = validEnemies[1]
+                            local bombTool, character = findBombTool()
+                            
+                            if bombTool and character then
+                                useBombOnEnemy(bombTool, character, firstValidEnemy)
+                            end
+                        elseif #validEnemies == 0 then
+                            if isUsingBomb and originalPosition then
+                                local character = player.Character
+                                if character and character:FindFirstChild("HumanoidRootPart") then
+                                    originalPosition = nil
+                                    isUsingBomb = false
+                                    if bombLoop then
+                                        bombLoop = nil
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end)
+            end
+
+            local function goToUpAndSpin()
+                spawn(function()
+                    local targetCenter = Vector3.new(116.876785, 47, 34.0727844)
+                    local circleRadius = 30
+                    local circleSpeed = 0.1
+                    local currentAngle = 0
+                    local isAtTarget = false
+                    local emergencyMode = false
+                    
+                    local function touchingLavaCopy(character)
+                        if not character or not character:FindFirstChild("HumanoidRootPart") then return false end
+                        local hrp = character.HumanoidRootPart
+                        local touchingParts = hrp:GetTouchingParts()
+                        for _, part in ipairs(touchingParts) do
+                            if part.Name:sub(1, 8) == "LavaCopy" then
+                                return true
+                            end
+                        end
+                        return false
+                    end
+
+                    local function moveToTargetHeight()
+                        local character = player.Character
+                        if not character or not character:FindFirstChild("HumanoidRootPart") then return false end
+                        
+                        local root = character.HumanoidRootPart
+                        local currentPos = root.Position
+                        
+                        if math.abs(currentPos.Y - targetCenter.Y) < 2 then
+                            isAtTarget = true
+                            return true
+                        end
+                        
+                        root.CFrame = CFrame.new(targetCenter)
+                        isAtTarget = true
+                        
+                        return true
+                    end
+
+                    local function performCircularMovement()
+                        local character = player.Character
+                        if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+                        
+                        local root = character.HumanoidRootPart
+                        currentAngle = currentAngle + circleSpeed
+                        
+                        local x = targetCenter.X + math.cos(currentAngle) * circleRadius
+                        local z = targetCenter.Z + math.sin(currentAngle) * circleRadius
+                        local circlePos = Vector3.new(x, targetCenter.Y, z)
+                        
+                        root.CFrame = CFrame.new(circlePos)
+                    end
+
+                    while SmartEvasion do
+                        task.wait(0.01)
+
+                        if not isInGame() then
+                            task.wait(0.2)
+                            continue
+                        end
+
+                        local character = player.Character
+                        if not character or not character:FindFirstChild("HumanoidRootPart") then
+                            task.wait()
+                            continue
+                        end
+
+                        local humanoidRootPart = character.HumanoidRootPart
+                        local currentPosition = humanoidRootPart.Position
+
+                        if touchingLavaCopy(character) then
+                            emergencyMode = true
+                            humanoidRootPart.CFrame = humanoidRootPart.CFrame + Vector3.new(0, 60, 0)
+                            task.wait(0.1)
+                            continue
+                        end
+
+                        local enemies, currentArena = detectEnemyPlayers()
+                        local enemiesWithBombs = getEnemiesWithBombs(enemies)
+
+                        if #enemiesWithBombs > 0 and not isUsingBomb then
+                            emergencyMode = false
+                            
+                            if not isAtTarget then
+                                moveToTargetHeight()
+                            else
+                                performCircularMovement()
+                            end
+                        else
+                            emergencyMode = false
+                        end
+                    end
+                end)
+            end
+
+            local function handlePlayerEvasion()
+                spawn(function()
+                    local lastEvasionTime = 0
+                    local emergencyMode = false
+                    local lastKnownEnemyPositions = {}
+                    local lastSafePos = nil
+                    local stuckCheckTime = tick()
+
+                    local function touchingLavaCopy(character)
+                        if not character or not character:FindFirstChild("HumanoidRootPart") then return false end
+                        local hrp = character.HumanoidRootPart
+                        local touchingParts = hrp:GetTouchingParts()
+                        for _, part in ipairs(touchingParts) do
+                            if part.Name:sub(1, 8) == "LavaCopy" then
+                                return true
+                            end
+                        end
+                        return false
+                    end
+
+                    while SmartEvasion do
+                        task.wait()
+
+                        if not isInGame() then
+                            task.wait(0.2)
+                            continue
+                        end
+
+                        local character = player.Character
+                        if not character or not character:FindFirstChild("HumanoidRootPart") then
+                            task.wait()
+                            continue
+                        end
+
+                        local humanoidRootPart = character.HumanoidRootPart
+                        local currentPosition = humanoidRootPart.Position
+                        local currentTime = tick()
+
+                        if touchingLavaCopy(character) then
+                            emergencyMode = true
+                            humanoidRootPart.CFrame = humanoidRootPart.CFrame + Vector3.new(0, 20, 0)
+                            task.wait(0.2)
+                            continue
+                        end
+
+                        local enemies, currentArena = detectEnemyPlayers()
+                        local enemiesWithBombs = getEnemiesWithBombs(enemies)
+
+                        if #enemiesWithBombs > 0 and not isUsingBomb then
+                            local mostDangerousEnemy = nil
+                            local closestDistance = math.huge
+                            local highestThreat = 0
+
+                            for _, enemy in pairs(enemiesWithBombs) do
+                                if enemy.Character and enemy.Character:FindFirstChild("HumanoidRootPart") then
+                                    local enemyPos = enemy.Character.HumanoidRootPart.Position
+                                    local distance = (currentPosition - enemyPos).Magnitude
+
+                                    local enemyVelocity = Vector3.new(0, 0, 0)
+                                    if lastKnownEnemyPositions[enemy.UserId] then
+                                        local lastPos = lastKnownEnemyPositions[enemy.UserId].position
+                                        local timeDiff = currentTime - lastKnownEnemyPositions[enemy.UserId].time
+                                        if timeDiff > 0 then
+                                            enemyVelocity = (enemyPos - lastPos) / timeDiff
+                                        end
+                                    end
+
+                                    lastKnownEnemyPositions[enemy.UserId] = {
+                                        position = enemyPos,
+                                        time = currentTime
+                                    }
+
+                                    local speed = enemyVelocity.Magnitude
+                                    local directionToMe = (currentPosition - enemyPos).Unit
+                                    local enemyDirection = enemyVelocity.Unit
+
+                                    local threatLevel = 0
+
+                                    if distance < 60 then
+                                        threatLevel = threatLevel + (60 - distance) * 2
+                                    end
+
+                                    if speed > 16 then 
+                                        threatLevel = threatLevel + speed * 2
+                                    end
+
+                                    if speed > 5 then
+                                        local dotProduct = enemyDirection:Dot(directionToMe)
+                                        if dotProduct > 0.7 then
+                                            threatLevel = threatLevel + 50
+                                            emergencyMode = true
+                                        elseif dotProduct > 0.3 then 
+                                            threatLevel = threatLevel + 25
+                                        end
+                                    end
+
+                                    if threatLevel > highestThreat or (threatLevel > 20 and distance < closestDistance) then
+                                        mostDangerousEnemy = enemy
+                                        highestThreat = threatLevel
+                                        closestDistance = distance
+                                    end
+                                end
+                            end
+
+                            if mostDangerousEnemy and (highestThreat > 10 or emergencyMode) then
+                                local safePosition = findUltimateEscapePosition(currentPosition, mostDangerousEnemy, enemiesWithBombs, currentArena)
+
+                                if safePosition then
+                                    local moveDistance = (safePosition - currentPosition).Magnitude
+                                    if moveDistance > 3 then
+                                        local steps = 8
+                                        for i = 1, steps do
+                                            if not SmartEvasion then break end
+                                            local alpha = i / steps
+                                            local newPos = currentPosition:Lerp(safePosition, alpha)
+                                            humanoidRootPart.CFrame = CFrame.new(newPos, newPos + (safePosition - currentPosition).Unit)
+                                            task.wait(0.02)
+                                        end
+                                    end
+
+                                    if lastSafePos then
+                                        local moved = (currentPosition - lastSafePos).Magnitude
+                                        if moved < 2 and (currentTime - stuckCheckTime) > 1 then
+                                            humanoidRootPart.CFrame = CFrame.new(safePosition + Vector3.new(0, 2, 0))
+                                            stuckCheckTime = currentTime
+                                        end
+                                    end
+                                    lastSafePos = humanoidRootPart.Position
+                                end
+                            end
+                        else
+                            emergencyMode = false
+                            lastKnownEnemyPositions = {}
+                        end
+                    end
+                end)
+            end
+
+            local function startEvasionLoop(EvasionMode)
+                if evasionConnection then evasionConnection:Disconnect() end
+                if spinConnection then spinConnection:Disconnect() end
+
+                if EvasionMode == "Player Evasion" then
+                    handlePlayerEvasion()
+                elseif EvasionMode == "Go to Up + Spin" then
+                    goToUpAndSpin()
+                end
+            end
+
+            local function findLavaInWorkspace(parent)
+                local lavaObjects = {}
+                
+                for _, child in pairs(parent:GetChildren()) do
+                    if child.Name == "Lava" then
+                        table.insert(lavaObjects, child)
+                    end
+                    
+                    if #child:GetChildren() > 0 then
+                        local subLava = findLavaInWorkspace(child)
+                        for _, lava in pairs(subLava) do
+                            table.insert(lavaObjects, lava)
+                        end
+                    end
+                end
+                
+                return lavaObjects
+            end
+
+            local function copyLavaObject(originalLava)
+                local copy = originalLava:Clone()
+                copy.Transparency = 1
+                copy.Name = "LavaCopy_" .. originalLava.Name .. "_" .. tostring(originalLava:GetDebugId())
+                
+                local originalPosition = originalLava.Position
+                copy.Position = Vector3.new(originalPosition.X, originalPosition.Y + 1, originalPosition.Z)
+                
+                copy.Parent = workspace
+                copy.CanCollide = true
+                
+                local lavaId = tostring(originalLava:GetDebugId())
+                copiedLavaObjects[lavaId] = {original = originalLava, copy = copy}
+                lavaDataCache[lavaId] = {
+                    position = originalPosition,
+                    size = originalLava.Size
+                }
+                
+                return copy
+            end
+
+            local function cleanupCopiedLava()
+                for _, lavaData in pairs(copiedLavaObjects) do
+                    if lavaData.copy and lavaData.copy.Parent then
+                        lavaData.copy:Destroy()
+                    end
+                end
+                
+                for _, obj in pairs(workspace:GetChildren()) do
+                    if obj.Name:find("LavaCopy_") then
+                        obj:Destroy()
+                    end
+                end
+                
+                copiedLavaObjects = {}
+                lavaDataCache = {}
+            end
+
+            local function updateLavaCopy(lavaId, originalLava)
+                local lavaData = copiedLavaObjects[lavaId]
+                if lavaData and lavaData.copy and lavaData.copy.Parent then
+                    local newPosition = originalLava.Position
+                    lavaData.copy.Position = Vector3.new(newPosition.X, newPosition.Y + 3, newPosition.Z)
+                    lavaData.copy.Size = originalLava.Size
+                    
+                    lavaDataCache[lavaId] = {
+                        position = newPosition,
+                        size = originalLava.Size
+                    }
+                end
+            end
+
+            local function hasLavaChanged(lavaId, currentLava)
+                local cachedData = lavaDataCache[lavaId]
+                if not cachedData then return true end
+                
+                local positionChanged = (cachedData.position - currentLava.Position).Magnitude > 0.1
+                local sizeChanged = (cachedData.size - currentLava.Size).Magnitude > 0.1
+                
+                return positionChanged or sizeChanged
+            end
+
+            local function startLavaCopyLoop()
+                spawn(function()
+                    while AutoLavaCopy do 
+                        task.wait(.3)
+
+                        if not AutoLavaCopy then break end
+
+                        local lavaObjects = findLavaInWorkspace(workspace)
+                        
+                        for _, lava in pairs(lavaObjects) do
+                            if not AutoLavaCopy then break end
+
+                            local lavaId = tostring(lava:GetDebugId())
+                            local alreadyCopied = copiedLavaObjects[lavaId] ~= nil
+                            
+                            if not alreadyCopied then
+                                copyLavaObject(lava)
+                            elseif hasLavaChanged(lavaId, lava) then
+                                updateLavaCopy(lavaId, lava)
+                            end
+                        end
+                    end
+                end)
+            end
+
+            local function disableIce()
+                if workspace.Arenas and workspace.Arenas:FindFirstChild("Arena5ICED") then
+                    local arena = workspace.Arenas.Arena5ICED
+                    if arena:FindFirstChild("Map") and arena.Map:FindFirstChild("Ice") then
+                        arena.Map.Ice.CustomPhysicalProperties = PhysicalProperties.new(0, 0, 0)
+                        WindUI:Notify({
+                            Title = _G.SelectedLanguage == "Arabic" and "تم تعطيل الجليد" or "Ice disabled",
+                            Content = _G.SelectedLanguage == "Arabic" and "الجليد ما راح يسبب تزحلق" or "Ice won't cause sliding",
+                            Duration = 3
+                        })
+                    end
+                end
+            end
+
+            -- زر كشف عدو أوتو بومب
+            Tabs.ProXFeatures:Toggle({
+                Title = T("autoPassBomb"),
+                Desc = T("autoPassBombDesc"),
+                Value = false,
+                Size = "xlarge",
+                Callback = function(state)
+                    EnemyDetection = state
+                    if state then
+                        startEnemyDetectionLoop()
+                        WindUI:Notify({
+                            Title = _G.SelectedLanguage == "Arabic" and "تم تفعيل كشف الأعداء" or "Enemy detection enabled",
+                            Content = "",
+                            Duration = 3
+                        })
+                    else
+                        if bombLoop then
+                            bombLoop = nil
+                        end
+                        isUsingBomb = false
+                        originalPosition = nil
+                        WindUI:Notify({
+                            Title = _G.SelectedLanguage == "Arabic" and "تم إيقاف كشف الأعداء" or "Enemy detection disabled",
+                            Content ="",
+                            Duration = 3
+                        })
+                    end
+                end
+            })
+
+            -- زر طريقة الهروب
+            local EvasionMode = "Player Evasion"
+            
+            Tabs.ProXFeatures:Dropdown({
+                Title = T("evasionMethod"),
+                Values = {"Player Evasion", "Go to Up + Spin"},
+                Value = "Player Evasion",
+                Size = "xlarge",
+                Callback = function(value)
+                    EvasionMode = value
+                    if SmartEvasion then
+                        startEvasionLoop(EvasionMode)
+                    end
+                end
+            })
+
+            -- زر نظام الهروب من القنبلة
+            Tabs.ProXFeatures:Toggle({
+                Title = T("bombEvasion"),
+                Desc = T("bombEvasionDesc"),
+                Value = false,
+                Size = "xlarge",
+                Callback = function(state)
+                    SmartEvasion = state
+                    if state then
+                        startEvasionLoop(EvasionMode)
+                        WindUI:Notify({
+                            Title = _G.SelectedLanguage == "Arabic" and "تم تفعيل نظام الهروب" or "Evasion system enabled",
+                            Content = _G.SelectedLanguage == "Arabic" and "بيبدأ بالهروب من اللاعبين اللي عندهم قنبلة" or "Will escape from players with bomb",
+                            Duration = 3
+                        })
+                    else
+                        if evasionConnection then evasionConnection:Disconnect() end
+                        if spinConnection then spinConnection:Disconnect() end
+                        WindUI:Notify({
+                            Title = _G.SelectedLanguage == "Arabic" and "تم إيقاف نظام الهروب" or "Evasion system disabled",
+                            Content = _G.SelectedLanguage == "Arabic" and "توقف نظام الهروب من القنابل" or "Stopped bomb evasion system",
+                            Duration = 3
+                        })
+                    end
+                end
+            })
+
+            -- زر FakeLag (فيك لاق)
+            Tabs.ProXFeatures:Button({
+                Title = T("fakeLag"),
+                Icon = "wifi-off",
+                Size = "xlarge",
+                Callback = function()
+                    WindUI:Notify({
+                        Title = _G.SelectedLanguage == "Arabic" and "جاري تحميل FakeLag" or "Loading FakeLag",
+                        Content = _G.SelectedLanguage == "Arabic" and "بيظهر لك نافذة التحكم" or "Control window will appear",
+                        Duration = 3
+                    })
+                    
+                    local Players = game:GetService("Players")
+                    local RunService = game:GetService("RunService")
+                    local UserInputService = game:GetService("UserInputService")
+                    local LocalPlayer = Players.LocalPlayer
+
+                    local FL = {
+                        enabled = false,
+                        delay = 2,
+                        realChar = nil,
+                        ghost = nil,
+                        hrp = nil,
+                        defaultSpeed = nil
+                    }
+
+                    local screenGui = Instance.new("ScreenGui")
+                    screenGui.Name = "PhantomXFakeLagGUI"
+                    screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+                    screenGui.ResetOnSpawn = false
+
+                    local frame = Instance.new("Frame")
+                    frame.Size = UDim2.new(0, 250, 0, 150)
+                    frame.Position = UDim2.new(0.5, -125, 0.5, -75)
+                    frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+                    frame.BorderSizePixel = 0
+                    frame.Active = true
+                    frame.Draggable = true
+                    frame.Parent = screenGui
+                    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 8)
+
+                    local title = Instance.new("TextLabel")
+                    title.Size = UDim2.new(1, 0, 0, 30)
+                    title.Position = UDim2.new(0, 0, 0, 0)
+                    title.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+                    title.Text = "🎭 PhantomX FakeLag"
+                    title.Font = Enum.Font.GothamBold
+                    title.TextSize = 16
+                    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+                    title.Parent = frame
+                    Instance.new("UICorner", title).CornerRadius = UDim.new(0, 8)
+
+                    local closeBtn = Instance.new("TextButton")
+                    closeBtn.Size = UDim2.new(0, 30, 0, 30)
+                    closeBtn.Position = UDim2.new(1, -35, 0, 5)
+                    closeBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+                    closeBtn.Text = "✖"
+                    closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+                    closeBtn.Font = Enum.Font.GothamBold
+                    closeBtn.TextSize = 14
+                    closeBtn.Parent = frame
+                    Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0,5)
+                    closeBtn.MouseButton1Click:Connect(function()
+                        screenGui:Destroy()
+                        FL.enabled = false
+                    end)
+
+                    local toggleBtn = Instance.new("TextButton")
+                    toggleBtn.Size = UDim2.new(1, -20, 0, 30)
+                    toggleBtn.Position = UDim2.new(0, 10, 0, 40)
+                    toggleBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+                    toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+                    toggleBtn.Font = Enum.Font.Gotham
+                    toggleBtn.TextSize = 14
+                    toggleBtn.Text = _G.SelectedLanguage == "Arabic" and "تشغيل الفيك لاق" or "Enable FakeLag"
+                    toggleBtn.Parent = frame
+                    Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0,5)
+
+                    local delayBox = Instance.new("TextBox")
+                    delayBox.Size = UDim2.new(1, -20, 0, 30)
+                    delayBox.Position = UDim2.new(0, 10, 0, 80)
+                    delayBox.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+                    delayBox.PlaceholderText = _G.SelectedLanguage == "Arabic" and "التأخير (بالثواني)" or "Delay (seconds)"
+                    delayBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+                    delayBox.Font = Enum.Font.Gotham
+                    delayBox.TextSize = 14
+                    delayBox.Text = tostring(FL.delay)
+                    delayBox.Parent = frame
+                    Instance.new("UICorner", delayBox).CornerRadius = UDim.new(0,5)
+
+                    local status = Instance.new("TextLabel")
+                    status.Size = UDim2.new(1, -20, 0, 20)
+                    status.Position = UDim2.new(0, 10, 0, 120)
+                    status.BackgroundTransparency = 1
+                    status.Font = Enum.Font.Gotham
+                    status.TextSize = 12
+                    status.TextColor3 = Color3.fromRGB(190, 190, 195)
+                    status.Text = _G.SelectedLanguage == "Arabic" and "الحالة: متوقف" or "Status: Stopped"
+                    status.Parent = frame
+
+                    local function createGhost()
+                        if FL.realChar and FL.realChar.PrimaryPart then
+                            local success, ghost = pcall(function()
+                                return FL.realChar:Clone()
+                            end)
+                            if success and ghost then
+                                for _,desc in ipairs(ghost:GetDescendants()) do
+                                    if desc:IsA("BasePart") then
+                                        desc.Anchored = true
+                                        desc.Transparency = 0.5
+                                        desc.CanCollide = false
+                                    elseif desc:IsA("Humanoid") then
+                                        desc.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+                                    end
+                                end
+                                ghost.Parent = workspace
+                                FL.ghost = ghost
+                            end
+                        end
+                    end
+
+                    local function removeGhost()
+                        if FL.ghost then
+                            FL.ghost:Destroy()
+                            FL.ghost = nil
+                        end
+                    end
+
+                    local function fakeLagLoop()
+                        task.spawn(function()
+                            while FL.enabled do
+                                local char = LocalPlayer.Character
+                                local hum = char and char:FindFirstChildOfClass("Humanoid")
+                                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                                if not char or not hum or not hrp then
+                                    task.wait(0.05)
+                                    continue
+                                end
+
+                                status.Text = _G.SelectedLanguage == "Arabic" and "الحالة: متجمد..." or "Status: Frozen..."
+                                hrp.Anchored = true
+                                hum.PlatformStand = false
+                                task.wait(0.5)
+
+                                status.Text = _G.SelectedLanguage == "Arabic" and "الحالة: شغال..." or "Status: Running..."
+                                hrp.Anchored = false
+                                hum.WalkSpeed = FL.defaultSpeed or hum.WalkSpeed
+                                local freeTime = math.max(FL.delay - 0.5, 0)
+                                local start = tick()
+                                while FL.enabled and (tick() - start < freeTime) do
+                                    task.wait(0.05)
+                                end
+                            end
+
+                            local char = LocalPlayer.Character
+                            local hum = char and char:FindFirstChildOfClass("Humanoid")
+                            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                            if hum and FL.defaultSpeed then hum.WalkSpeed = FL.defaultSpeed end
+                            if hrp then hrp.Anchored = false end
+                            status.Text = _G.SelectedLanguage == "Arabic" and "الحالة: متوقف" or "Status: Stopped"
+                        end)
+                    end
+
+                    toggleBtn.MouseButton1Click:Connect(function()
+                        FL.enabled = not FL.enabled
+                        toggleBtn.Text = FL.enabled and 
+                            (_G.SelectedLanguage == "Arabic" and "ايقاف الفيك لاق" or "Disable FakeLag") or 
+                            (_G.SelectedLanguage == "Arabic" and "تشغيل الفيك لاق" or "Enable FakeLag")
+                        toggleBtn.BackgroundColor3 = FL.enabled and Color3.fromRGB(255, 60, 60) or Color3.fromRGB(45, 45, 45)
+
+                        if FL.enabled then
+                            FL.realChar = LocalPlayer.Character
+                            if FL.realChar then
+                                local hum = FL.realChar:FindFirstChildOfClass("Humanoid")
+                                FL.hrp = FL.realChar:FindFirstChild("HumanoidRootPart")
+                                if hum then
+                                    FL.defaultSpeed = hum.WalkSpeed
+                                end
+                                if FL.hrp then
+                                    createGhost()
+                                    fakeLagLoop()
+                                    status.Text = _G.SelectedLanguage == "Arabic" and "الحالة: شغال..." or "Status: Running..."
+                                end
+                            end
+                        else
+                            if FL.hrp then FL.hrp.Anchored = false end
+                            local char = LocalPlayer.Character
+                            local hum = char and char:FindFirstChildOfClass("Humanoid")
+                            if hum and FL.defaultSpeed then hum.WalkSpeed = FL.defaultSpeed end
+                            removeGhost()
+                            status.Text = _G.SelectedLanguage == "Arabic" and "الحالة: متوقف" or "Status: Stopped"
+                        end
+                    end)
+
+                    delayBox.FocusLost:Connect(function()
+                        local val = tonumber(delayBox.Text)
+                        if val and val > 0 then
+                            FL.delay = val
+                            WindUI:Notify({
+                                Title = _G.SelectedLanguage == "Arabic" and "تم تغيير التأخير" or "Delay changed",
+                                Content = _G.SelectedLanguage == "Arabic" and "التأخير الجديد: " .. val .. " ثانية" or "New delay: " .. val .. " seconds",
+                                Duration = 3
+                            })
+                        else
+                            delayBox.Text = tostring(FL.delay)
+                        end
+                    end)
+
+                    UserInputService.InputBegan:Connect(function(input, gpe)
+                        if not gpe and input.KeyCode == Enum.KeyCode.L then
+                            toggleBtn:Activate()
+                        end
+                    end)
+
+                    Window:OnDestroy(function()
+                        if screenGui then
+                            screenGui:Destroy()
+                        end
+                        FL.enabled = false
+                    end)
+                end
+            })
+
+            -- زر مضاد نار
+            Tabs.ProXFeatures:Toggle({
+                Title = T("antiFire"),
+                Desc = T("antiFireDesc"),
+                Value = false,
+                Size = "xlarge",
+                Callback = function(state)
+                    AutoLavaCopy = state
+                    if state then
+                        startLavaCopyLoop()
+                        WindUI:Notify({
+                            Title = _G.SelectedLanguage == "Arabic" and "تم تفعيل مضاد النار" or "Anti-fire enabled",
+                            Content = "",
+                            Duration = 3
+                        })
+                    else
+                        AutoLavaCopy = false
+                        cleanupCopiedLava()
+                        WindUI:Notify({
+                            Title = _G.SelectedLanguage == "Arabic" and "تم إيقاف مضاد النار" or "Anti-fire disabled",
+                            Content = "",
+                            Duration = 3
+                        })
+                    end
+                end
+            })
+
+            -- زر منع تزحلق
+            Tabs.ProXFeatures:Button({
+                Title = T("antiIce"),
+                Icon = "snowflake",
+                Size = "xlarge",
+                Callback = function()
+                    disableIce()
+                end
+            })
+
+            Tabs.ProXFeatures:Divider({Title = ""})
+
+            Tabs.ProXFeatures:Paragraph({
+                Title = T("warningText"),
+                Desc = T("warningDesc"),
+                Image = "alert-triangle",
+                ImageSize = 28,
+                Color = Color3.fromRGB(100, 100, 225)
+            })
+        end
+
+        -- =============================================
+        -- تبويب الإعدادات
+        -- =============================================
+        do
+            Tabs.Config:Paragraph({
+                Title = T("scriptSettings"),
+                Desc = T("scriptDesc"),
+                Image = "settings",
+                ImageSize = 28,
+                Color = "White"
+            })
+
+            Tabs.Config:Dropdown({
+                Title = T("selectTheme"),
+                Values = {"داكن 🌙", "فاتح ☀️", "أزرق 🔵", "أخضر 💚", "أحمر 🔴"},
+                Value = "داكن 🌙",
+                Size = "xlarge",
+                Callback = function(value)
+                    local themeMap = {
+                        ["داكن 🌙"] = "Dark",
+                        ["فاتح ☀️"] = "Light", 
+                        ["أزرق 🔵"] = "Sapphire",
+                        ["أخضر 💚"] = "Emerald",
+                        ["أحمر 🔴"] = "Ruby"
+                    }
+                    WindUI:SetTheme(themeMap[value] or "Dark")
+                end
+            })
+            
+            -- زر تغيير اللغة في الإعدادات
+            Tabs.Config:Button({
+                Title = T("changeLanguage"),
+                Icon = "refresh-cw",
+                Size = "xlarge",
+                Callback = function()
+                    WindUI:Notify({
+                        Title = T("notification"),
+                        Content = T("languageChanged"),
+                        Duration = 3
+                    })
+                    
+                    task.wait(1)
+                    
+                    -- تغيير اللغة
+                    if _G.SelectedLanguage == "Arabic" then
+                        _G.SelectedLanguage = "English"
+                    else
+                        _G.SelectedLanguage = "Arabic"
+                    end
+                    
+                    -- إغلاق النافذة وإعادة التشغيل
+                    Window:Destroy()
+                    cleanupGUI()
+                    task.wait(1)
+                    createMainScript()
+                end
+            })
+
+            Tabs.Config:Button({
+                Title = T("updateScript"),
+                Icon = "refresh-cw",
+                Size = "xlarge",
+                Callback = function()
+                    WindUI:Notify({
+                        Title = _G.SelectedLanguage == "Arabic" and "جاري التحديث" or "Updating",
+                        Content = _G.SelectedLanguage == "Arabic" and "بيتم إعادة تحميل السكربت..." or "Reloading script...",
+                        Duration = 3
+                    })
+                    
+                    wait(2)
+                    
+                    loadstring(game:HttpGet("https://raw.githubusercontent.com/AlphaBay00/Test/main/Faq.txt"))()
+                end
+            })
+
+            Tabs.Config:Button({
+                Title = T("closeScript"),
+                Icon = "power",
+                Size = "xlarge",
+                Callback = function()
+                    if autoJoinConnection then
+                        autoJoinConnection:Disconnect()
+                    end
+                    removeArenaESP()
+                    Window:Destroy()
+                    cleanupGUI()
+                    WindUI:Notify({
+                        Title = T("notification"),
+                        Content = T("scriptClosed"),
+                        Duration = 2
+                    })
+                end
+            })
+        end
+
+-- =============================================
+-- تبويب المطور
+-- =============================================
+do
+    Tabs.Credits:Paragraph({
+        Title = T("developerName"),
+        Desc = T("developerDesc"),
+        Image = "user",
+        ImageSize = 80,
+        Color = Color3.fromHex("#FF6B35")
+    })
+
+    Tabs.Credits:Button({
+        Title = T("joinDiscord"),
+        Icon = "message-circle",
+        Size = "xlarge",
+        Callback = function()
+            setclipboard("https://discord.gg/Mvf8PahjRQ")
+            WindUI:Notify({
+                Title = T("notification"),
+                Content = _G.SelectedLanguage == "Arabic" and "تم نسخ الرابط" or "Link copied",
+                Duration = 2
+            })
+        end
+    })
+
+    Tabs.Credits:Button({
+        Title = T("version"),
+        Icon = "tag",
+        Size = "xlarge",
+        Callback = function() end
+    })
+
+    Tabs.Credits:Button({
+        Title = T("contactDev"),
+        Icon = "mail",
+        Size = "xlarge",
+        Callback = function()
+            setclipboard("cypherclient")
+            WindUI:Notify({
+                Title = T("notification"),
+                Content = _G.SelectedLanguage == "Arabic" and "تم نسخ يوزر المطور" or "Developer username copied",
+                Duration = 2
+            })
+        end
+    })
+    
+    -- قسم التحديثات الجديدة
+    Tabs.Credits:Divider({Title = ""})
+    
+    Tabs.Credits:Paragraph({
+        Title = _G.SelectedLanguage == "Arabic" and "📝 التحديثات الجديدة" or "📝 Latest Updates",
+        Desc = _G.SelectedLanguage == "Arabic" and 
+            "✅ تمت إضافة الميزات التالية:\n\n" ..
+            "• زر تثبيت الأوتو 🎯\n" ..
+            "• منع الانزلاق على الجليد ❄️\n" ..
+            "• تحسينات في الأداء ⚡\n" ..
+            "• نافذة التحديثات الجديدة ✨" or
+            "✅ Added the following features:\n\n" ..
+            "• Pin Auto Button 🎯\n" ..
+            "• Anti Ice Sliding ❄️\n" ..
+            "• Performance Improvements ⚡\n" ..
+            "• New Updates Popup ✨",
+        Image = "zap",
+        ImageSize = 28,
+        Color = Color3.fromHex("#00FFAA")
+    })
+end
+
+        -- التنظيف عند الإغلاق
+        Window:OnDestroy(function()
+            if speedConnection then speedConnection:Disconnect() end
+            if CFloop then CFloop:Disconnect() end
+            if autoFollowGUI then autoFollowGUI:Destroy() end
+            if autoJoinConnection then autoJoinConnection:Disconnect() end
+            
+            if fpsBoostActive then
+                Lighting.GlobalShadows = true
+                settings().Rendering.QualityLevel = Enum.QualityLevel.Automatic
+            end
+            
+            if EnemyDetection and bombLoop then
+                bombLoop = nil
+            end
+            if SmartEvasion then
+                if evasionConnection then evasionConnection:Disconnect() end
+                if spinConnection then spinConnection:Disconnect() end
+            end
+            if AutoLavaCopy then
+                cleanupCopiedLava()
+            end
+        end)
+
+        -- إشعار الترحيب
+        task.wait(4)
+        WindUI:Notify({
+            Title = T("welcome"),
+            Content = _G.SelectedLanguage == "Arabic" 
+                and "السكربت شغّال وجاهز للاستخدام!\nتمتع بمميزاتنا الحصرية 🚀" 
+                or "Script is running and ready!\nEnjoy our exclusive features 🚀",
+            Duration = 6
+        })
+        
+        -- تحذير أمان بعد 5 ثواني
+        wait(5)
+        
+        -- إضافة تحذير في تبويب ProX Features
+        local success, _ = pcall(function()
+            if Tabs and Tabs.ProXFeatures then
+                Tabs.ProXFeatures:Paragraph({
+                    Title = _G.SelectedLanguage == "Arabic" and "🚨 تحذير أمان" or "🚨 Security Warning",
+                    Desc = _G.SelectedLanguage == "Arabic" 
+                        and "Auto Pass Bomb: ⛔ ممنوع في ماب النط!\nاستخدامه هناك يؤدي لحظر مؤكد."
+                        or "Auto Pass Bomb: ⛔ Forbidden in jump maps!\nUsing it there leads to guaranteed ban.",
+                    Image = "shield-alert",
+                    Color = Color3.fromRGB(255, 50, 50)
+                })
+            end
+        end)
+        
+        -- إشعار تحذيري
+        WindUI:Notify({
+            Title = _G.SelectedLanguage == "Arabic" and "تنبيه هام" or "Important Alert",
+            Content = _G.SelectedLanguage == "Arabic" 
+                and "راجع تحذيرات الأمان في تبويب ProX Features"
+                or "Check security warnings in ProX Features tab",
+            Duration = 6
+        })
+        
+    end
+else
+    print("Failed to load WindUI")
+end
+print("Done")
