@@ -7,7 +7,6 @@
 --
 --   Obfuscate By Cypher
 --
---   wrapper v5.0
 local p,q,r,s,u=string.sub,string.byte,string.char,table.concat,string.reverse
 local G=(getgenv and getgenv()) or _G
 local LN=r(108,111,97,100,115,116,114,105,110,103)
